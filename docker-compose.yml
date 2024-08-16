@@ -4,7 +4,7 @@ services:
   web:
     build: .
     ports:
-      - "8000:8000"
+      - "8080:80"
     depends_on:
       - redis
     environment:
@@ -12,6 +12,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: ["redis-server", "--appendonly", "yes"]
+    command: [ "redis-server", "--appendonly", "yes" ]
     ports:
       - "6379:6379"
