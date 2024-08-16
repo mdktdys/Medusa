@@ -24,9 +24,7 @@
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="f8f5d409-de27-45e6-99e2-4e446f6577b8" object-ref="consoles/Zameny" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
     <connection id="f8f5d409-de27-45e6-99e2-4e446f6577b8" />
