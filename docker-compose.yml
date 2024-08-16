@@ -2,16 +2,11 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    image: nginx:latest
     ports:
       - "3000:80"
-    depends_on:
-      - redis
-    environment:
-      REDIS_URL: redis://redis:6379
 
   redis:
     image: redis:7-alpine
-    command: [ "redis-server", "--appendonly", "yes" ]
     ports:
       - "6379:6379"
