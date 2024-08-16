@@ -22,4 +22,4 @@ jobs:
 
       - name: Deploy with Docker Compose
         run: |
-          sshpass -p "${{ secrets.VDS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VDS_USER }}@${{ secrets.VDS_HOST }} "cd /medusa && docker-compose up --build -d"
+          sshpass -p "${{ secrets.VDS_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.VDS_USER }}@${{ secrets.VDS_HOST }} "cd medusa && docker-compose up --build -d"
