@@ -18,7 +18,7 @@ jobs:
 
       - name: Copy files to VDS
         run: |
-          sshpass -p "${{ secrets.VDS_PASSWORD }}" scp -o StrictHostKeyChecking=no -r ./* ${{ secrets.VDS_USER }}@${{ secrets.VDS_HOST }}:/medusa
+          sshpass -p "${{ secrets.VDS_PASSWORD }}" scp -o StrictHostKeyChecking=no -r ./* ${{ secrets.VDS_USER }}@${{ secrets.VDS_HOST }}:/
 
       - name: Deploy with Docker Compose
         run: |
