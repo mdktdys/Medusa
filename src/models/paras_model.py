@@ -2,15 +2,39 @@ import datetime
 
 
 class Paras:
-    def __init__(self, id: int, group_id: int, number_para: int, course_id: int, teacher_id: int, cabinet_id: int,
-                 date: datetime.date):
+    id: int
+    group: int
+    number: int
+    course: int
+    teacher: int
+    cabinet: int
+    date: datetime
+
+    def __init__(
+        self,
+        id: int,
+        group: int,
+        number: int,
+        course: int,
+        teacher: int,
+        cabinet: int,
+        date: datetime.date,
+    ):
         self.id = id
-        self.group_id = group_id
-        self.number_para = number_para
-        self.course_id = course_id
-        self.teacher_id = teacher_id
-        self.cabinet_id = cabinet_id
+        self.group = group
+        self.number = number
+        self.course = course
+        self.teacher = teacher
+        self.cabinet = cabinet
         self.date = date
 
     def toDict(self) -> dict:
-        return {'id':self.id,'group':self.group_id,'number':self.number_para,'course':self.course_id,'teacher':self.teacher_id,'cabinet':self.cabinet_id,'date':self.date.strftime("%Y-%m-%d")}
+        return {
+            "id": self.id,
+            "group": self.group,
+            "number": self.number,
+            "course": self.course,
+            "teacher": self.teacher,
+            "cabinet": self.cabinet,
+            "date": self.date.strftime("%Y-%m-%d"),
+        }
