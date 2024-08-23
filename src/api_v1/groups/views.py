@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
@@ -17,23 +18,36 @@ async def get_groups(session: AsyncSession = Depends(db_helper.session_dependenc
     return await crud.get_groups(session=session)
 
 
-@router.get("/id/{group_id}/{date}", response_model=list[Group])
+@router.get("/id/{group_id}/", response_model=list[Group])
 @cache(expire=60)
 async def get_group_by_id(
     group_id: int = -1,
-    date: datetime = datetime.now(),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    return await crud.get_group_by_id(session=session, group_id=group_id, date=date)
+    return await crud.get_group_by_id(session=session, group_id=group_id)
 
 
 @router.get("/day_schedule/{group_id}/{date}/", response_model=DaySchedule)
 @cache(expire=60)
-async def get_group_shedule_by_date(
+async def get_group_day_schedule_by_date(
     group_id: int = -1,
     date: datetime = datetime.now(),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    return await crud.get_group_shedule_by_date(
+    return await crud.get_group_day_sсhedule_by_date(
         session=session, group_id=group_id, date=date
+    )
+
+
+@router.get(
+    "/week_schedule/{group_id}/{monday_date}/", response_model=List[DaySchedule]
+)
+@cache(expire=60)
+async def get_group_week_schedule_by_date(
+    group_id: int = -1,
+    monday_date: datetime = datetime.now(),
+    session: AsyncSession = Depends(db_helper.session_dependency),
+):
+    return await crud.get_group_week_sсhedule(
+        session=session, group_id=group_id, monday_date=monday_date
     )

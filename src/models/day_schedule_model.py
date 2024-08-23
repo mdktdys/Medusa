@@ -4,7 +4,7 @@ from src.models.paras_model import Paras
 
 
 class Para:
-    origin: Paras
+    origin: Paras | None = None
     zamena: Paras | None = None
 
     def __init__(self, origin, zamena):
