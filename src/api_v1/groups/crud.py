@@ -28,7 +28,7 @@ async def get_group_by_id(session: AsyncSession, group_id: int) -> list[AlchemyG
     return list(result.scalars().all())
 
 
-async def get_group_schedule_by_date(
+async def get_group_day_sсhedule_by_date(
     session: AsyncSession, group_id: int, date: datetime
 ) -> DaySchedule:
 
@@ -57,7 +57,7 @@ async def get_group_schedule_by_date(
     return res
 
 
-async def get_group_week_sсhedule(
+async def get_group_week_schedule_by_date(
     session: AsyncSession, group_id: int, monday_date: datetime
 ) -> List[DaySchedule]:
 

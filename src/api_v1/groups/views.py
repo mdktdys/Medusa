@@ -29,7 +29,7 @@ async def get_group_by_id(
 
 @router.get("/day_schedule/{group_id}/{date}/", response_model=DaySchedule)
 @cache(expire=60)
-async def get_group_day_schedule_by_date(
+async def get_group_day_sсhedule_by_date(
     group_id: int = -1,
     date: datetime = datetime.now(),
     session: AsyncSession = Depends(db_helper.session_dependency),
@@ -48,6 +48,6 @@ async def get_group_week_schedule_by_date(
     monday_date: datetime = datetime.now(),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
-    return await crud.get_group_week_sсhedule(
+    return await crud.get_group_week_schedule_by_date(
         session=session, group_id=group_id, monday_date=monday_date
     )
