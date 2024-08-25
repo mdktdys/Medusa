@@ -81,7 +81,7 @@ async def get_group_day_schedule_by_date_formatted(
                 rows.append(
                     f"\n{get_number_para_emoji(para.zamena.number)} {para.zamena.Courses_.fullname} <b>Замена🔄️</b>"
                     f"\n{para.zamena.Teachers_.name}️"
-                    f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end} 🚪{para.zamena.Cabinets_.name}"
+                    f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end}   {para.zamena.Cabinets_.name}"
                 )
             else:
                 rows.append(
@@ -89,19 +89,19 @@ async def get_group_day_schedule_by_date_formatted(
                 )
                 rows.append(
                     f"{para.zamena.Teachers_.name}"
-                    f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end} 🚪{para.zamena.Cabinets_.name}"
+                    f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end}   {para.zamena.Cabinets_.name}"
                 )
                 rows.append(
                     f"<s>"
                     f"\n{para.origin.Courses_.fullname}"
                     f"\n{para.origin.Teachers_.name}"
-                    f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end} 🚪{para.origin.Cabinets_.name}</s>"
+                    f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end}   {para.origin.Cabinets_.name}</s>"
                 )
         else:
             rows.append(
                 f"\n{get_number_para_emoji(para.origin.number)} {para.origin.Courses_.fullname}"
                 f"\n{para.origin.Teachers_.name}"
-                f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end} 🚪{para.origin.Cabinets_.name}"
+                f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end}   {para.origin.Cabinets_.name}"
             )
     return DayScheduleFormatted(paras=rows, search_name=schedule.search_name)
 
