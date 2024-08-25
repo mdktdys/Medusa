@@ -418,7 +418,9 @@ class Paras(Base):
     cabinet: Mapped[Optional[int]] = mapped_column(BigInteger)
     date: Mapped[Optional[datetime.date]] = mapped_column(Date)
 
-    Cabinets_: Mapped["Cabinets"] = relationship("Cabinets", back_populates="Paras")
+    Cabinets_: Mapped["Cabinets"] = relationship(
+        "Cabinets", back_populates="Paras", lazy="selectin"
+    )
     Courses_: Mapped["Courses"] = relationship(
         "Courses", back_populates="Paras", lazy="selectin"
     )
@@ -426,7 +428,9 @@ class Paras(Base):
     scheduleTimetable: Mapped["ScheduleTimetable"] = relationship(
         "ScheduleTimetable", back_populates="Paras"
     )
-    Teachers_: Mapped["Teachers"] = relationship("Teachers", back_populates="Paras")
+    Teachers_: Mapped["Teachers"] = relationship(
+        "Teachers", back_populates="Paras", lazy="selectin"
+    )
 
 
 class Practices(Base):
@@ -488,7 +492,9 @@ class Zamenas(Base):
     date: Mapped[Optional[datetime.date]] = mapped_column(Date)
     cabinet: Mapped[Optional[int]] = mapped_column(BigInteger)
 
-    Cabinets_: Mapped["Cabinets"] = relationship("Cabinets", back_populates="Zamenas")
+    Cabinets_: Mapped["Cabinets"] = relationship(
+        "Cabinets", back_populates="Zamenas", lazy="selectin"
+    )
     Courses_: Mapped["Courses"] = relationship(
         "Courses", back_populates="Zamenas", lazy="selectin"
     )
@@ -496,7 +502,9 @@ class Zamenas(Base):
     scheduleTimetable: Mapped["ScheduleTimetable"] = relationship(
         "ScheduleTimetable", back_populates="Zamenas"
     )
-    Teachers_: Mapped["Teachers"] = relationship("Teachers", back_populates="Zamenas")
+    Teachers_: Mapped["Teachers"] = relationship(
+        "Teachers", back_populates="Zamenas", lazy="selectin"
+    )
 
 
 class ZamenasFull(Base):
