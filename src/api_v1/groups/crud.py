@@ -38,12 +38,12 @@ async def get_group_day_schedule_by_date(
     # Get schedule
     print(f"search date: {date}")
     query = select(database.Paras).where(
-        (database.Paras.group == group_id) and (database.Paras.date == date)
+        and_(database.Paras.group == group_id, database.Paras.date == date)
     )
     result: Result = await session.execute(query)
     paras_on_day: List[database.Paras] = list(result.scalars().all())
     query = select(database.Zamenas).where(
-        (database.Zamenas.group == group_id and database.Zamenas.date == date)
+        and_(database.Zamenas.group == group_id, database.Zamenas.date == date)
     )
     result: Result = await session.execute(query)
     zamenas_on_day: List[database.Zamenas] = list(result.scalars().all())
@@ -88,15 +88,17 @@ async def get_group_week_schedule_by_date(
 
     # Get schedule
     query = select(database.Zamenas).where(
-        (database.Zamenas.group == group_id)
-        and (database.Zamenas.date.between(monday_date, end_week))
+        and_(
+            database.Zamenas.group == group_id,
+            database.Zamenas.date.between(monday_date, end_week),
+        )
     )
     result: Result = await session.execute(query)
     paras_on_week: List[Paras] = list(result.scalars().all())
     query = select(database.Zamenas).where(
-        (
-            database.Zamenas.group == group_id
-            and database.Zamenas.date.between(monday_date, end_week)
+        and_(
+            database.Zamenas.group == group_id,
+            database.Zamenas.date.between(monday_date, end_week),
         )
     )
     result: Result = await session.execute(query)
