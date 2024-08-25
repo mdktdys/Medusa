@@ -36,6 +36,7 @@ async def get_group_day_schedule_by_date(
 ) -> DaySchedule:
 
     # Get schedule
+    print(f"search date: {date}")
     query = select(database.Paras).where(
         (database.Paras.group == group_id) and (database.Paras.date == date)
     )
