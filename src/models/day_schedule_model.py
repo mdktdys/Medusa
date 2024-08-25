@@ -1,11 +1,15 @@
 from typing import List
 
-from src.models.paras_model import Paras
+from src.alchemy import database
+
+
+# from src.alchemy import Paras as AlchemyParas
+# from src.alchemy import Zamena as AlchemyZamena
 
 
 class Para:
-    origin: Paras | None = None
-    zamena: Paras | None = None
+    origin: database.Paras | None = None
+    zamena: database.Zamenas | None = None
 
     def __init__(self, origin, zamena):
         self.origin = origin

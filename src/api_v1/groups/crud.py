@@ -9,42 +9,45 @@ from sqlalchemy.engine import Result
 from sqlalchemy import *
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy import Group as AlchemyGroup
-from src.alchemy import Paras as AlchemyParas
-from src.alchemy import Zamena as AlchemyZamena
+# from src.alchemy import Group as AlchemyGroup
+# from src.alchemy import Paras as AlchemyParas
+# from src.alchemy import Zamena as AlchemyZamena
+from src.alchemy import database
 from src.api_v1.groups.schemas import Zamena, Paras
 from src.models.day_schedule_model import DaySchedule, Para
 
 
-async def get_groups(session: AsyncSession) -> list[AlchemyGroup]:
-    query = select(AlchemyGroup)
+async def get_groups(session: AsyncSession) -> list[database.Groups]:
+    query = select(database.Groups)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
 
-async def get_group_by_id(session: AsyncSession, group_id: int) -> list[AlchemyGroup]:
-    query = select(AlchemyGroup).where(AlchemyGroup.id == group_id)
+async def get_group_by_id(
+    session: AsyncSession, group_id: int
+) -> list[database.Groups]:
+    query = select(database.Groups).where(database.Groups.id == group_id)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
 
-async def get_group_day_sсhedule_by_date(
+async def get_group_day_schedule_by_date(
     session: AsyncSession, group_id: int, date: datetime
 ) -> DaySchedule:
 
     # Get schedule
-    query = select(AlchemyParas).where(
-        (AlchemyParas.group == group_id) and (AlchemyParas.date == date)
+    query = select(database.Paras).where(
+        (database.Paras.group == group_id) and (database.Paras.date == date)
     )
     result: Result = await session.execute(query)
-    paras_on_day: List[AlchemyParas] = list(result.scalars().all())
-    query = select(AlchemyZamena).where(
-        (AlchemyZamena.group == group_id and AlchemyZamena.date == date)
+    paras_on_day: List[database.Paras] = list(result.scalars().all())
+    query = select(database.Zamenas).where(
+        (database.Zamenas.group == group_id and database.Zamenas.date == date)
     )
     result: Result = await session.execute(query)
-    zamenas_on_day: List[AlchemyZamena] = list(result.scalars().all())
+    zamenas_on_day: List[database.Zamenas] = list(result.scalars().all())
 
-    lessons_list = []
+    lessons_list: List[Para] = []
     for i in range(1, 6):
         lesson_origin = next((x for x in paras_on_day if x.number == i), None)
         lesson_zamena = next((x for x in zamenas_on_day if x.number == i), None)
@@ -53,8 +56,27 @@ async def get_group_day_sсhedule_by_date(
 
     # Create final schedule
     res = DaySchedule(paras=lessons_list)
-
     return res
+
+
+async def get_group_day_schedule_by_date_formatted(
+    session: AsyncSession, group_id: int, date: datetime
+) -> str:
+    schedule: DaySchedule = await get_group_day_schedule_by_date(
+        session=session, group_id=group_id, date=date
+    )
+    rows = []
+    for para in schedule.paras:
+        if para.zamena is not None:
+            if para.origin is None:
+                rows.append(f"{para.zamena.Courses_.fullname} new\n")
+            else:
+                rows.append(f"{para.origin.Courses_.fullname} old\n")
+                rows.append(f"{para.zamena.Courses_.fullname} new\n")
+        else:
+            rows.append(f"{para.origin.Courses_.fullname} old")
+
+    return "".join(rows)
 
 
 async def get_group_week_schedule_by_date(
@@ -64,16 +86,16 @@ async def get_group_week_schedule_by_date(
     end_week = monday_date + timedelta(days=6)
 
     # Get schedule
-    query = select(AlchemyParas).where(
-        (AlchemyParas.group == group_id)
-        and (AlchemyParas.date.between(monday_date, end_week))
+    query = select(database.Zamenas).where(
+        (database.Zamenas.group == group_id)
+        and (database.Zamenas.date.between(monday_date, end_week))
     )
     result: Result = await session.execute(query)
     paras_on_week: List[Paras] = list(result.scalars().all())
-    query = select(AlchemyZamena).where(
+    query = select(database.Zamenas).where(
         (
-            AlchemyZamena.group == group_id
-            and AlchemyZamena.date.between(monday_date, end_week)
+            database.Zamenas.group == group_id
+            and database.Zamenas.date.between(monday_date, end_week)
         )
     )
     result: Result = await session.execute(query)
