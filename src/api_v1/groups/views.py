@@ -6,7 +6,7 @@ from fastapi_cache.decorator import cache
 
 from src.alchemy.db_helper import *
 from . import crud
-from .schemas import Group
+from .schemas import Group, DayScheduleFormatted
 from .schemas import DaySchedule
 
 router = APIRouter(tags=["Groups"])
@@ -39,7 +39,9 @@ async def get_group_day_schedule_by_date(
     )
 
 
-@router.get("/day_schedule_formatted/{group_id}/{date}/", response_model=str)
+@router.get(
+    "/day_schedule_formatted/{group_id}/{date}/", response_model=DayScheduleFormatted
+)
 @cache(expire=60)
 async def get_group_day_schedule_by_date_formatted(
     group_id: int = -1,

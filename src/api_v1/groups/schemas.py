@@ -85,3 +85,8 @@ class Group(GroupBase):
 class DaySchedule(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     paras: List[Para]
+
+
+class DayScheduleFormatted(BaseModel):
+    search_name: str
+    paras: str = ""

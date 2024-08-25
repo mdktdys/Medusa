@@ -17,7 +17,9 @@ class Para:
 
 
 class DaySchedule:
+    search_name: str
     paras: List[Para] = []
 
-    def __init__(self, paras):
+    def __init__(self, paras, search_name):
         self.paras: List[Para] = paras
+        self.search_name: str = search_name
