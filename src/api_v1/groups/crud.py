@@ -79,21 +79,21 @@ async def get_group_day_schedule_by_date_formatted(
             if para.origin is None:
                 rows.append(
                     f"\n{para.zamena.number} {para.zamena.Courses_.fullname} {para.zamena.Teachers_.name}🔄️"
-                    f" 🚪{para.zamena.Cabinets_.name}"
+                    f"\n 🚪{para.zamena.Cabinets_.name}"
                 )
             else:
                 rows.append(
                     f"\n{para.zamena.number} {para.zamena.Courses_.fullname} {para.zamena.Teachers_.name}🔄️"
-                    f" 🚪{para.zamena.Cabinets_.name}"
+                    f"\n 🚪{para.zamena.Cabinets_.name}"
                 )
                 rows.append(
                     f"<s>{para.origin.number} {para.origin.Courses_.fullname} {para.origin.Teachers_.name}"
-                    f" 🚪{para.origin.Cabinets_.name}</s>"
+                    f"\n 🚪{para.origin.Cabinets_.name}</s>"
                 )
         else:
             rows.append(
                 f"\n{para.origin.number} {para.origin.Courses_.fullname} {para.origin.Teachers_.name}"
-                f" 🚪{para.origin.Cabinets_.name}"
+                f"\n 🚪{para.origin.Cabinets_.name}"
             )
     return DayScheduleFormatted(paras=rows, search_name=schedule.search_name)
 
