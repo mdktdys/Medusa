@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 from src.api_v1.groups.schemas import Zamena, Paras, DayScheduleFormatted
 from src.models.day_schedule_model import DaySchedule, Para
-from src.utils import get_number_para_emoji
+from src.utils.tools import get_number_para_emoji
 
 
 async def get_groups(session: AsyncSession) -> list[database.Groups]:
