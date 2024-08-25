@@ -90,7 +90,7 @@ async def get_group_day_schedule_by_date_formatted(
                     f"\n{get_number_para_emoji(para.zamena.number)} <b>Замена</b>"
                 )
                 rows.append(
-                    f"\n📙{para.zamena.Courses_.fullname}"
+                    f"📙{para.zamena.Courses_.fullname}"
                     f"\n🐒{para.zamena.Teachers_.name}🔄️"
                     f"\n🚪{para.zamena.Cabinets_.name}"
                     f"\n🕑{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end}"
