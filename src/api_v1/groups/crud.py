@@ -77,13 +77,11 @@ async def get_group_day_schedule_by_date_formatted(
     for para in schedule.paras:
         if para.zamena is not None:
             if para.origin is None:
-                rows.append(
-                    f"{para.zamena.number} {para.zamena.Courses_.fullname} 🔁🔄️🔁🔃"
-                )
+                rows.append(f"{para.zamena.number} {para.zamena.Courses_.fullname} 🔄️")
             else:
-                rows.append(f"{para.origin.number} {para.origin.Courses_.fullname}")
+                rows.append(f"{para.zamena.number} {para.zamena.Courses_.fullname} 🔄️")
                 rows.append(
-                    f"{para.zamena.number} {para.zamena.Courses_.fullname} 🔁🔄️🔁🔃"
+                    f"<s>{para.origin.number} {para.origin.Courses_.fullname}</s>"
                 )
         else:
             rows.append(f"{para.origin.number} {para.origin.Courses_.fullname}")
