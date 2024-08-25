@@ -89,4 +89,4 @@ class DaySchedule(BaseModel):
 
 class DayScheduleFormatted(BaseModel):
     search_name: str
-    paras: str = ""
+    paras: List[str] = []

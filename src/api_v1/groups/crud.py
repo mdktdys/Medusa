@@ -44,6 +44,7 @@ async def get_group_day_schedule_by_date(
         .scalars()
         .all()
     )[0]
+
     query = select(database.Paras).where(
         and_(database.Paras.group == group_id, database.Paras.date == date)
     )
@@ -56,13 +57,12 @@ async def get_group_day_schedule_by_date(
     zamenas_on_day: List[database.Zamenas] = list(result.scalars().all())
 
     lessons_list: List[Para] = []
-    for i in range(1, 6):
+    for i in range(1, 8):
         lesson_origin = next((x for x in paras_on_day if x.number == i), None)
         lesson_zamena = next((x for x in zamenas_on_day if x.number == i), None)
         if lesson_zamena is not None or lesson_origin is not None:
             lessons_list.append(Para(origin=lesson_origin, zamena=lesson_zamena))
 
-    # Create final schedule
     res = DaySchedule(paras=lessons_list, search_name=search_group.name)
     return res
 
@@ -77,14 +77,17 @@ async def get_group_day_schedule_by_date_formatted(
     for para in schedule.paras:
         if para.zamena is not None:
             if para.origin is None:
-                rows.append(f"{para.zamena.Courses_.fullname} new\n")
+                rows.append(
+                    f"{para.zamena.number} {para.zamena.Courses_.fullname} 🔁🔄️🔁🔃"
+                )
             else:
-                rows.append(f"{para.origin.Courses_.fullname} old\n")
-                rows.append(f"{para.zamena.Courses_.fullname} new\n")
+                rows.append(f"{para.origin.number} {para.origin.Courses_.fullname}")
+                rows.append(
+                    f"{para.zamena.number} {para.zamena.Courses_.fullname} 🔁🔄️🔁🔃"
+                )
         else:
-            rows.append(f"{para.origin.Courses_.fullname} old")
-
-    return DayScheduleFormatted(paras="".join(rows), search_name=schedule.search_name)
+            rows.append(f"{para.origin.number} {para.origin.Courses_.fullname}")
+    return DayScheduleFormatted(paras=rows, search_name=schedule.search_name)
 
 
 async def get_group_week_schedule_by_date(
