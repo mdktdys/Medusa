@@ -63,7 +63,7 @@ async def get_group_day_schedule_by_date(
             lessons_list.append(Para(origin=lesson_origin, zamena=lesson_zamena))
 
     # Create final schedule
-    res = DaySchedule(paras=lessons_list, search_name=search_group)
+    res = DaySchedule(paras=lessons_list, search_name=search_group.name)
     return res
 
 
