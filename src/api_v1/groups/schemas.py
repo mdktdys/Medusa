@@ -4,14 +4,6 @@ from typing import List
 from pydantic import BaseModel, ConfigDict
 
 
-class GroupBase(BaseModel):
-    id: int
-
-
-class GroupGet:
-    pass
-
-
 class Paras(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
@@ -21,24 +13,6 @@ class Paras(BaseModel):
     teacher: int
     cabinet: int
     date: datetime
-
-    def __init__(
-        self,
-        id: int,
-        group_id: int,
-        number_para: int,
-        course_id: int,
-        teacher_id: int,
-        cabinet_id: int,
-        date: datetime.date,
-    ):
-        self.id = id
-        self.group_id = group_id
-        self.number_para = number_para
-        self.course_id = course_id
-        self.teacher_id = teacher_id
-        self.cabinet_id = cabinet_id
-        self.date = date
 
 
 class Zamena(BaseModel):
@@ -51,24 +25,6 @@ class Zamena(BaseModel):
     cabinet: int
     date: datetime
 
-    def __init__(
-        self,
-        id: int,
-        group_id: int,
-        number_para: int,
-        course_id: int,
-        teacher_id: int,
-        cabinet_id: int,
-        date: datetime.date,
-    ):
-        self.id = id
-        self.group_id = group_id
-        self.number_para = number_para
-        self.course_id = course_id
-        self.teacher_id = teacher_id
-        self.cabinet_id = cabinet_id
-        self.date = date
-
 
 class Para(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -76,8 +32,9 @@ class Para(BaseModel):
     zamena: Paras | None = None
 
 
-class Group(GroupBase):
+class Group(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    id: int
     name: str
     department: int
 

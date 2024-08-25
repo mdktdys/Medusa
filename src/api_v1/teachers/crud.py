@@ -4,32 +4,33 @@ from sqlalchemy import *
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 from src.api_v1.groups.schemas import Zamena, Paras, DayScheduleFormatted
+from src.api_v1.teachers.schemas import DayScheduleTeacher
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
 
 
-async def get_groups(session: AsyncSession) -> list[database.Groups]:
-    query = select(database.Groups)
+async def get_teachers(session: AsyncSession) -> list[database.Teachers]:
+    query = select(database.Teachers)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
 
-async def get_group_by_id(
-    session: AsyncSession, group_id: int
-) -> list[database.Groups]:
-    query = select(database.Groups).where(database.Groups.id == group_id)
+async def get_teacher_by_id(
+    session: AsyncSession, teacher_id: int
+) -> list[database.Teachers]:
+    query = select(database.Teachers).where(database.Teachers.id == teacher_id)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
 
-async def get_group_day_schedule_by_date(
-    session: AsyncSession, group_id: int, date: datetime
-) -> DaySchedule:
+async def get_teacher_day_schedule_by_date(
+    session: AsyncSession, teacher_id: int, date: datetime
+) -> DayScheduleTeacher:
 
-    search_group: database.Groups = list(
+    search_group: database.Teachers = list(
         (
             await session.execute(
-                select(database.Groups).where(database.Groups.id == group_id)
+                select(database.Teachers).where(database.Teachers.id == teacher_id)
             )
         )
         .scalars()
@@ -37,12 +38,12 @@ async def get_group_day_schedule_by_date(
     )[0]
 
     query = select(database.Paras).where(
-        and_(database.Paras.group == group_id, database.Paras.date == date)
+        and_(database.Paras.teacher == teacher_id, database.Paras.date == date)
     )
     result: Result = await session.execute(query)
     paras_on_day: List[database.Paras] = list(result.scalars().all())
     query = select(database.Zamenas).where(
-        and_(database.Zamenas.group == group_id, database.Zamenas.date == date)
+        and_(database.Zamenas.teacher == teacher_id, database.Zamenas.date == date)
     )
     result: Result = await session.execute(query)
     zamenas_on_day: List[database.Zamenas] = list(result.scalars().all())
@@ -54,15 +55,15 @@ async def get_group_day_schedule_by_date(
         if lesson_zamena is not None or lesson_origin is not None:
             lessons_list.append(Para(origin=lesson_origin, zamena=lesson_zamena))
 
-    res = DaySchedule(paras=lessons_list, search_name=search_group.name)
+    res = DayScheduleTeacher(paras=lessons_list, search_name=search_group.name)
     return res
 
 
-async def get_group_day_schedule_by_date_formatted(
-    session: AsyncSession, group_id: int, date: datetime
+async def get_teacher_day_schedule_by_date_formatted(
+    session: AsyncSession, teacher_id: int, date: datetime
 ) -> DayScheduleFormatted:
-    schedule: DaySchedule = await get_group_day_schedule_by_date(
-        session=session, group_id=group_id, date=date
+    schedule: DayScheduleTeacher = await get_teacher_day_schedule_by_date(
+        session=session, teacher_id=teacher_id, date=date
     )
     rows = []
     for para in schedule.paras:
@@ -96,14 +97,14 @@ async def get_group_day_schedule_by_date_formatted(
     return DayScheduleFormatted(paras=rows, search_name=schedule.search_name)
 
 
-async def get_group_week_schedule_by_date(
-    session: AsyncSession, group_id: int, monday_date: datetime
+async def get_teacher_week_schedule_by_date(
+    session: AsyncSession, teacher_id: int, monday_date: datetime
 ) -> List[DaySchedule]:
     end_week = monday_date + timedelta(days=6)
     search_group: database.Groups = list(
         (
             await session.execute(
-                select(database.Groups).where(database.Groups.id == group_id)
+                select(database.Groups).where(database.Teachers.id == teacher_id)
             )
         )
         .scalars()
@@ -111,7 +112,7 @@ async def get_group_week_schedule_by_date(
     )[0]
     query = select(database.Zamenas).where(
         and_(
-            database.Zamenas.group == group_id,
+            database.Zamenas.teacher == teacher_id,
             database.Zamenas.date.between(monday_date, end_week),
         )
     )
@@ -119,14 +120,14 @@ async def get_group_week_schedule_by_date(
     paras_on_week: List[Paras] = list(result.scalars().all())
     query = select(database.Zamenas).where(
         and_(
-            database.Zamenas.group == group_id,
+            database.Zamenas.teacher == teacher_id,
             database.Zamenas.date.between(monday_date, end_week),
         )
     )
     result: Result = await session.execute(query)
     zamenas_on_week: List[Zamena] = list(result.scalars().all())
 
-    week_lessons: List[DaySchedule] = []
+    week_lessons: List[DayScheduleTeacher] = []
     for day in range(0, 6):
         current_date = monday_date + timedelta(days=day)
         day_paras = [
@@ -144,6 +145,6 @@ async def get_group_week_schedule_by_date(
                     Para(origin=lesson_origin, zamena=lesson_zamena)
                 )
         week_lessons.append(
-            DaySchedule(paras=day_lessons_list, search_name=search_group.name)
+            DayScheduleTeacher(paras=day_lessons_list, search_name=search_group.name)
         )
     return week_lessons
