@@ -75,27 +75,24 @@ async def get_teacher_day_schedule_by_date(
         zamenas_on_day
     )
 
-    lessons_list: List[List[Para | List]] = [[] for i in range(0, 8)]
+    lessons_list: List[List[Para | List]] = [[] for i in range(0, 7)]
     for i in range(1, 8):
-        lessons_list[i] = []
         lesson_origin = [x for x in paras_on_day if x.number == i]
         lesson_zamena = [x for x in zamenas_on_day if x.number == i]
 
         if len(lesson_zamena) == 0:
-            if len(lesson_origin) == 0:
-                pass
-            else:
+            if len(lesson_origin) != 0:
                 for lesson in lesson_origin:
                     if not full_zamenas.__contains__(lesson):
-                        lessons_list[i].append(Para(origin=lesson, zamena=None))
+                        lessons_list[i - 1].append(Para(origin=lesson, zamena=None))
         else:
             if len(lesson_origin) == 0:
                 for zamena in lesson_zamena:
-                    lessons_list[i].append(Para(zamena=zamena, origin=None))
+                    lessons_list[i - 1].append(Para(zamena=zamena, origin=None))
             else:
                 for origin in lesson_origin:
                     if not full_zamenas.__contains__(origin):
-                        lessons_list[i].append(Para(zamena=None, origin=origin))
+                        lessons_list[i - 1].append(Para(zamena=None, origin=origin))
 
     return DayScheduleTeacher(paras=lessons_list, search_name=teacher_task.name)
 
