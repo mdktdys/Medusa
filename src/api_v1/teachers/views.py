@@ -6,7 +6,12 @@ from fastapi_cache.decorator import cache
 
 from src.alchemy.db_helper import *
 from . import crud
-from .schemas import DayScheduleFormatted, Teacher, DayScheduleTeacher
+from .schemas import (
+    DayScheduleFormatted,
+    Teacher,
+    DayScheduleTeacher,
+    DayScheduleTeacherPydantic,
+)
 
 router = APIRouter(tags=["Teachers"])
 
@@ -26,7 +31,9 @@ async def get_teacher_by_id(
     return await crud.get_teacher_by_id(session=session, teacher_id=teacher_id)
 
 
-@router.get("/day_schedule/{teacher_id}/{date}/", response_model=DayScheduleTeacher)
+@router.get(
+    "/day_schedule/{teacher_id}/{date}/", response_model=DayScheduleTeacherPydantic
+)
 async def get_teacher_day_schedule_by_date(
     teacher_id: int = -1,
     date: datetime = datetime.now(),
@@ -52,7 +59,7 @@ async def get_teacher_day_schedule_by_date_formatted(
 
 @router.get(
     "/week_schedule/{teacher_id}/{monday_date}/",
-    response_model=List[DayScheduleTeacher],
+    response_model=List[DayScheduleTeacherPydantic],
 )
 @cache(expire=600)
 async def get_teacher_week_schedule_by_date(

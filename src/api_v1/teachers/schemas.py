@@ -3,13 +3,27 @@ from typing import List
 
 from pydantic import BaseModel, ConfigDict
 
-from src.api_v1.groups.schemas import Para
+from src.models.day_schedule_model import Para
+from src.api_v1.groups.schemas import Para as ParaPydantic
 
 
-class DayScheduleTeacher(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class DayScheduleTeacher:
     search_name: str
     paras: List[List[Para | List]]
+
+    def __init__(self, search_name, paras):
+        self.search_name = search_name
+        self.paras = paras
+
+
+class DayScheduleTeacherPydantic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    search_name: str
+    paras: List[List[ParaPydantic | List]]
+
+    def __init__(self, search_name, paras):
+        self.search_name = search_name
+        self.paras = paras
 
 
 class DayScheduleFormatted(BaseModel):

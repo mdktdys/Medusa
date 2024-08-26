@@ -4,10 +4,9 @@ from sqlalchemy import *
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 from src.api_v1.groups.schemas import Paras, DayScheduleFormatted
-from src.api_v1.teachers.schemas import DayScheduleTeacher
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
-from src.api_v1.teachers.schemas import ZamenasFull
+from src.api_v1.teachers.schemas import ZamenasFull, DayScheduleTeacher
 from src.api_v1.groups.schemas import Zamena as Zamenas
 import asyncio
 
@@ -108,34 +107,42 @@ async def get_teacher_day_schedule_by_date_formatted(
         session=session, teacher_id=teacher_id, date=date
     )
     rows = []
-    for para in schedule.paras:
-        if para.zamena is not None:
-            if para.origin is None:
-                rows.append(
-                    f"\n{get_number_para_emoji(para.zamena.number)} {para.zamena.Courses_.fullname} <b>Замена🔄️</b>"
-                    f"\n{para.zamena.Teachers_.name}️"
-                    f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end}   {para.zamena.Cabinets_.name}"
-                )
-            else:
-                rows.append(
-                    f"\n{get_number_para_emoji(para.zamena.number)} {para.zamena.Courses_.fullname} <b>Замена🔄️</b>"
-                )
-                rows.append(
-                    f"{para.zamena.Teachers_.name}"
-                    f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end}   {para.zamena.Cabinets_.name}"
-                )
-                rows.append(
-                    f"<s>"
-                    f"\n{para.origin.Courses_.fullname}"
-                    f"\n{para.origin.Teachers_.name}"
-                    f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end}   {para.origin.Cabinets_.name}</s>"
-                )
-        else:
-            rows.append(
-                f"\n{get_number_para_emoji(para.origin.number)} {para.origin.Courses_.fullname}"
-                f"\n{para.origin.Teachers_.name}"
-                f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end}   {para.origin.Cabinets_.name}"
-            )
+    print(type(schedule))
+    for paras in schedule.paras:
+        if (len(paras)) != 0:
+            for para in paras:
+                print(type(para))
+                if isinstance(para, Para):
+                    print(para)
+                    print(para.origin)
+                    print(para.zamena)
+                    if para.origin is None:
+                        rows.append(
+                            f"\n{get_number_para_emoji(para.zamena.number)} {para.zamena.Courses_.name} <b>Замена🔄️</b>"
+                            f"\n{para.zamena.Groups_.name}️"
+                            f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end}   {para.zamena.Cabinets_.name}"
+                        )
+                        # else:
+                        #     rows.append(
+                        #         f"\n{get_number_para_emoji(para.zamena.number)} {para.zamena.Courses_.fullname} <b>Замена🔄️</b>"
+                        #     )
+                        #     rows.append(
+                        #         f"{para.zamena.Teachers_.name}"
+                        #         f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end}   {para.zamena.Cabinets_.name}"
+                        #     )
+                        #     rows.append(
+                        #         f"<s>"
+                        #         f"\n{para.origin.Courses_.fullname}"
+                        #         f"\n{para.origin.Teachers_.name}"
+                        #         f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end}   {para.origin.Cabinets_.name}</s>"
+                        #     )
+                    else:
+                        rows.append(
+                            f"\n{get_number_para_emoji(para.origin.number)} {para.origin.Courses_.name}"
+                            f"\n{para.origin.Groups_.name}"
+                            f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end}   {para.origin.Cabinets_.name}"
+                        )
+            rows.append("\n")
     return DayScheduleFormatted(paras=rows, search_name=schedule.search_name)
 
 

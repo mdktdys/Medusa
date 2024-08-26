@@ -424,7 +424,9 @@ class Paras(Base):
     Courses_: Mapped["Courses"] = relationship(
         "Courses", back_populates="Paras", lazy="selectin"
     )
-    Groups_: Mapped["Groups"] = relationship("Groups", back_populates="Paras")
+    Groups_: Mapped["Groups"] = relationship(
+        "Groups", back_populates="Paras", lazy="selectin"
+    )
     scheduleTimetable: Mapped["ScheduleTimetable"] = relationship(
         "ScheduleTimetable", back_populates="Paras", lazy="selectin"
     )
@@ -498,7 +500,9 @@ class Zamenas(Base):
     Courses_: Mapped["Courses"] = relationship(
         "Courses", back_populates="Zamenas", lazy="selectin"
     )
-    Groups_: Mapped["Groups"] = relationship("Groups", back_populates="Zamenas")
+    Groups_: Mapped["Groups"] = relationship(
+        "Groups", back_populates="Zamenas", lazy="selectin"
+    )
     scheduleTimetable: Mapped["ScheduleTimetable"] = relationship(
         "ScheduleTimetable", back_populates="Zamenas", lazy="selectin"
     )
