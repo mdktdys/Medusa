@@ -93,6 +93,8 @@ async def get_teacher_day_schedule_by_date(
                 for origin in lesson_origin:
                     if not full_zamenas.__contains__(origin):
                         lessons_list[i - 1].append(Para(zamena=None, origin=origin))
+                for zamena in lesson_zamena:
+                    lessons_list[i - 1].append((Para(zamena=zamena, origin=None)))
 
     return DayScheduleTeacher(paras=lessons_list, search_name=teacher_task.name)
 
