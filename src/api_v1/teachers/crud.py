@@ -60,7 +60,7 @@ async def get_teacher_day_schedule_by_date(
     ) -> List[ZamenasFull]:
         query = select(database.ZamenasFull).where(
             and_(
-                database.ZamenasFull.group.in_([group.id for group in zamenas_on_day]),
+                database.ZamenasFull.group.in_([x.group for x in zamenas_on_day]),
                 database.ZamenasFull.date == date,
             )
         )
@@ -72,8 +72,9 @@ async def get_teacher_day_schedule_by_date(
         get_teachers_origin_paras_by_date(),
         get_teachers_zamenas_by_date(),
     )
+
     full_zamenas: List[ZamenasFull] = await get_groups_zamenas_full_by_date(
-        zamenas_on_day
+        zamenas_on_day=zamenas_on_day
     )
 
     lessons_list: List[List[Para | List]] = [[] for i in range(0, 7)]
@@ -85,8 +86,6 @@ async def get_teacher_day_schedule_by_date(
             if len(lesson_origin) != 0:
                 for lesson in lesson_origin:
                     if len([x for x in full_zamenas if x.group == lesson.group]) == 0:
-                        print(lesson.group)
-                        print([x for x in full_zamenas if x.group == lesson.group])
                         lessons_list[i - 1].append(Para(origin=lesson, zamena=None))
         else:
             if len(lesson_origin) == 0:
@@ -95,11 +94,8 @@ async def get_teacher_day_schedule_by_date(
             else:
                 for lesson in lesson_origin:
                     if len([x for x in full_zamenas if x.group == lesson.group]) == 0:
-                        print(lesson.group)
-                        print([x for x in full_zamenas if x.group == lesson.group])
                         lessons_list[i - 1].append(Para(zamena=None, origin=lesson))
                 for zamena in lesson_zamena:
-                    print("SET")
                     lessons_list[i - 1].append((Para(zamena=zamena, origin=None)))
 
     return DayScheduleTeacher(paras=lessons_list, search_name=teacher_task.name)
