@@ -8,6 +8,8 @@ from src.api_v1.teachers.schemas import DayScheduleTeacher
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
 
+import asyncio
+
 
 async def get_teachers(session: AsyncSession) -> list[database.Teachers]:
     query = select(database.Teachers)
@@ -27,36 +29,75 @@ async def get_teacher_day_schedule_by_date(
     session: AsyncSession, teacher_id: int, date: datetime
 ) -> DayScheduleTeacher:
 
-    search_group: database.Teachers = list(
-        (
-            await session.execute(
-                select(database.Teachers).where(database.Teachers.id == teacher_id)
+    async def get_search_teacher() -> database.Teachers:
+        return list(
+            (
+                await session.execute(
+                    select(database.Teachers).where(database.Teachers.id == teacher_id)
+                )
+            )
+            .scalars()
+            .all()
+        )[0]
+
+    async def get_teachers_origin_paras_by_date() -> List[database.Paras]:
+        query = select(database.Paras).where(
+            and_(database.Paras.teacher == teacher_id, database.Paras.date == date)
+        )
+        result: Result = await session.execute(query)
+        return list(result.scalars().all())
+
+    async def get_teachers_zamenas_by_date() -> List[database.Zamenas]:
+        query = select(database.Zamenas).where(
+            and_(database.Zamenas.teacher == teacher_id, database.Zamenas.date == date)
+        )
+        result: Result = await session.execute(query)
+        return list(result.scalars().all())
+
+    async def get_groups_zamenas_full_by_date(
+        zamenas_on_day: List[database.Zamenas],
+    ) -> List[database.ZamenasFull]:
+        query = select(database.ZamenasFull).where(
+            and_(
+                database.ZamenasFull.group.in_([group.id for group in zamenas_on_day]),
+                database.ZamenasFull.date == date,
             )
         )
-        .scalars()
-        .all()
-    )[0]
+        result: Result = await session.execute(query)
+        return list(result.scalars().all())
 
-    query = select(database.Paras).where(
-        and_(database.Paras.teacher == teacher_id, database.Paras.date == date)
+    teacher_task, paras_on_day, zamenas_on_day = await asyncio.gather(
+        get_search_teacher(),
+        get_teachers_origin_paras_by_date(),
+        get_teachers_zamenas_by_date(),
     )
-    result: Result = await session.execute(query)
-    paras_on_day: List[database.Paras] = list(result.scalars().all())
-    query = select(database.Zamenas).where(
-        and_(database.Zamenas.teacher == teacher_id, database.Zamenas.date == date)
+    full_zamenas: List[database.ZamenasFull] = await get_groups_zamenas_full_by_date(
+        zamenas_on_day
     )
-    result: Result = await session.execute(query)
-    zamenas_on_day: List[database.Zamenas] = list(result.scalars().all())
 
-    lessons_list: List[Para] = []
+    lessons_list: List[List[Para | List]] = [[] for i in range(0, 8)]
     for i in range(1, 8):
-        lesson_origin = next((x for x in paras_on_day if x.number == i), None)
-        lesson_zamena = next((x for x in zamenas_on_day if x.number == i), None)
-        if lesson_zamena is not None or lesson_origin is not None:
-            lessons_list.append(Para(origin=lesson_origin, zamena=lesson_zamena))
+        lessons_list[i] = []
+        lesson_origin = [x for x in paras_on_day if x.number == i]
+        lesson_zamena = [x for x in zamenas_on_day if x.number == i]
 
-    res = DayScheduleTeacher(paras=lessons_list, search_name=search_group.name)
-    return res
+        if len(lesson_zamena) == 0:
+            if len(lesson_origin) == 0:
+                pass
+            else:
+                for lesson in lesson_origin:
+                    if not full_zamenas.__contains__(lesson):
+                        lessons_list[i].append(Para(origin=lesson, zamena=None))
+        else:
+            if len(lesson_origin) == 0:
+                for zamena in lesson_zamena:
+                    lessons_list[i].append(Para(zamena=zamena, origin=None))
+            else:
+                for origin in lesson_origin:
+                    if not full_zamenas.__contains__(origin):
+                        lessons_list[i].append(Para(zamena=None, origin=origin))
+
+    return DayScheduleTeacher(paras=lessons_list, search_name=teacher_task.name)
 
 
 async def get_teacher_day_schedule_by_date_formatted(
