@@ -3,11 +3,12 @@ from typing import List
 from sqlalchemy import *
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
-from src.api_v1.groups.schemas import Zamena, Paras, DayScheduleFormatted
+from src.api_v1.groups.schemas import Paras, DayScheduleFormatted
 from src.api_v1.teachers.schemas import DayScheduleTeacher
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
-
+from src.api_v1.teachers.schemas import ZamenasFull
+from src.api_v1.groups.schemas import Zamena as Zamenas
 import asyncio
 
 
@@ -40,14 +41,14 @@ async def get_teacher_day_schedule_by_date(
             .all()
         )[0]
 
-    async def get_teachers_origin_paras_by_date() -> List[database.Paras]:
+    async def get_teachers_origin_paras_by_date() -> List[Paras]:
         query = select(database.Paras).where(
             and_(database.Paras.teacher == teacher_id, database.Paras.date == date)
         )
         result: Result = await session.execute(query)
         return list(result.scalars().all())
 
-    async def get_teachers_zamenas_by_date() -> List[database.Zamenas]:
+    async def get_teachers_zamenas_by_date() -> List[Zamenas]:
         query = select(database.Zamenas).where(
             and_(database.Zamenas.teacher == teacher_id, database.Zamenas.date == date)
         )
@@ -55,8 +56,8 @@ async def get_teacher_day_schedule_by_date(
         return list(result.scalars().all())
 
     async def get_groups_zamenas_full_by_date(
-        zamenas_on_day: List[database.Zamenas],
-    ) -> List[database.ZamenasFull]:
+        zamenas_on_day: List[Zamenas],
+    ) -> List[ZamenasFull]:
         query = select(database.ZamenasFull).where(
             and_(
                 database.ZamenasFull.group.in_([group.id for group in zamenas_on_day]),
@@ -71,7 +72,7 @@ async def get_teacher_day_schedule_by_date(
         get_teachers_origin_paras_by_date(),
         get_teachers_zamenas_by_date(),
     )
-    full_zamenas: List[database.ZamenasFull] = await get_groups_zamenas_full_by_date(
+    full_zamenas: List[ZamenasFull] = await get_groups_zamenas_full_by_date(
         zamenas_on_day
     )
 
@@ -83,16 +84,16 @@ async def get_teacher_day_schedule_by_date(
         if len(lesson_zamena) == 0:
             if len(lesson_origin) != 0:
                 for lesson in lesson_origin:
-                    if not full_zamenas.__contains__(lesson):
+                    if not [x for x in full_zamenas if x.group == lesson.group]:
                         lessons_list[i - 1].append(Para(origin=lesson, zamena=None))
         else:
             if len(lesson_origin) == 0:
                 for zamena in lesson_zamena:
                     lessons_list[i - 1].append(Para(zamena=zamena, origin=None))
             else:
-                for origin in lesson_origin:
-                    if not full_zamenas.__contains__(origin):
-                        lessons_list[i - 1].append(Para(zamena=None, origin=origin))
+                for lesson in lesson_origin:
+                    if not [x for x in full_zamenas if x.group == lesson.group]:
+                        lessons_list[i - 1].append(Para(zamena=None, origin=lesson))
                 for zamena in lesson_zamena:
                     lessons_list[i - 1].append((Para(zamena=zamena, origin=None)))
 
@@ -165,7 +166,7 @@ async def get_teacher_week_schedule_by_date(
         )
     )
     result: Result = await session.execute(query)
-    zamenas_on_week: List[Zamena] = list(result.scalars().all())
+    zamenas_on_week: List[Zamenas] = list(result.scalars().all())
 
     week_lessons: List[DayScheduleTeacher] = []
     for day in range(0, 6):
