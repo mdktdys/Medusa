@@ -118,7 +118,7 @@ async def get_teacher_day_schedule_by_date_formatted(
                     print(para.zamena)
                     if para.origin is None:
                         rows.append(
-                            f"\n{get_number_para_emoji(para.zamena.number)} {para.zamena.Courses_.name} <b>Замена🔄️</b>"
+                            f"\n{get_number_para_emoji(para.zamena.number)} {para.zamena.Courses_.fullname} <b>Замена🔄️</b>"
                             f"\n{para.zamena.Groups_.name}️"
                             f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end}   {para.zamena.Cabinets_.name}"
                         )
@@ -138,11 +138,10 @@ async def get_teacher_day_schedule_by_date_formatted(
                         #     )
                     else:
                         rows.append(
-                            f"\n{get_number_para_emoji(para.origin.number)} {para.origin.Courses_.name}"
+                            f"\n{get_number_para_emoji(para.origin.number)} {para.origin.Courses_.fullname}"
                             f"\n{para.origin.Groups_.name}"
                             f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end}   {para.origin.Cabinets_.name}"
                         )
-            rows.append("\n")
     return DayScheduleFormatted(paras=rows, search_name=schedule.search_name)
 
 
