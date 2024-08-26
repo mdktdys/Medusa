@@ -14,10 +14,10 @@ from fastapi_cache.decorator import cache
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     # redis = aioredis.from_url("redis://localhost")
-    redis = aioredis.from_url("redis://redis")
+    # redis = aioredis.from_url("redis://redis")
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    # FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
 
 

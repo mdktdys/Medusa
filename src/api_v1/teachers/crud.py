@@ -85,6 +85,8 @@ async def get_teacher_day_schedule_by_date(
             if len(lesson_origin) != 0:
                 for lesson in lesson_origin:
                     if len([x for x in full_zamenas if x.group == lesson.group]) == 0:
+                        print(lesson.group)
+                        print([x for x in full_zamenas if x.group == lesson.group])
                         lessons_list[i - 1].append(Para(origin=lesson, zamena=None))
         else:
             if len(lesson_origin) == 0:
@@ -93,8 +95,11 @@ async def get_teacher_day_schedule_by_date(
             else:
                 for lesson in lesson_origin:
                     if len([x for x in full_zamenas if x.group == lesson.group]) == 0:
+                        print(lesson.group)
+                        print([x for x in full_zamenas if x.group == lesson.group])
                         lessons_list[i - 1].append(Para(zamena=None, origin=lesson))
                 for zamena in lesson_zamena:
+                    print("SET")
                     lessons_list[i - 1].append((Para(zamena=zamena, origin=None)))
 
     return DayScheduleTeacher(paras=lessons_list, search_name=teacher_task.name)
