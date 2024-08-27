@@ -33,7 +33,9 @@ async def get_teacher_day_schedule_by_date(
         return list(
             (
                 await session.execute(
-                    select(database.Teachers).where(database.Teachers.id == teacher_id)
+                    select(database.Teachers)
+                    .where(database.Teachers.id == teacher_id)
+                    .limit(1)
                 )
             )
             .scalars()

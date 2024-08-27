@@ -29,7 +29,7 @@ async def get_group_day_schedule_by_date(
     search_group: database.Groups = list(
         (
             await session.execute(
-                select(database.Groups).where(database.Groups.id == group_id)
+                select(database.Groups).where(database.Groups.id == group_id).limit(1)
             )
         )
         .scalars()

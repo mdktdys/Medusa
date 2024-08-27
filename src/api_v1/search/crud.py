@@ -10,6 +10,7 @@ from src.api_v1.search.schemas import SearchResult
 async def get_search_items(
     session: AsyncSession, search_filter: str
 ) -> List[SearchResult]:
+
     async def search_groups():
         query = select(database.Groups).where(
             database.Groups.name.icontains(search_filter)
@@ -24,7 +25,6 @@ async def get_search_items(
         result: Result = await session.execute(query)
         return list(result.scalars().all())
 
-    # Запускаем оба запроса параллельно
     groups_task, teachers_task = await asyncio.gather(
         search_groups(), search_teachers()
     )
@@ -32,10 +32,8 @@ async def get_search_items(
     groups = groups_task
     teachers = teachers_task
 
-    # Объединяем результаты поиска групп и преподавателей
     search_results = groups + teachers
 
-    # Создаем список SearchResult с использованием спискового включения
     res = [
         SearchResult(
             search_type="group" if isinstance(i, database.Groups) else "teacher",
