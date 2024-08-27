@@ -113,9 +113,6 @@ async def get_teacher_day_schedule_by_date_formatted(
             for para in paras:
                 print(type(para))
                 if isinstance(para, Para):
-                    print(para)
-                    print(para.origin)
-                    print(para.zamena)
                     if para.origin is None:
                         rows.append(
                             f"\n{get_number_para_emoji(para.zamena.number)} {para.zamena.Courses_.fullname} <b>Замена🔄️</b>"
