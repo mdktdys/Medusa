@@ -20,5 +20,5 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, docs_url="/")
 app.include_router(router=router_v1, prefix=settings.api_v1_prefix)
