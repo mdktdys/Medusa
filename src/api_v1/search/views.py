@@ -7,7 +7,7 @@ from src.alchemy.db_helper import *
 from . import crud
 from .schemas import SearchResult
 
-router = APIRouter(tags=["search"])
+router = APIRouter(tags=["Search"])
 
 
 @router.get("/search/{query}/")
