@@ -4,7 +4,9 @@ from contextlib import asynccontextmanager
 from src.alchemy import *
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
+from fastapi_cache.backends.memcached import MemcachedBackend
 from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.backends.inmemory import InMemoryBackend
 from redis import asyncio as aioredis
 from src.api_v1 import router as router_v1
 from src.core.config import settings
@@ -24,7 +26,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         print(f"{key}")
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    # FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    FastAPICache.init(InMemoryBackend())
     yield
 
 
