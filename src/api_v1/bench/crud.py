@@ -1,0 +1,24 @@
+from datetime import datetime, timedelta
+from typing import List
+from sqlalchemy import *
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.alchemy import database
+from src.api_v1.bench.schemas import Teacher
+from src.api_v1.groups.schemas import Paras, DayScheduleFormatted
+from src.models.day_schedule_model import DaySchedule, Para
+from src.utils.tools import get_number_para_emoji
+from src.api_v1.teachers.schemas import ZamenasFull, DayScheduleTeacher
+from src.api_v1.groups.schemas import Zamena as Zamenas
+import asyncio
+
+
+async def bench_alchemy(session: AsyncSession) -> List[Teacher]:
+    query = select(database.Teachers)
+    result: Result = await session.execute(query)
+    return list(result.scalars().all())
+
+
+async def bench_supabase(session: AsyncSession, supabase) -> List[Teacher]:
+
+    data, _ = supabase.table("Teachers").select("*").execute()
+    return [Teacher.parse_obj(x) for x in data[1]]

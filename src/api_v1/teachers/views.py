@@ -15,6 +15,9 @@ from .schemas import (
 
 router = APIRouter(tags=["Teachers"])
 
+import time
+import asyncio
+
 
 @router.get("/", response_model=list[Teacher])
 @cache(expire=600)
