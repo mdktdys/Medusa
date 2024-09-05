@@ -17,7 +17,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     redis_data = await redis.keys()
     print(redis_data)
     for key in redis_data:
-        print(f"{key}: {redis_data[key]}")
+        print(f"{key}")
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
