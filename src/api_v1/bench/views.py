@@ -10,7 +10,8 @@ from . import crud
 from .schemas import Teacher
 
 router = APIRouter(tags=["Bench"])
-#test
+# test 2
+
 
 @router.get("/bench/alchemy/")
 async def bench_alchemy(
