@@ -4,12 +4,10 @@ from contextlib import asynccontextmanager
 from src.alchemy import *
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
-from fastapi_cache.backends.memcached import MemcachedBackend
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 from src.api_v1 import router as router_v1
 from src.core.config import settings
-from fastapi_cache.decorator import cache
 
 
 @asynccontextmanager
