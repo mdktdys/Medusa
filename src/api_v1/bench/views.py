@@ -41,3 +41,14 @@ async def bench_supabase(
     end_time = time.perf_counter()
     print(f"Время выполнения {end_time - start_time} секунд")
     return res
+
+
+@cache()
+async def get_cache():
+    return 1
+
+
+@router.get("/test/")
+@cache(expire=60)
+async def index():
+    return dict(hello="world")
