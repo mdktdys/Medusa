@@ -8,7 +8,7 @@ from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
 
 
-async def get_groups(session: AsyncSession) -> list[database.Groups]:
+async def get_groups(session: AsyncSession) -> List[database.Groups]:
     query = select(database.Groups)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
@@ -16,7 +16,7 @@ async def get_groups(session: AsyncSession) -> list[database.Groups]:
 
 async def get_group_by_id(
     session: AsyncSession, group_id: int
-) -> list[database.Groups]:
+) -> List[database.Groups]:
     query = select(database.Groups).where(database.Groups.id == group_id)
     result: Result = await session.execute(query)
     return list(result.scalars().all())

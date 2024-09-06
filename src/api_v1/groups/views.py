@@ -12,9 +12,11 @@ from .schemas import DaySchedule
 router = APIRouter(tags=["Groups"])
 
 
-@router.get("/", response_model=list[Group])
+@router.get("/", response_model=List[Group])
 @cache()
-async def get_groups(session: AsyncSession = Depends(db_helper.session_dependency)):
+async def get_groups(
+    session: AsyncSession = Depends(db_helper.session_dependency),
+) -> List[Group]:
     return await crud.get_groups(session=session)
 
 
@@ -23,7 +25,7 @@ async def get_groups(session: AsyncSession = Depends(db_helper.session_dependenc
 async def get_group_by_id(
     group_id: int = -1,
     session: AsyncSession = Depends(db_helper.session_dependency),
-):
+) -> List[Group]:
     return await crud.get_group_by_id(session=session, group_id=group_id)
 
 
@@ -33,7 +35,7 @@ async def get_group_day_schedule_by_date(
     group_id: int = -1,
     date: datetime = datetime.now(),
     session: AsyncSession = Depends(db_helper.session_dependency),
-):
+) -> DaySchedule:
     return await crud.get_group_day_schedule_by_date(
         session=session, group_id=group_id, date=date
     )
@@ -47,7 +49,7 @@ async def get_group_day_schedule_by_date_formatted(
     group_id: int = -1,
     date: datetime = datetime.now(),
     session: AsyncSession = Depends(db_helper.session_dependency),
-):
+) -> DayScheduleFormatted:
     return await crud.get_group_day_schedule_by_date_formatted(
         session=session, group_id=group_id, date=date
     )
@@ -61,7 +63,7 @@ async def get_group_week_schedule_by_date(
     group_id: int = -1,
     monday_date: datetime = datetime.now(),
     session: AsyncSession = Depends(db_helper.session_dependency),
-):
+) -> List[DaySchedule]:
     return await crud.get_group_week_schedule_by_date(
         session=session, group_id=group_id, monday_date=monday_date
     )
