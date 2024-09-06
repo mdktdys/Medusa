@@ -49,6 +49,6 @@ async def get_cache():
 
 
 @router.get("/test/")
-@cache(expire=60)
+@cache(expire=6000)
 async def index():
     return dict(hello="world")

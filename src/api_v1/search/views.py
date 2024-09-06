@@ -11,7 +11,7 @@ router = APIRouter(tags=["Search"])
 
 
 @router.get("/search/{query}/")
-@cache(expire=600)
+@cache(expire=6000)
 async def get_search(
     query: str, session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> List[SearchResult]:
