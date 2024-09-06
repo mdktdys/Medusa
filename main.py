@@ -12,11 +12,7 @@ from src.core.config import settings
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    redis = aioredis.from_url(
-        "redis://redis",
-        decode_responses=True,
-        encoding="utf8",
-    )
+    redis = aioredis.from_url("redis://redis")
     redis_data = await redis.keys()
     print(redis_data)
     for key in redis_data:
@@ -27,6 +23,5 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-# ssmjghasdfasdfvgknjhbkbh
 app = FastAPI(lifespan=lifespan, docs_url="/")
 app.include_router(router=router_v1, prefix=settings.api_v1_prefix)
