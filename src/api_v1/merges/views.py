@@ -8,7 +8,7 @@ from src.alchemy.db_helper import *
 from . import crud
 from .schemas import MergeResult
 
-router = APIRouter(tags=["merge"])
+router = APIRouter(tags=["Merge"])
 
 pass_ = os.environ.get("API_SECRET")
 

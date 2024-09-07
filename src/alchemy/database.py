@@ -50,6 +50,9 @@ class Cabinets(Base):
         primary_key=True,
     )
     name: Mapped[str] = mapped_column(Text)
+    synonyms: Mapped[list] = mapped_column(
+        ARRAY(String()), server_default=text("'{}'::character varying[]")
+    )
 
     Paras: Mapped[List["Paras"]] = relationship("Paras", back_populates="Cabinets_")
     Zamenas: Mapped[List["Zamenas"]] = relationship(
