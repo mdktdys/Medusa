@@ -36,10 +36,10 @@ async def merge_teachers(
         result = await session.execute(query)
         logs["zamenas"] = len(result.fetchall())
 
-        teacher_from: Teacher = get_teacher_by_id(
+        teacher_from: Teacher = await get_teacher_by_id(
             session=session, teacher_id=merge_from_id
         )[0]
-        teacher_to: Teacher = get_teacher_by_id(
+        teacher_to: Teacher = await get_teacher_by_id(
             session=session, teacher_id=merge_to_id
         )[0]
 
