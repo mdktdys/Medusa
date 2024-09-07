@@ -12,7 +12,8 @@ from src.core.config import settings
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    redis = aioredis.from_url("redis://redis", decode_responses=False)
+    # redis = aioredis.from_url("redis://redis", decode_responses=False)
+    redis = aioredis.from_url("redis://localhost", decode_responses=False)
     redis_data = await redis.keys()
     print(redis_data)
     for key in redis_data:
