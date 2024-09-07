@@ -49,9 +49,9 @@ async def merge_teachers(
         merged_synonyms = teacher_from_synonyms + teacher_to_synonyms
         # merge paras
         query = (
-            update(database.Paras)
-            .returning(database.Paras.teacher)
-            .where(database.Paras.teacher == merge_to_id)
+            update(database.Teachers)
+            .returning(database.Teachers.id)
+            .where(database.Teachers.id == merge_to_id)
             .values(synonyms=merged_synonyms)
         )
         result = await session.execute(query)
