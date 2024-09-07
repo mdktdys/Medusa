@@ -24,6 +24,21 @@ async def merge_cabinets(
     )
 
 
+# @dp.message(F.text, Command("merge_teacher"))
+# async def my_handler(message: Message):
+#     if message.chat.id in admins:
+#         merge_from = message.text.split()[1]
+#         merge_to = message.text.split()[2]
+#         data = sup.table('Paras').update({'teacher': merge_to}).eq('teacher', merge_from).execute()
+#         print(data)
+#         count = len(data.data)
+#         data = sup.table('Zamenas').update({'teacher': merge_to}).eq('teacher', merge_from).execute()
+#         print(data)
+#         count = count + len(data.data)
+#         sup.table('Teachers').delete().eq('id', merge_from).execute()
+#         await message.answer(f"Поменял с {merge_from} на {merge_to} | {count} раз")
+
+
 async def merge_groups(
     session: AsyncSession, merge_from_id: int, merge_to_id: int
 ) -> MergeResult:
