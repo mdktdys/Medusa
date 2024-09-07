@@ -6,13 +6,61 @@ import asyncio
 from src.alchemy import database
 from src.api_v1.merges.schemas import MergeResult
 from src.api_v1.search.schemas import SearchResult
+from src.api_v1.teachers.crud import get_teacher_by_id
+from src.api_v1.teachers.schemas import Teacher
 
 
 async def merge_teachers(
     session: AsyncSession, merge_from_id: int, merge_to_id: int
 ) -> MergeResult:
+    async with session.begin():
+        logs = dict()
+
+        # merge paras
+        query = (
+            update(database.Paras)
+            .returning(database.Paras.teacher)
+            .where(database.Paras.teacher == merge_from_id)
+            .values(teacher=merge_to_id)
+        )
+        result = await session.execute(query)
+        logs["paras"] = len(result.fetchall())
+
+        # merge zamenas
+        query = (
+            update(database.Zamenas)
+            .returning(database.Zamenas.teacher)
+            .where(database.Zamenas.teacher == merge_from_id)
+            .values(teacher=merge_to_id)
+        )
+        result = await session.execute(query)
+        logs["zamenas"] = len(result.fetchall())
+
+        teacher_from: Teacher = get_teacher_by_id(
+            session=session, teacher_id=merge_from_id
+        )[0]
+        teacher_to: Teacher = get_teacher_by_id(
+            session=session, teacher_id=merge_to_id
+        )[0]
+
+        teacher_from_synonyms = teacher_from.synonyms
+        teacher_to_synonyms = teacher_to.synonyms
+        merged_synonyms = teacher_from_synonyms + teacher_to_synonyms
+        # merge paras
+        query = (
+            update(database.Paras)
+            .returning(database.Paras.teacher)
+            .where(database.Paras.teacher == merge_to_id)
+            .values(synonyms=merged_synonyms)
+        )
+        result = await session.execute(query)
+        print(result)
+        logs["synonyms"] = merged_synonyms
+
+        await session.commit()
     return MergeResult(
-        result="success merge teachers", replaced_information="replaced 0"
+        result="success merge groups",
+        replaced_information=f"{logs}",
     )
 
 
@@ -22,21 +70,6 @@ async def merge_cabinets(
     return MergeResult(
         result="success merge cabinets", replaced_information="replaced 0"
     )
-
-
-# @dp.message(F.text, Command("merge_teacher"))
-# async def my_handler(message: Message):
-#     if message.chat.id in admins:
-#         merge_from = message.text.split()[1]
-#         merge_to = message.text.split()[2]
-#         data = sup.table('Paras').update({'teacher': merge_to}).eq('teacher', merge_from).execute()
-#         print(data)
-#         count = len(data.data)
-#         data = sup.table('Zamenas').update({'teacher': merge_to}).eq('teacher', merge_from).execute()
-#         print(data)
-#         count = count + len(data.data)
-#         sup.table('Teachers').delete().eq('id', merge_from).execute()
-#         await message.answer(f"Поменял с {merge_from} на {merge_to} | {count} раз")
 
 
 async def merge_groups(
@@ -55,8 +88,6 @@ async def merge_groups(
         result = await session.execute(query)
         logs["liquidation"] = len(result.fetchall())
 
-        print("l")
-
         # merge practices
         query = (
             update(database.Practices)
@@ -66,8 +97,6 @@ async def merge_groups(
         )
         result = await session.execute(query)
         logs["liquidation"] = len(result.fetchall())
-
-        print("p")
 
         # merge fullzamenas
         query = (
@@ -79,8 +108,6 @@ async def merge_groups(
         result = await session.execute(query)
         logs["zamenasfull"] = len(result.fetchall())
 
-        print("f")
-
         # merge zamenas
         query = (
             update(database.Zamenas)
@@ -90,8 +117,6 @@ async def merge_groups(
         )
         result = await session.execute(query)
         logs["zamenas"] = len(result.fetchall())
-
-        print("z")
 
         # merge paras
         query = (
@@ -103,13 +128,9 @@ async def merge_groups(
         result = await session.execute(query)
         logs["paras"] = len(result.fetchall())
 
-        print("p")
-
         query = delete(database.Groups).where(database.Groups.id == merge_from_id)
         result = await session.execute(query)
         print(result)
-
-        print("d")
 
         await session.commit()
     return MergeResult(

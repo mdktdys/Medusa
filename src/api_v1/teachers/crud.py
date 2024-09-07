@@ -11,7 +11,7 @@ from src.api_v1.groups.schemas import Zamena as Zamenas
 import asyncio
 
 
-async def get_teachers(session: AsyncSession) -> list[database.Teachers]:
+async def get_teachers(session: AsyncSession) -> List[database.Teachers]:
     query = select(database.Teachers)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
@@ -19,7 +19,7 @@ async def get_teachers(session: AsyncSession) -> list[database.Teachers]:
 
 async def get_teacher_by_id(
     session: AsyncSession, teacher_id: int
-) -> list[database.Teachers]:
+) -> List[database.Teachers]:
     query = select(database.Teachers).where(database.Teachers.id == teacher_id)
     result: Result = await session.execute(query)
     return list(result.scalars().all())

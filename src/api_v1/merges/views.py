@@ -9,6 +9,7 @@ from .schemas import MergeResult
 
 router = APIRouter(tags=["merge"])
 
+# кто сломает мне бд чмо
 passes = ["secret"]
 
 

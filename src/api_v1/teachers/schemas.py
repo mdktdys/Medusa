@@ -35,6 +35,7 @@ class Teacher(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
+    synonyms: List[str]
 
 
 class ZamenasFull(BaseModel):

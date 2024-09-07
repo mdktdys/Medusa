@@ -19,6 +19,7 @@ from sqlalchemy import (
     Time,
     UniqueConstraint,
     text,
+    ARRAY,
 )
 from sqlalchemy.dialects.postgresql import OID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -72,6 +73,9 @@ class Courses(Base):
     )
     color: Mapped[str] = mapped_column(String)
     name: Mapped[Optional[str]] = mapped_column(Text, server_default=text("''::text"))
+    synonyms: Mapped[list] = mapped_column(
+        ARRAY(String()), server_default=text("'{}'::character varying[]")
+    )
     fullname: Mapped[Optional[str]] = mapped_column(String)
 
     Paras: Mapped[List["Paras"]] = relationship("Paras", back_populates="Courses_")
@@ -190,6 +194,9 @@ class Teachers(Base):
         primary_key=True,
     )
     name: Mapped[str] = mapped_column(String)
+    synonyms: Mapped[list] = mapped_column(
+        ARRAY(String()), server_default=text("'{}'::character varying[]")
+    )
 
     Paras: Mapped[List["Paras"]] = relationship("Paras", back_populates="Teachers_")
     Zamenas: Mapped[List["Zamenas"]] = relationship(
