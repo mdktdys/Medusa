@@ -58,6 +58,10 @@ async def merge_teachers(
         print(result)
         logs["synonyms"] = merged_synonyms
 
+        query = delete(database.Teachers).where(database.Teachers.id == merge_from_id)
+        result = await session.execute(query)
+        print(result)
+
         await session.commit()
     return MergeResult(
         result="success merge groups",
