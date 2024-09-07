@@ -13,11 +13,6 @@ from src.core.config import settings
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     redis = aioredis.from_url("redis://redis", decode_responses=False)
-    # redis = aioredis.from_url("redis://localhost", decode_responses=False)
-    redis_data = await redis.keys()
-    print(redis_data)
-    for key in redis_data:
-        print(f"{key}")
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
