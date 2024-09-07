@@ -4,6 +4,7 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
 from src.alchemy import database
+from src.alchemy.database import Teachers
 from src.api_v1.merges.schemas import MergeResult
 from src.api_v1.search.schemas import SearchResult
 from src.api_v1.teachers.crud import get_teacher_by_id
@@ -36,11 +37,11 @@ async def merge_teachers(
         result = await session.execute(query)
         logs["zamenas"] = len(result.fetchall())
 
-        teacher_from: Teacher = await get_teacher_by_id(
-            session=session, teacher_id=merge_from_id
+        teacher_from: Teachers = (
+            await get_teacher_by_id(session=session, teacher_id=merge_from_id)
         )[0]
-        teacher_to: Teacher = await get_teacher_by_id(
-            session=session, teacher_id=merge_to_id
+        teacher_to: Teachers = (
+            await get_teacher_by_id(session=session, teacher_id=merge_to_id)
         )[0]
 
         teacher_from_synonyms = teacher_from.synonyms
