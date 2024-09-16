@@ -27,6 +27,18 @@ class Base(DeclarativeBase):
     pass
 
 
+class UserRead(schemas.BaseUser[UUID]):
+    pass
+
+
+class UserCreate(schemas.BaseUserCreate):
+    pass
+
+
+class UserUpdate(schemas.BaseUserUpdate):
+    pass
+
+
 # User model (inherits from BaseUser)
 class User(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "users"
@@ -98,7 +110,7 @@ router.include_router(
 )
 
 router.include_router(
-    fastapi_users.get_register_router(),
+    fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/auth",
     tags=["auth"],
 )
