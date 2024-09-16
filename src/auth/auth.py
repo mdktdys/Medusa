@@ -92,7 +92,7 @@ def get_jwt_strategy() -> JWTStrategy:
 # Authentication backend
 auth_backend = AuthenticationBackend(
     name="jwt",
-    transport=BearerTransport(tokenUrl="auth/jwt/login"),
+    transport=BearerTransport(tokenUrl="jwt/login"),
     get_strategy=get_jwt_strategy,
 )
 
@@ -105,13 +105,13 @@ fastapi_users = FastAPIUsers[User, UUID](
 # Include the routes for user authentication and registration
 router.include_router(
     fastapi_users.get_auth_router(auth_backend),
-    prefix="/auth/jwt",
+    prefix="/jwt",
     tags=["auth"],
 )
 
 router.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix="/auth",
+    prefix="/",
     tags=["auth"],
 )
 
