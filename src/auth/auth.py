@@ -1,7 +1,11 @@
 from typing import Optional
 from fastapi import Depends, FastAPI, Request
 from fastapi_users import FastAPIUsers, schemas
-from fastapi_users.authentication import JWTStrategy, AuthenticationBackend
+from fastapi_users.authentication import (
+    JWTStrategy,
+    AuthenticationBackend,
+    BearerTransport,
+)
 from fastapi_users.db import SQLAlchemyUserDatabase
 from fastapi_users.manager import BaseUserManager
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
@@ -76,7 +80,7 @@ def get_jwt_strategy() -> JWTStrategy:
 # Authentication backend
 auth_backend = AuthenticationBackend(
     name="jwt",
-    transport=JWTStrategy.get_transport(),
+    transport=BearerTransport(tokenUrl="auth/jwt/login"),
     get_strategy=get_jwt_strategy,
 )
 
