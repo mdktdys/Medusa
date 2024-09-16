@@ -8,6 +8,7 @@ from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 from src.api_v1 import router as router_v1
 from src.core.config import settings
+from router import router
 
 
 @asynccontextmanager
@@ -20,4 +21,4 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(lifespan=lifespan, docs_url="/")
-app.include_router(router=router_v1, prefix=settings.api_v1_prefix)
+app.include_router(router=router, prefix=settings.api_v1_prefix)
