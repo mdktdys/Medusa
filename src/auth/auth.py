@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi_users import FastAPIUsers, schemas
 from fastapi_users.authentication import JWTStrategy, AuthenticationBackend
 from fastapi_users.db import SQLAlchemyUserDatabase
