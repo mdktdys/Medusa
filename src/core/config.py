@@ -4,6 +4,8 @@ from pydantic_settings import BaseSettings
 from pathlib import Path
 
 database_pass = os.environ.get("POSTGRES_PASSWORD")
+print(database_pass)
+print(f"postgresql+asyncpg://root:{database_pass}@postgres:5432/Devotion")
 
 
 class Settings(BaseSettings):
