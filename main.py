@@ -21,5 +21,9 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(lifespan=lifespan, docs_url="/")
+app = FastAPI(
+    lifespan=lifespan,
+    docs_url="/",
+    swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
+)
 app.include_router(router=router)
