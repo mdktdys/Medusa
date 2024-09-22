@@ -12,7 +12,7 @@ class Settings(BaseSettings):
         database_connection
         # f"postgresql+asyncpg://root:{database_pass}@postgres:5432/Devotion"
     )
-    db_echo: bool = True
+    db_echo: bool = False
     app_name: str = "Medusa"
     items_per_user: int = 50
 
