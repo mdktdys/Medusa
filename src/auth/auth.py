@@ -17,7 +17,7 @@ from fastapi import APIRouter
 
 # Set your JWT secret and other constants
 SECRET = "secret"
-DATABASE_URL = "postgresql+asyncpg://test:test@uksivt-helios-1d0f44:5432/test"
+DATABASE_URL = "postgresql+asyncpg://root:banana@postgres:5432/Devotion"
 
 router = APIRouter()
 
