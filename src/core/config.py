@@ -3,15 +3,14 @@ import os
 from pydantic_settings import BaseSettings
 from pathlib import Path
 
-database_pass = os.environ.get("POSTGRES_PASSWORD")
-print(database_pass)
-print(f"postgresql+asyncpg://root:{database_pass}@postgres:5432/Devotion")
+database_connection = os.environ.get("SUPABASE_DATABASE_CONNECTION")
+print(database_connection)
 
 
 class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     db_url: str = (
-        "postgresql+asyncpg://postgres.ojbsikxdqcbuvamygezd:KCQjsy4bJiYqXxL9@aws-0-eu-west-2.pooler.supabase.com:5432/postgres"
+        database_connection
         # f"postgresql+asyncpg://root:{database_pass}@postgres:5432/Devotion"
     )
     db_echo: bool = True

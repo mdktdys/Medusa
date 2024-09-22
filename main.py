@@ -11,8 +11,6 @@ from src.api_v1 import router as router_v1
 from src.core.config import settings
 from router import router
 
-print(os.environ.get("SUPABASE_DATABASE_CONNECTION"))
-
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
