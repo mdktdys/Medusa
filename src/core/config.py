@@ -8,7 +8,6 @@ print(database_connection)
 
 
 class Settings(BaseSettings):
-    api_v1_prefix: str = ""
     db_url: str = (
         database_connection
         # f"postgresql+asyncpg://root:{database_pass}@postgres:5432/Devotion"
