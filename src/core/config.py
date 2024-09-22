@@ -11,8 +11,8 @@ print(f"postgresql+asyncpg://root:{database_pass}@postgres:5432/Devotion")
 class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
     db_url: str = (
-        # "postgresql+asyncpg://postgres.ojbsikxdqcbuvamygezd:KCQjsy4bJiYqXxL9@aws-0-eu-west-2.pooler.supabase.com:5432/postgres"
-        f"postgresql+asyncpg://root:{database_pass}@postgres:5432/Devotion"
+        "postgresql+asyncpg://postgres.ojbsikxdqcbuvamygezd:KCQjsy4bJiYqXxL9@aws-0-eu-west-2.pooler.supabase.com:5432/postgres"
+        # f"postgresql+asyncpg://root:{database_pass}@postgres:5432/Devotion"
     )
     db_echo: bool = True
     app_name: str = "Medusa"
