@@ -2,6 +2,8 @@ import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+from fastapi.openapi.docs import get_swagger_ui_html
+
 from src.alchemy import *
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
@@ -26,4 +28,14 @@ app = FastAPI(
     docs_url="/",
     swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
 )
+
 app.include_router(router=router)
+
+
+@app.get("/", include_in_schema=False)
+async def custom_swagger_ui_html_cdn():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title=f"{app.title} - Swagger UI",
+        swagger_css_url="https://cdn.jsdelivr.net/gh/Itz-fork/Fastapi-Swagger-UI-Dark/assets/swagger_ui_dark.min.css",
+    )
