@@ -3,6 +3,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi.openapi.docs import get_swagger_ui_html
+from starlette.middleware.cors import CORSMiddleware
 
 from src.alchemy import *
 from fastapi import FastAPI
@@ -27,6 +28,20 @@ app = FastAPI(
     lifespan=lifespan,
     docs_url="/",
     swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
+)
+
+origins = [
+    "http://telegram_bot",
+    "http://localhost",
+    "https://admin.uksivt.xyz",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_headers=["*"],
+    allow_methods=["*"],
 )
 
 app.include_router(router=router)
