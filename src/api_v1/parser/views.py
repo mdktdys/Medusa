@@ -13,6 +13,6 @@ pass_ = os.environ.get("API_SECRET")
 
 
 @router.get("/get_latest_zamena_link_celery", response_model=dict)
-@cache(6000)
+@cache(300)
 async def get_latest_zamena_link_celery() -> dict:
     return await crud.get_latest_zamena_link()
