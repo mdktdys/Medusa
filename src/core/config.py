@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings
 
-from secrets import supabase_database_connection, local_database_connection
+from my_secrets import supabase_database_connection, local_database_connection
 
 
 class Settings(BaseSettings):
