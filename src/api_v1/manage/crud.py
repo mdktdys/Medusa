@@ -29,29 +29,35 @@ async def copy_table(
     table_name: str,
     force: bool = True,
 ):
-    # Загружаем метаданные и таблицу из исходной базы данных
+    # Загружаем метаданные и таблицу из исходной базы данных с использованием синхронного движка
     metadata = MetaData()
-    source_table = Table(table_name, metadata, autoload_with=source_session.bind)
 
-    # Загружаем метаданные целевой базы данных
+    # Работаем с синхронным движком для загрузки схемы таблицы
+    async with source_session() as source_conn:
+        await source_conn.run_sync(
+            metadata.reflect
+        )  # Отражаем все таблицы в исходной базе
+
+    source_table = metadata.tables.get(table_name)
+
+    if not source_table:
+        raise Exception(f"Table {table_name} not found in source database.")
+
+    # Аналогично для целевой базы данных
     target_metadata = MetaData()
 
-    # Попытаемся отразить таблицу из целевой базы данных
-    try:
-        target_table = Table(
-            table_name, target_metadata, autoload_with=target_session.bind
-        )
-    except Exception as e:
-        print(f"Table {table_name} does not exist in target_db. Creating the table.")
+    async with target_session() as target_conn:
+        # Попытаемся загрузить таблицу в целевой базе данных
+        await target_conn.run_sync(target_metadata.reflect)
 
-        # Создаем таблицу, если она не существует
-        target_table = Table(table_name, target_metadata)
-        source_table.metadata.reflect(
-            bind=source_session.bind
-        )  # Отражаем исходную схему
-        source_table.metadata.create_all(
-            bind=target_session.bind, tables=[source_table]
-        )
+        target_table = target_metadata.tables.get(table_name)
+
+        if not target_table:
+            print(
+                f"Table {table_name} does not exist in target_db. Creating the table."
+            )
+            # Создаем таблицу, если она не существует
+            await target_conn.run_sync(metadata.create_all, tables=[source_table])
 
     if force:
         # Очистка таблицы в целевой базе данных
