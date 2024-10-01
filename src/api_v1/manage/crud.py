@@ -33,7 +33,7 @@ async def copy_table(
     metadata = MetaData()
 
     # Работаем с синхронным движком для загрузки схемы таблицы
-    async with source_session() as source_conn:
+    async with source_session as source_conn:
         await source_conn.run_sync(
             metadata.reflect
         )  # Отражаем все таблицы в исходной базе
@@ -46,7 +46,7 @@ async def copy_table(
     # Аналогично для целевой базы данных
     target_metadata = MetaData()
 
-    async with target_session() as target_conn:
+    async with target_session as target_conn:
         # Попытаемся загрузить таблицу в целевой базе данных
         await target_conn.run_sync(target_metadata.reflect)
 
