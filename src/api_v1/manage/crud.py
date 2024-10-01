@@ -29,26 +29,27 @@ async def copy_table(
     table_name: str,
     force: bool = True,
 ):
-    # Загружаем метаданные и таблицу из исходной базы данных с использованием синхронного движка
+    # Загружаем метаданные
     metadata = MetaData()
 
+    # Создаем синхронный движок для отражения таблиц
+    sync_source_engine = create_engine(source_session.bind.url)
+    sync_target_engine = create_engine(target_session.bind.url)
+
     # Работаем с синхронным движком для загрузки схемы таблицы
-    async with source_session as source_conn:
-        await source_conn.run_sync(
-            metadata.reflect
-        )  # Отражаем все таблицы в исходной базе
+    with sync_source_engine.connect() as source_conn:
+        metadata.reflect(bind=source_conn)
 
     source_table = metadata.tables.get(table_name)
 
     if not source_table:
         raise Exception(f"Table {table_name} not found in source database.")
 
-    # Аналогично для целевой базы данных
+    # Проверяем, существует ли целевая таблица
     target_metadata = MetaData()
 
-    async with target_session as target_conn:
-        # Попытаемся загрузить таблицу в целевой базе данных
-        await target_conn.run_sync(target_metadata.reflect)
+    with sync_target_engine.connect() as target_conn:
+        target_metadata.reflect(bind=target_conn)
 
         target_table = target_metadata.tables.get(table_name)
 
@@ -57,7 +58,7 @@ async def copy_table(
                 f"Table {table_name} does not exist in target_db. Creating the table."
             )
             # Создаем таблицу, если она не существует
-            await target_conn.run_sync(metadata.create_all, tables=[source_table])
+            target_metadata.create_all(bind=target_conn, tables=[source_table])
 
     if force:
         # Очистка таблицы в целевой базе данных
