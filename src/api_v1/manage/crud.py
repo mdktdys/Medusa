@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List
 from sqlalchemy import *
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, MetaData, Table, select
 from sqlalchemy.orm import sessionmaker
@@ -32,13 +32,13 @@ async def copy_table(
     # Загружаем метаданные
     metadata = MetaData()
 
-    # Создаем синхронный движок для отражения таблиц
-    sync_source_engine = create_engine(source_session.bind.url)
-    sync_target_engine = create_engine(target_session.bind.url)
+    # Используем асинхронный движок для отражения таблиц
+    async_source_engine = create_async_engine(str(source_session.bind.url))
+    async_target_engine = create_async_engine(str(target_session.bind.url))
 
-    # Работаем с синхронным движком для загрузки схемы таблицы
-    with sync_source_engine.connect() as source_conn:
-        metadata.reflect(bind=source_conn)
+    # Работаем с асинхронным движком для загрузки схемы таблицы
+    async with async_source_engine.connect() as source_conn:
+        await source_conn.run_sync(metadata.reflect, bind=source_conn)
 
     source_table = metadata.tables.get(table_name)
 
@@ -48,8 +48,8 @@ async def copy_table(
     # Проверяем, существует ли целевая таблица
     target_metadata = MetaData()
 
-    with sync_target_engine.connect() as target_conn:
-        target_metadata.reflect(bind=target_conn)
+    async with async_target_engine.connect() as target_conn:
+        await target_conn.run_sync(target_metadata.reflect, bind=target_conn)
 
         target_table = target_metadata.tables.get(table_name)
 
@@ -58,7 +58,7 @@ async def copy_table(
                 f"Table {table_name} does not exist in target_db. Creating the table."
             )
             # Создаем таблицу, если она не существует
-            target_metadata.create_all(bind=target_conn, tables=[source_table])
+            await target_conn.run_sync(metadata.create_all, bind=target_conn)
 
     if force:
         # Очистка таблицы в целевой базе данных
@@ -78,5 +78,3 @@ async def copy_table(
 
         # Фиксируем изменения в целевой базе данных
         await target_session.commit()
-
-    print(f"Copied table {table_name} with {len(rows)} rows.")
