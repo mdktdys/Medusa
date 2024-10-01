@@ -30,6 +30,28 @@ class Base(DeclarativeBase):
     pass
 
 
+class AlreadyFoundsLinks(Base):
+    __tablename__ = "AlreadyFoundsLinks"
+    __table_args__ = (PrimaryKeyConstraint("id", name="AlreadyFoundsLinks_pkey"),)
+
+    id: Mapped[int] = mapped_column(
+        BigInteger,
+        Identity(
+            start=1,
+            increment=1,
+            minvalue=1,
+            maxvalue=9223372036854775807,
+            cycle=False,
+            cache=1,
+        ),
+        primary_key=True,
+    )
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(True), server_default=text("now()")
+    )
+    link: Mapped[Optional[str]] = mapped_column(String)
+
+
 class Cabinets(Base):
     __tablename__ = "Cabinets"
     __table_args__ = (

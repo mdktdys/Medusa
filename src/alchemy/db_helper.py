@@ -31,3 +31,4 @@ class DatabaseHelper:
 
 
 db_helper = DatabaseHelper(url=settings.db_url, echo=True)
+local_db_helper = DatabaseHelper(url=settings.db_url, echo=True)

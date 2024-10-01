@@ -10,6 +10,8 @@ from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
+
+from src.alchemy.db_helper import local_db_helper
 from src.api_v1 import router as router_v1
 from src.core.config import settings
 from router import router
@@ -19,6 +21,8 @@ from router import router
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     redis = aioredis.from_url("redis://redis", decode_responses=False)
     async with db_helper.engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    async with local_db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield

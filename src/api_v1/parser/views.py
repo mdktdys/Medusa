@@ -19,6 +19,21 @@ async def get_latest_zamena_link_celery() -> dict:
     return await crud.get_latest_zamena_link()
 
 
+@router.get("/get_founded_links", response_model=List[str])
+@cache(300)
+async def get_founded_links(
+    session: AsyncSession = Depends(db_helper.session_dependency),
+) -> List[str]:
+    return await crud.get_founded_links(session=session)
+
+
+@router.get("/check_new", response_model=List[str])
+async def check_new(
+    session: AsyncSession = Depends(db_helper.session_dependency),
+) -> dict:
+    return await crud.check_new(session=session)
+
+
 @router.get("/containers")
 def get_containers():
     client = docker.from_env()  # Используем Docker SDK для Python
