@@ -36,13 +36,20 @@ async def copy_table(
     # Загружаем метаданные
     metadata = MetaData()
 
-    # Загружаем таблицу из исходной базы данных
-    source_table = Table(table_name, metadata, autoload_with=source_session.bind)
+    # Получаем соединение для инспекции
+    async with source_session.begin():
+        # Загружаем таблицу из исходной базы данных
+        source_table = await source_session.run_sync(
+            lambda conn: Table(table_name, metadata, autoload_with=conn)
+        )
 
     # Проверяем, существует ли таблица в целевой базе данных
     try:
-        target_table = Table(table_name, metadata, autoload_with=target_session.bind)
-        print(f"Таблица '{table_name}' уже существует в целевой базе данных.")
+        async with target_session.begin():
+            target_table = await target_session.run_sync(
+                lambda conn: Table(table_name, metadata, autoload_with=conn)
+            )
+            print(f"Таблица '{table_name}' уже существует в целевой базе данных.")
     except NoSuchTableError:
         if force:
             # Если таблица не существует и force=True, создаем её
