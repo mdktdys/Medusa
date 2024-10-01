@@ -37,20 +37,26 @@ async def copy_table(
     metadata = MetaData()
 
     # Получаем синхронное соединение для инспекции
-    async with source_session.begin():
-        sync_source_conn = await source_session.run_sync(lambda conn: conn)
+    sync_source_conn = await source_session.run_sync(lambda conn: conn)
+    sync_target_conn = await target_session.run_sync(lambda conn: conn)
+
+    # Загружаем таблицу из исходной базы данных
+    try:
         source_table = Table(table_name, metadata, autoload_with=sync_source_conn)
+    except NoSuchTableError:
+        print(f"Таблица '{table_name}' не найдена в исходной базе данных.")
+        return
 
     # Проверяем, существует ли таблица в целевой базе данных
     try:
-        async with target_session.begin():
-            sync_target_conn = await target_session.run_sync(lambda conn: conn)
-            target_table = Table(table_name, metadata, autoload_with=sync_target_conn)
-            print(f"Таблица '{table_name}' уже существует в целевой базе данных.")
+        target_table = Table(table_name, metadata, autoload_with=sync_target_conn)
+        print(f"Таблица '{table_name}' уже существует в целевой базе данных.")
     except NoSuchTableError:
         if force:
             # Если таблица не существует и force=True, создаем её
-            await target_session.execute(CreateTable(source_table))
+            await target_session.run_sync(
+                lambda conn: conn.execute(CreateTable(source_table))
+            )
             print(f"Создана таблица '{table_name}' в целевой базе данных.")
         else:
             print(
@@ -62,6 +68,12 @@ async def copy_table(
     select_query = select(source_table)
     results = await source_session.execute(select_query)
 
+    async with target_session.begin():
+        async for row in results:
+            # Вставляем каждую строку в целевую таблицу
+            await target_session.execute(insert(target_table).values(**row))
+
+    print(f"Данные из таблицы '{table_name}' успешно перенесены.")
     async with target_session.begin():
         async for row in results:
             # Вставляем каждую строку в целевую таблицу
