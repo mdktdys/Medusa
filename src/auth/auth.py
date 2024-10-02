@@ -127,7 +127,7 @@ def auth(roles: List[str] = None):
     return decorator
 
 
-@auth(roles=["owner"])
 @router.get("/protected-route", tags=["users"])
+@auth(roles=["owner"])
 async def protected_route():
     return {"message": f"Hello "}
