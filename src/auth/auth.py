@@ -103,11 +103,8 @@ router.include_router(
     tags=["auth"],
 )
 
-ROLES = {"admin": []}
-
 
 def authorize(roles):
-
     def decorator(func):
         async def wrapper(current_user: User = Depends(current_active_user)):
             if current_user.role not in roles:
