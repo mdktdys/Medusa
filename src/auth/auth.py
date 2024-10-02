@@ -125,6 +125,6 @@ async def protected_route(
 
 
 # Run the database initialization at startup
-@router.on_event("startup")
-async def on_startup():
-    await create_db_and_tables()
+# @router.on_event("startup")
+# async def on_startup():
+#     await create_db_and_tables()
