@@ -20,63 +20,58 @@ async def sync_local_database(
     source_session: AsyncSession, target_session: AsyncSession
 ):
     table_names = ["AlreadyFoundsLinks"]
-
-    for table_name in table_names:
-        await copy_table(source_session, target_session, table_name)
+    await copy_tables(
+        table_names=table_names,
+        source_session=source_session,
+        target_session=target_session,
+        force=True,
+    )
 
     return {"res": "ok"}
 
 
-async def copy_table(
+async def copy_tables(
+    table_names: List[str],
     source_session: AsyncSession,
     target_session: AsyncSession,
-    table_name: str,
     force: bool = True,
 ):
-    # Загружаем метаданные
-    metadata = MetaData()
+    src_engine = create_engine(source_session.bind.url)
+    src_metadata = MetaData()
 
-    # Получаем синхронное соединение для инспекции
-    sync_source_conn = await source_session.run_sync(lambda conn: conn)
-    sync_target_conn = await target_session.run_sync(lambda conn: conn)
+    tgt_engine = create_engine(target_session.bind.url)
+    tgt_metadata = MetaData()
 
-    # Загружаем таблицу из исходной базы данных
-    try:
-        source_table = Table(table_name, metadata, autoload_with=sync_source_conn)
-    except NoSuchTableError:
-        print(f"Таблица '{table_name}' не найдена в исходной базе данных.")
-        return
+    src_conn = src_engine.connect()
+    tgt_conn = tgt_engine.connect()
+    tgt_metadata.reflect(bind=tgt_engine)
 
-    # Проверяем, существует ли таблица в целевой базе данных
-    try:
-        target_table = Table(table_name, metadata, autoload_with=sync_target_conn)
-        print(f"Таблица '{table_name}' уже существует в целевой базе данных.")
-    except NoSuchTableError:
-        if force:
-            # Если таблица не существует и force=True, создаем её
-            await target_session.run_sync(
-                lambda conn: conn.execute(CreateTable(source_table))
-            )
-            print(f"Создана таблица '{table_name}' в целевой базе данных.")
-        else:
-            print(
-                f"Таблица '{table_name}' не найдена и force=False, пропуск копирования."
-            )
-            return
+    for table in reversed(tgt_metadata.sorted_tables):
+        if table.name in table_names:
+            print("dropping table =", table.name)
+            table.drop(bind=tgt_engine)
 
-    # Перенос данных из исходной таблицы в целевую
-    select_query = select(source_table)
-    results = await source_session.execute(select_query)
+    tgt_metadata.clear()
+    tgt_metadata.reflect(bind=tgt_engine)
+    src_metadata.reflect(bind=src_engine)
 
-    async with target_session.begin():
-        async for row in results:
-            # Вставляем каждую строку в целевую таблицу
-            await target_session.execute(insert(target_table).values(**row))
+    # create all tables in target database
+    for table in src_metadata.sorted_tables:
+        if table.name in table_names:
+            table.create(bind=tgt_engine)
 
-    print(f"Данные из таблицы '{table_name}' успешно перенесены.")
-    async with target_session.begin():
-        async for row in results:
-            # Вставляем каждую строку в целевую таблицу
-            await target_session.execute(insert(target_table).values(**row))
+    # refresh metadata before you can copy data
+    tgt_metadata.clear()
+    tgt_metadata.reflect(bind=tgt_engine)
 
-    print(f"Данные из таблицы '{table_name}' успешно перенесены.")
+    # Copy all data from src to target
+    for table in tgt_metadata.sorted_tables:
+        src_table = src_metadata.tables[table.name]
+        stmt = table.insert()
+        for index, row in enumerate(src_conn.execute(src_table.select())):
+            print("table =", table.name, "Inserting row", index)
+            tgt_conn.execute(stmt.values(row))
+
+    tgt_conn.commit()
+    src_conn.close()
+    tgt_conn.close()
