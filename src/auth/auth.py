@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Request
-from my_secrets import SECRET, API_KEY  # добавьте сюда ваш API ключ
+from my_secrets import SECRET, API_KEY  # ваш секретный API ключ
 from src.auth.schemas import UserRead, UserCreate
 import uuid
 from typing import Optional
@@ -17,11 +17,12 @@ from src.auth.schemas import User
 router = APIRouter()
 
 
-# Зависимость для проверки API ключа
-async def api_key_auth(request: Request):
+# Функция для проверки API ключа
+async def api_key_auth(request: Request) -> bool:
     api_key = request.headers.get("X-API-KEY")
-    if api_key != API_KEY:
-        raise HTTPException(status_code=403, detail="Invalid API Key")
+    if api_key == API_KEY:
+        return True
+    return False
 
 
 # Получение базы данных пользователей
@@ -85,33 +86,33 @@ router.include_router(
 )
 
 
-# Авторизация по ролям и API Key
-def authorize(roles):
+# Функция для авторизации по API Key или роли
+def authorize(roles: list[str]):
     def decorator(func):
         async def wrapper(
             request: Request,
             current_user: Optional[User] = Depends(current_active_user),
         ):
-            print(request.headers)
+            # 1. Проверяем наличие API Key
+            if await api_key_auth(request):
+                return (
+                    await func()
+                )  # если API Key валидный, продолжаем без проверки роли
 
-            # Проверка на API Key
-            api_key = request.headers.get("X-API-KEY")
-            if api_key != API_KEY:
-                raise HTTPException(status_code=403, detail="Invalid API Key")
+            # 2. Проверяем авторизацию через пользователя (если API Key не передан)
+            if current_user and current_user.role in roles:
+                return await func()
 
-            # Проверка роли пользователя
-            if current_user.role not in roles:
-                raise HTTPException(status_code=403, detail="Unauthorized")
-
-            return await func()
+            # Если ни одно из условий не выполнено
+            raise HTTPException(status_code=403, detail="Unauthorized")
 
         return wrapper
 
     return decorator
 
 
-# Пример защищённого маршрута с проверкой роли и API Key
+# Пример защищённого маршрута с доступом по API Key ИЛИ роли "Owner"
 @router.get("/protected-route", tags=["Users"])
 @authorize(roles=["Owner"])
 async def protected_route():
-    return {"message": "Hello, this is a protected route!"}
+    return {"message": "Hello, you have access to the protected route!"}
