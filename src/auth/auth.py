@@ -2,7 +2,7 @@ from functools import partial, wraps
 from typing import Optional, List
 from fastapi import Depends, FastAPI, Request, HTTPException, status
 from fastapi.security import HTTPBearer
-from fastapi_users import FastAPIUsers, schemas
+from fastapi_users import FastAPIUsers, schemas, jwt
 from fastapi_users.authentication import (
     JWTStrategy,
     AuthenticationBackend,
@@ -18,7 +18,6 @@ from uuid import UUID
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
-from jose import jwt, JWTError
 from src.alchemy.database import Base
 from src.alchemy.db_helper import local_db_helper
 from src.auth.schemas import User, UserRead, UserCreate
@@ -107,25 +106,13 @@ router.include_router(
 ROLES = {"admin": []}
 
 
-async def get_current_user(token=Depends(HTTPBearer())):
-    try:
-        payload = jwt.decode(token.credentials, SECRET, algorithms=["HS256"])
-        username = payload.get("sub")
-        role = payload.get("role")
-        if role not in ROLES:
-            raise HTTPException(status_code=403, detail="Invalid role")
-        print({"username": username, "role": role})
-        return {"username": username, "role": role}
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-
 def authorize(roles):
+
     def decorator(func):
-        async def wrapper(current_user=Depends(get_current_user), **kwargs):
+        async def wrapper(current_user=Depends(current_active_user)):
             if current_user["role"] not in roles:
                 raise HTTPException(status_code=403, detail="Unauthorized")
-            return await func(**kwargs)
+            return await func()
 
         return wrapper
 
