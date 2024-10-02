@@ -91,16 +91,19 @@ def authorize(roles: list[str]):
     def decorator(func):
         async def wrapper(
             request: Request,
-            current_user: Optional[User] = Depends(current_active_user),
+            # Пользователь проверяется ТОЛЬКО если не передан API Key
+            current_user: Optional[User] = None,
         ):
-            print(request)
             # 1. Проверяем наличие API Key
             if await api_key_auth(request):
                 return (
                     await func()
                 )  # если API Key валидный, продолжаем без проверки роли
 
-            # 2. Проверяем авторизацию через пользователя (если API Key не передан)
+            # 2. Если API Key нет, проверяем JWT авторизацию
+            current_user = await current_active_user(
+                request
+            )  # получаем пользователя через JWT
             if current_user and current_user.role in roles:
                 return await func()
 
