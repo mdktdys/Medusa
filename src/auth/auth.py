@@ -59,7 +59,9 @@ router = APIRouter()
 #         yield session
 
 
-async def get_user_db(session: AsyncSession = Depends(local_db_helper)):
+async def get_user_db(
+    session: AsyncSession = Depends(local_db_helper.session_dependency),
+):
     yield SQLAlchemyUserDatabase(session, User)
 
 
