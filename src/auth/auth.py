@@ -106,7 +106,7 @@ router.include_router(
 def auth(roles: List[str] = None):
     def decorator(func):
         @wraps(func)
-        async def wrapper(*args, user=Depends(get_user_db), **kwargs):
+        async def wrapper(*args, user=Depends(current_active_user), **kwargs):
             if not user:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
