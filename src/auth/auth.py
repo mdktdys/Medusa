@@ -129,7 +129,5 @@ def auth(roles: List[str] = None):
 
 @auth(roles=["owner"])
 @router.get("/protected-route", tags=["users"])
-async def protected_route(
-    user: User = Depends(fastapi_users.current_user(active=True)),
-):
-    return {"message": f"Hello {user.email}"}
+async def protected_route():
+    return {"message": f"Hello "}
