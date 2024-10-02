@@ -1,5 +1,6 @@
-from typing import Optional
-from fastapi import Depends, FastAPI, Request
+from functools import partial, wraps
+from typing import Optional, List
+from fastapi import Depends, FastAPI, Request, HTTPException, status
 from fastapi_users import FastAPIUsers, schemas
 from fastapi_users.authentication import (
     JWTStrategy,
@@ -101,6 +102,32 @@ router.include_router(
 )
 
 
+# Декоратор для проверки авторизации
+def auth(roles: List[str] = None):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, user=Depends(get_user_db), **kwargs):
+            if not user:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Not authenticated",
+                )
+
+            if roles and user["role"] not in roles:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="You do not have permission to access this resource",
+                )
+
+            # Если проверка пройдена, вызываем исходную функцию
+            return await func(*args, user=user, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+@auth(roles=["owner"])
 @router.get("/protected-route", tags=["users"])
 async def protected_route(
     user: User = Depends(fastapi_users.current_user(active=True)),
