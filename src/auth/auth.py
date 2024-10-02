@@ -120,6 +120,6 @@ def authorize(roles):
 
 
 @router.get("/protected-route", tags=["users"])
-@authorize(roles=["owner"])
+@authorize(roles=["Owner"])
 async def protected_route():
     return {"message": f"Hello "}
