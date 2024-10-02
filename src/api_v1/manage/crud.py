@@ -10,6 +10,7 @@ import json
 
 from sqlalchemy.sql.ddl import CreateTable
 
+from my_secrets import supabase_database_connection, local_database_connection
 from src.alchemy import database
 from src.api_v1.groups.schemas import Zamena, Paras, DayScheduleFormatted
 from src.models.day_schedule_model import DaySchedule, Para
@@ -36,10 +37,10 @@ async def copy_tables(
     target_session: AsyncSession,
     force: bool = True,
 ):
-    src_engine = create_engine(source_session.bind.url)
+    src_engine = create_engine(supabase_database_connection.replace("+asyncpg", ""))
     src_metadata = MetaData()
 
-    tgt_engine = create_engine(target_session.bind.url)
+    tgt_engine = create_engine(local_database_connection.replace("+asyncpg", ""))
     tgt_metadata = MetaData()
 
     src_conn = src_engine.connect()
