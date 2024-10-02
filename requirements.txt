@@ -12,3 +12,4 @@ celery==5.4.0
 docker~=7.1.0
 starlette~=0.37.2
 psycopg2-binary==2.9.9
+jose==1.0.0
