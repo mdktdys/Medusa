@@ -20,7 +20,25 @@ from src.utils.tools import get_number_para_emoji
 async def sync_local_database(
     source_session: AsyncSession, target_session: AsyncSession
 ):
-    table_names = ["AlreadyFoundsLinks"]
+    table_names = [
+        "AlreadyFoundsLinks",
+        "Cabinets",
+        "Courses",
+        "Departments",
+        "Groups",
+        "Holidays",
+        "Liquidation",
+        "MessagingClients",
+        "Paras",
+        "Practices",
+        "Subscribers",
+        "Teachers",
+        "ZamenaFileLinks",
+        "Zamenas",
+        "ZamenasFull",
+        "scheduleTimetable",
+        "timings",
+    ]
     await copy_tables(
         table_names=table_names,
         source_session=source_session,
