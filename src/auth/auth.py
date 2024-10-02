@@ -109,8 +109,8 @@ ROLES = {"admin": []}
 def authorize(roles):
 
     def decorator(func):
-        async def wrapper(current_user=Depends(current_active_user)):
-            if current_user["role"] not in roles:
+        async def wrapper(current_user: User = Depends(current_active_user)):
+            if current_user.role not in roles:
                 raise HTTPException(status_code=403, detail="Unauthorized")
             return await func()
 
