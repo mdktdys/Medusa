@@ -19,6 +19,8 @@ from src.alchemy.database import Base
 from src.alchemy.db_helper import local_db_helper
 from src.auth.schemas import User, UserRead, UserCreate
 from src.auth.users import fastapi_users, auth_backend
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from typing import AsyncGenerator
 
 # Set your JWT secret and other constants
 SECRET = "secret"
@@ -32,16 +34,17 @@ engine = create_async_engine(DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
-# Create the database and tables
 async def create_db_and_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
 
-# Set up the user database
-async def get_user_db(
-    session: AsyncSession = Depends(local_db_helper.session_dependency),
-):
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        yield session
+
+
+async def get_user_db(session: AsyncSession = Depends(get_async_session)):
     yield SQLAlchemyUserDatabase(session, User)
 
 
