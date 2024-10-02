@@ -47,32 +47,33 @@ async def copy_tables(
     tgt_conn = tgt_engine.connect()
     tgt_metadata.reflect(bind=tgt_engine)
 
-    for table in reversed(tgt_metadata.sorted_tables):
+    # Если force=True, удаляем все строки из таблиц в целевой базе данных
+    for table in tgt_metadata.sorted_tables:
         if table.name in table_names:
-            print("dropping table =", table.name)
-            table.drop(bind=tgt_engine)
+            print(f"Очистка таблицы {table.name}")
+            tgt_conn.execute(table.delete())  # Удаляем все строки из таблицы
 
+    tgt_conn.commit()  # Сохраняем изменения после очистки таблиц
+
+    # Отражаем (рефлексируем) метаданные заново после очистки
     tgt_metadata.clear()
     tgt_metadata.reflect(bind=tgt_engine)
     src_metadata.reflect(bind=src_engine)
 
-    # create all tables in target database
+    # Копируем структуру таблиц из исходной базы данных в целевую, если их еще нет
     for table in src_metadata.sorted_tables:
-        if table.name in table_names:
+        if table.name in table_names and table.name not in tgt_metadata.tables:
             table.create(bind=tgt_engine)
 
-    # refresh metadata before you can copy data
-    tgt_metadata.clear()
-    tgt_metadata.reflect(bind=tgt_engine)
+    # Копируем данные из исходной базы данных в целевую
+    for table in src_metadata.sorted_tables:
+        if table.name in table_names:
+            src_table = src_metadata.tables[table.name]
+            stmt = table.insert()  # Подготавливаем вставку данных
+            for index, row in enumerate(src_conn.execute(src_table.select())):
+                print(f"Таблица {table.name}: Вставка строки {index}")
+                tgt_conn.execute(stmt.values(row))
 
-    # Copy all data from src to target
-    for table in tgt_metadata.sorted_tables:
-        src_table = src_metadata.tables[table.name]
-        stmt = table.insert()
-        for index, row in enumerate(src_conn.execute(src_table.select())):
-            print("table =", table.name, "Inserting row", index)
-            tgt_conn.execute(stmt.values(row))
-
-    tgt_conn.commit()
+    tgt_conn.commit()  # Сохраняем все изменения после копирования данных
     src_conn.close()
     tgt_conn.close()
