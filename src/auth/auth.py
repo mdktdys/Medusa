@@ -93,6 +93,7 @@ def authorize(roles: list[str]):
             request: Request,
             current_user: Optional[User] = Depends(current_active_user),
         ):
+            print(request)
             # 1. Проверяем наличие API Key
             if await api_key_auth(request):
                 return (
