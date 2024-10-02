@@ -15,39 +15,16 @@ from sqlalchemy.orm import DeclarativeBase
 from uuid import UUID
 from fastapi import APIRouter
 
+from src.alchemy.database import Base
+from src.alchemy.db_helper import local_db_helper
+from src.auth.schemas import User, UserRead, UserCreate
+from src.auth.users import fastapi_users, auth_backend
+
 # Set your JWT secret and other constants
 SECRET = "secret"
 DATABASE_URL = "postgresql+asyncpg://root:banana@postgres:5432/Devotion"
 
 router = APIRouter()
-
-
-# Base model
-class Base(DeclarativeBase):
-    pass
-
-
-class UserRead(schemas.BaseUser[UUID]):
-    pass
-
-
-class UserCreate(schemas.BaseUserCreate):
-    pass
-
-
-class UserUpdate(schemas.BaseUserUpdate):
-    pass
-
-
-# User model (inherits from BaseUser)
-class User(SQLAlchemyBaseUserTableUUID, Base):
-    __tablename__ = "users"
-
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True, nullable=False)
-    is_superuser = Column(Boolean, default=False, nullable=False)
-    is_verified = Column(Boolean, default=False, nullable=False)
 
 
 # Create the async engine and session maker
@@ -61,48 +38,13 @@ async def create_db_and_tables():
         await conn.run_sync(Base.metadata.create_all)
 
 
-# Dependency to get async session
-async def get_async_session() -> AsyncSession:
-    async with async_session_maker() as session:
-        yield session
-
-
 # Set up the user database
-async def get_user_db(session: AsyncSession = Depends(get_async_session)):
+async def get_user_db(
+    session: AsyncSession = Depends(local_db_helper.session_dependency),
+):
     yield SQLAlchemyUserDatabase(session, User)
 
 
-# User Manager
-class UserManager(BaseUserManager[User, UUID]):
-    user_db_model = User
-
-    async def on_after_register(self, user: User, request: Optional[Request] = None):
-        print(f"User {user.id} has registered.")
-
-
-async def get_user_manager(user_db=Depends(get_user_db)):
-    yield UserManager(user_db)
-
-
-# JWT Strategy for token generation
-def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
-
-
-# Authentication backend
-auth_backend = AuthenticationBackend(
-    name="jwt",
-    transport=BearerTransport(tokenUrl="jwt/login"),
-    get_strategy=get_jwt_strategy,
-)
-
-# FastAPI Users object
-fastapi_users = FastAPIUsers[User, UUID](
-    get_user_manager,
-    [auth_backend],
-)
-
-# Include the routes for user authentication and registration
 router.include_router(
     fastapi_users.get_auth_router(auth_backend),
     prefix="/jwt",
