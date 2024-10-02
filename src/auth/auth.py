@@ -116,7 +116,7 @@ def authorize(roles: list[str]):
 
 
 # Пример защищённого маршрута с доступом по API Key ИЛИ роли "Owner"
-@router.get("/protected-route", tags=["Users"])
+@router.get("/protected-route", tags=["Users"], response_model=False)
 @authorize(roles=["Owner"])
 async def protected_route():
     return {"message": "Hello, you have access to the protected route!"}
