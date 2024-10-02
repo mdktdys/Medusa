@@ -21,23 +21,23 @@ async def sync_local_database(
     source_session: AsyncSession, target_session: AsyncSession
 ):
     table_names = [
-        "AlreadyFoundsLinks",
-        "Cabinets",
-        "Courses",
-        "Departments",
-        "Groups",
+        "Paras",
+        "Zamenas",
         "Holidays",
         "Liquidation",
-        "MessagingClients",
-        "Paras",
         "Practices",
+        "AlreadyFoundsLinks",
+        "MessagingClients",
         "Subscribers",
-        "Teachers",
         "ZamenaFileLinks",
-        "Zamenas",
         "ZamenasFull",
         "scheduleTimetable",
         "timings",
+        "Cabinets",
+        "Courses",
+        "Groups",
+        "Teachers",
+        "Departments",
     ]
     await copy_tables(
         table_names=table_names,
