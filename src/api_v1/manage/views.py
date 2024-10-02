@@ -8,11 +8,15 @@ from src.alchemy.db_helper import *
 from . import crud
 import docker
 
+from ...auth.auth import fastapi_users
+from ...auth.schemas import User
+
 router = APIRouter(tags=["Manage"])
 
 
 @router.get("/sync_local_database", response_model=dict)
 async def sync_local_database(
+    user: User = Depends(fastapi_users.current_user(active=True)),
     supabase_session: AsyncSession = Depends(db_helper.session_dependency),
     local_session: AsyncSession = Depends(local_db_helper.session_dependency),
 ) -> dict:
