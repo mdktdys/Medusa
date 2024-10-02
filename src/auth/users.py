@@ -10,6 +10,7 @@ from fastapi_users.authentication import (
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
 
+from src.alchemy.db_helper import local_db_helper
 from src.auth.schemas import User
 
 SECRET = "SECRET"
@@ -33,7 +34,9 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 
 
-async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db)):
+async def get_user_manager(
+    user_db: SQLAlchemyUserDatabase = Depends(local_db_helper.session_dependency),
+):
     yield UserManager(user_db)
 
 
