@@ -88,6 +88,7 @@ def authorize(roles):
             current_user: Optional[User] = Depends(current_active_user),
         ):
             trusted_services = ["telegram_bot"]
+            print(request.headers)
             if request.headers.get("X-Internal-Service-Name") in trusted_services:
                 return await func()
 
