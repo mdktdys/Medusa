@@ -70,7 +70,7 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
 
 
 fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
-current_active_user = fastapi_users.current_user(active=True)
+current_active_user = fastapi_users.current_user(active=True,optional=True)
 
 # Включаем маршруты для FastAPI Users
 router.include_router(
@@ -91,19 +91,16 @@ def authorize(roles: list[str]):
     def decorator(func):
         async def wrapper(
             request: Request,
-            # Пользователь проверяется ТОЛЬКО если не передан API Key
-            current_user: Optional[User] = None,
+            current_user: Optional[User] = Depends(current_active_user),
         ):
+            print(request)
             # 1. Проверяем наличие API Key
             if await api_key_auth(request):
                 return (
                     await func()
                 )  # если API Key валидный, продолжаем без проверки роли
 
-            # 2. Если API Key нет, проверяем JWT авторизацию
-            current_user = await current_active_user(
-                request
-            )  # получаем пользователя через JWT
+            # 2. Проверяем авторизацию через пользователя (если API Key не передан)
             if current_user and current_user.role in roles:
                 return await func()
 
@@ -116,7 +113,7 @@ def authorize(roles: list[str]):
 
 
 # Пример защищённого маршрута с доступом по API Key ИЛИ роли "Owner"
-@router.get("/protected-route", tags=["Users"], response_model=False)
+@router.get("/protected-route", tags=["Users"])
 @authorize(roles=["Owner"])
 async def protected_route():
     return {"message": "Hello, you have access to the protected route!"}
