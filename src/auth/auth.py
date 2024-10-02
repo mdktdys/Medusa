@@ -39,24 +39,7 @@ from src.auth.schemas import User
 # Set your JWT secret and other constants
 SECRET = "SECRET"
 
-DATABASE_URL = "postgresql+asyncpg://root:banana@postgres:5432/Devotion"
-
 router = APIRouter()
-
-
-# Create the async engine and session maker
-# engine = create_async_engine(DATABASE_URL)
-# async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
-
-#
-# async def create_db_and_tables():
-#     async with engine.begin() as conn:
-#         await conn.run_sync(Base.metadata.create_all)
-
-
-# async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-#     async with async_session_maker() as session:
-#         yield session
 
 
 async def get_user_db(
@@ -118,15 +101,8 @@ router.include_router(
 )
 
 
-# Protected route example
 @router.get("/protected-route", tags=["users"])
 async def protected_route(
     user: User = Depends(fastapi_users.current_user(active=True)),
 ):
     return {"message": f"Hello {user.email}"}
-
-
-# Run the database initialization at startup
-# @router.on_event("startup")
-# async def on_startup():
-#     await create_db_and_tables()

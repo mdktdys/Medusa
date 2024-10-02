@@ -4,7 +4,7 @@ from fastapi_users import schemas
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
 from sqlalchemy import Column, String, Boolean
 
-from src.alchemy import Base
+from src.alchemy.database import Base
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
