@@ -1,6 +1,7 @@
 from functools import partial, wraps
 from typing import Optional, List
 from fastapi import Depends, FastAPI, Request, HTTPException, status
+from fastapi.security import HTTPBearer
 from fastapi_users import FastAPIUsers, schemas
 from fastapi_users.authentication import (
     JWTStrategy,
@@ -15,7 +16,9 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import DeclarativeBase
 from uuid import UUID
 from fastapi import APIRouter
-
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer
+from jose import jwt, JWTError
 from src.alchemy.database import Base
 from src.alchemy.db_helper import local_db_helper
 from src.auth.schemas import User, UserRead, UserCreate
@@ -101,26 +104,28 @@ router.include_router(
     tags=["auth"],
 )
 
+ROLES = {"admin": []}
 
-# Декоратор для проверки авторизации
-def auth(roles: List[str] = None):
+
+async def get_current_user(token=Depends(HTTPBearer())):
+    try:
+        payload = jwt.decode(token.credentials, SECRET, algorithms=["HS256"])
+        username = payload.get("sub")
+        role = payload.get("role")
+        if role not in ROLES:
+            raise HTTPException(status_code=403, detail="Invalid role")
+        print({"username": username, "role": role})
+        return {"username": username, "role": role}
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+
+def authorize(roles):
     def decorator(func):
-        @wraps(func)
-        async def wrapper(*args, user=Depends(current_active_user), **kwargs):
-            if not user:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Not authenticated",
-                )
-
-            if roles and user["role"] not in roles:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="You do not have permission to access this resource",
-                )
-
-            # Если проверка пройдена, вызываем исходную функцию
-            return await func(*args, user=user, **kwargs)
+        async def wrapper(current_user=Depends(get_current_user), **kwargs):
+            if current_user["role"] not in roles:
+                raise HTTPException(status_code=403, detail="Unauthorized")
+            return await func(**kwargs)
 
         return wrapper
 
@@ -128,6 +133,6 @@ def auth(roles: List[str] = None):
 
 
 @router.get("/protected-route", tags=["users"])
-@auth(roles=["owner"])
+@authorize(roles=["owner"])
 async def protected_route():
     return {"message": f"Hello "}
