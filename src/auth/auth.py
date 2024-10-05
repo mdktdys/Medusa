@@ -72,20 +72,6 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
 
 
 fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
-current_active_user = fastapi_users.current_user(active=True, optional=True)
-
-# Включаем маршруты для FastAPI Users
-router.include_router(
-    fastapi_users.get_auth_router(auth_backend),
-    prefix="/jwt",
-    tags=["Auth"],
-)
-#
-router.include_router(
-    fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix="",
-    tags=["Auth"],
-)
 
 
 def any_auth_method(roles: List[str]):
@@ -109,6 +95,23 @@ def any_auth_method(roles: List[str]):
         )
 
     return dependency
+
+
+current_active_user = fastapi_users.current_user(active=True, optional=True)
+
+
+router.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/jwt",
+    tags=["Auth"],
+)
+
+router.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="",
+    dependencies=[Depends(any_auth_method(roles=["Owner"]))],
+    tags=["Auth"],
+)
 
 
 @router.get(

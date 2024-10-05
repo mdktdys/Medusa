@@ -6,7 +6,6 @@ router = APIRouter()
 router.include_router(
     auth_router,
     prefix="/auth",
-    dependencies=[Depends(any_auth_method(roles=["Owner"]))],
 )
 router.include_router(
     api_v1_router,
