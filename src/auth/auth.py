@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends, Request
-from my_secrets import SECRET, API_KEY  # ваш секретный API ключ
+from fastapi import APIRouter, HTTPException, Depends, Request, status
+
+from my_secrets import SECRET, API_KEY, IS_DEV
 from src.auth.schemas import UserRead, UserCreate
 import uuid
-from typing import Optional
+from typing import Optional, List
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
 from fastapi_users.authentication import (
     AuthenticationBackend,
@@ -15,6 +16,7 @@ from src.alchemy.db_helper import local_db_helper
 from src.auth.schemas import User
 
 router = APIRouter()
+api_keys = [API_KEY]
 
 
 # Функция для проверки API ключа
@@ -76,44 +78,44 @@ current_active_user = fastapi_users.current_user(active=True, optional=True)
 router.include_router(
     fastapi_users.get_auth_router(auth_backend),
     prefix="/jwt",
-    tags=["auth"],
+    tags=["Auth"],
 )
 #
 router.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="",
-    tags=["auth"],
+    tags=["Auth"],
 )
 
 
-# Функция для авторизации по API Key или роли
-def authorize(roles: list[str]):
-    def decorator(func):
-        async def wrapper(
-            request: Request,
-            current_user: Optional[User] = Depends(current_active_user),
-        ):
-            print(request.headers)
-            # 1. Проверяем наличие API Key
-            if await api_key_auth(request):
-                return (
-                    await func()
-                )  # если API Key валидный, продолжаем без проверки роли
+def any_auth_method(roles: List[str]):
+    async def dependency(
+        api_key: Optional[str] = Depends(api_key_auth),
+        user_id: User = Depends(current_active_user),
+    ):
+        if api_key:
+            return True
+        if user_id:
+            if user_id.role in roles:
+                return True
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="No access",
+                )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No valid authentication method found",
+        )
 
-            # 2. Проверяем авторизацию через пользователя (если API Key не передан)
-            if current_user and current_user.role in roles:
-                return await func()
-
-            # Если ни одно из условий не выполнено
-            raise HTTPException(status_code=403, detail="Unauthorized")
-
-        return wrapper
-
-    return decorator
+    return dependency
 
 
-# Пример защищённого маршрута с доступом по API Key ИЛИ роли "Owner"
-@router.get("/protected-route", tags=["Users"])
-@authorize(roles=["Owner"])
+@router.get(
+    "/protected-route",
+    tags=["Users"],
+    dependencies=[Depends(any_auth_method(roles=["Owner"]))],
+    include_in_schema=IS_DEV,
+)
 async def protected_route():
     return {"message": "Hello, you have access to the protected route!"}

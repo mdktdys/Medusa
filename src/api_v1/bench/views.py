@@ -5,17 +5,16 @@ from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 import time
 import asyncio
+
+from my_secrets import IS_DEV
 from src.alchemy.db_helper import *
 from . import crud
 from .schemas import Teacher
-from ...auth.auth import authorize
 
-router = APIRouter(tags=["Bench"])
-# test 2
+router = APIRouter(tags=["Bench"], include_in_schema=IS_DEV)
 
 
 @router.get("/bench/alchemy/")
-@authorize(roles=["Owner"])
 async def bench_alchemy(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> List[Teacher]:
@@ -27,7 +26,6 @@ async def bench_alchemy(
 
 
 @router.get("/bench/supabase/")
-@authorize(roles=["Owner"])
 async def bench_supabase(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> List[Teacher]:
@@ -46,13 +44,7 @@ async def bench_supabase(
     return res
 
 
-@cache()
-async def get_cache():
-    return 1
-
-
 @router.get("/test/")
-@authorize(roles=["Owner"])
 @cache(expire=6000)
 async def index():
     return dict(hello="world")
