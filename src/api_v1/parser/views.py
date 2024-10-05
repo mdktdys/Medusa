@@ -9,6 +9,7 @@ from src.alchemy.db_helper import *
 from . import crud
 import docker
 
+from .schemas import ParseZamenaRequest
 from ...auth.auth import authorize
 
 router = APIRouter(tags=["Parser"])
@@ -40,13 +41,12 @@ async def check_new(
     return await crud.check_new(session=session)
 
 
-@router.get("/parse_zamena/{url}/{date}/", response_model=dict)
+@router.get("/parse_zamena", response_model=dict)
 async def parse_zamena(
-    url: str,
-    date: datetime.datetime,
+    request: ParseZamenaRequest,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> dict:
-    return await crud.parse_zamena(url, date)
+    return await crud.parse_zamena(request)
 
 
 @router.get("/containers")
