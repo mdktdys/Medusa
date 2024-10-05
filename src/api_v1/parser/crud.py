@@ -18,7 +18,16 @@ async def parse_zamena(request: ParseZamenaRequest):
     try:
         # Отправляем задачу в Celery
         task = fastapi_celery_app.send_task(
-            "parser.tasks.parse_zamena", args=[url, date]
+            "parser.tasks.parse_zamena",
+            args=[url, date],
+            retry=True,
+            retry_policy={
+                "max_retries": 5,
+                "interval_start": 1,
+                "interval_step": 1,
+                "interval_max": 10,
+                "retry_errors": None,
+            },
         )
 
         # Ожидаем результат задачи, используя asyncio.to_thread для выполнения task.get() в отдельном потоке
