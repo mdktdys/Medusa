@@ -7,6 +7,7 @@ from fastapi_cache.decorator import cache
 from src.alchemy.db_helper import *
 from . import crud
 from .schemas import MergeResult
+from ...auth.auth import authorize
 
 router = APIRouter(tags=["Merge"])
 
@@ -14,6 +15,7 @@ pass_ = os.environ.get("API_SECRET")
 
 
 @router.patch("/teachers/{merge_from_id}/{merge_to_id}/{password}/")
+@authorize(roles=["Owner"])
 async def merge_teachers(
     merge_from_id: int,
     merge_to_id: int,
@@ -28,6 +30,7 @@ async def merge_teachers(
 
 
 @router.patch("/cabinets/{merge_from_id}/{merge_to_id}/{password}/")
+@authorize(roles=["Owner"])
 async def merge_cabinets(
     merge_from_id: int,
     merge_to_id: int,
@@ -42,6 +45,7 @@ async def merge_cabinets(
 
 
 @router.patch("/groups/{merge_from_id}/{merge_to_id}/{password}/")
+@authorize(roles=["Owner"])
 async def merge_groups(
     merge_from_id: int,
     merge_to_id: int,

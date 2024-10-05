@@ -70,7 +70,7 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
 
 
 fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
-current_active_user = fastapi_users.current_user(active=True,optional=True)
+current_active_user = fastapi_users.current_user(active=True, optional=True)
 
 # Включаем маршруты для FastAPI Users
 router.include_router(
@@ -78,7 +78,7 @@ router.include_router(
     prefix="/jwt",
     tags=["auth"],
 )
-
+#
 router.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="",
@@ -93,7 +93,7 @@ def authorize(roles: list[str]):
             request: Request,
             current_user: Optional[User] = Depends(current_active_user),
         ):
-            print(request)
+            print(request.headers)
             # 1. Проверяем наличие API Key
             if await api_key_auth(request):
                 return (

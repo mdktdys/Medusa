@@ -1,3 +1,4 @@
+import datetime
 import os
 from typing import List
 
@@ -8,6 +9,8 @@ from src.alchemy.db_helper import *
 from . import crud
 import docker
 
+from ...auth.auth import authorize
+
 router = APIRouter(tags=["Parser"])
 
 pass_ = os.environ.get("API_SECRET")
@@ -15,12 +18,14 @@ pass_ = os.environ.get("API_SECRET")
 
 @router.get("/get_latest_zamena_link_celery", response_model=dict)
 @cache(300)
+@authorize(roles=["Owner"])
 async def get_latest_zamena_link_celery() -> dict:
     return await crud.get_latest_zamena_link()
 
 
 @router.get("/get_founded_links", response_model=List[str])
 @cache(300)
+@authorize(roles=["Owner"])
 async def get_founded_links(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> List[str]:
@@ -28,13 +33,24 @@ async def get_founded_links(
 
 
 @router.get("/check_new", response_model=List[str])
+@authorize(roles=["Owner"])
 async def check_new(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> dict:
     return await crud.check_new(session=session)
 
 
+@router.get("/parse_zamena/{url}/{date}/", response_model=dict)
+async def parse_zamena(
+    url: str,
+    date: datetime.datetime,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+) -> dict:
+    return await crud.parse_zamena(url, date)
+
+
 @router.get("/containers")
+@authorize(roles=["Owner"])
 def get_containers():
     client = docker.from_env()  # Используем Docker SDK для Python
     containers = client.containers.list(all=True)  # Получаем список всех контейнеров

@@ -8,12 +8,14 @@ import asyncio
 from src.alchemy.db_helper import *
 from . import crud
 from .schemas import Teacher
+from ...auth.auth import authorize
 
 router = APIRouter(tags=["Bench"])
 # test 2
 
 
 @router.get("/bench/alchemy/")
+@authorize(roles=["Owner"])
 async def bench_alchemy(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> List[Teacher]:
@@ -25,6 +27,7 @@ async def bench_alchemy(
 
 
 @router.get("/bench/supabase/")
+@authorize(roles=["Owner"])
 async def bench_supabase(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> List[Teacher]:
@@ -49,6 +52,7 @@ async def get_cache():
 
 
 @router.get("/test/")
+@authorize(roles=["Owner"])
 @cache(expire=6000)
 async def index():
     return dict(hello="world")

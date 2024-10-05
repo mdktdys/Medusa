@@ -9,18 +9,21 @@ from . import crud
 from .schemas import (
     Cabinet,
 )
+from ...auth.auth import authorize
 
 router = APIRouter(tags=["Cabinets"])
 
 
 @router.get("/", response_model=list[Cabinet])
 @cache(expire=6000)
+@authorize(roles=["Owner"])
 async def get_cabinets(session: AsyncSession = Depends(db_helper.session_dependency)):
     return await crud.get_cabinets(session=session)
 
 
 @router.get("/id/{cabinet_id}/", response_model=list[Cabinet])
 @cache(expire=6000)
+@authorize(roles=["Owner"])
 async def get_cabinet_by_id(
     cabinet_id: int = -1,
     session: AsyncSession = Depends(db_helper.session_dependency),
