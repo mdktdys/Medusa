@@ -41,7 +41,7 @@ async def check_new(
     return await crud.check_new(session=session)
 
 
-@router.get("/parse_zamena", response_model=dict)
+@router.post("/parse_zamena", response_model=dict)
 async def parse_zamena(
     request: ParseZamenaRequest,
     session: AsyncSession = Depends(db_helper.session_dependency),
