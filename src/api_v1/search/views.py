@@ -11,9 +11,9 @@ from ...auth.auth import authorize
 router = APIRouter(tags=["Search"])
 
 
+@authorize(roles=["Owner"])
 @router.get("/search/{query}/")
 @cache(expire=6000)
-@authorize(roles=["Owner"])
 async def get_search(
     query: str, session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> List[SearchResult]:
