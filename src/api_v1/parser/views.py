@@ -79,4 +79,4 @@ def get_containers():
             }
         )
 
-    return container_info
+    return {"containers": container_info}
