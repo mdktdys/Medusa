@@ -57,8 +57,6 @@ def get_containers():
         print(container_attrs)
         state = container_attrs["State"]
 
-        # Время запуска контейнера
-        started_at = state["StartedAt"]
         # Время завершения контейнера (если остановлен)
         finished_at = (
             state["FinishedAt"]
@@ -66,21 +64,13 @@ def get_containers():
             else None
         )
 
-        # Преобразование времени в читаемый формат
-        started_at_dt = datetime.datetime.strptime(started_at, "%Y-%m-%dT%H:%M:%S.%fZ")
-        finished_at_dt = None
-        if finished_at:
-            finished_at_dt = datetime.datetime.strptime(
-                finished_at, "%Y-%m-%dT%H:%M:%S.%fZ"
-            )
-
         container_info.append(
             {
                 "name": container.name,
                 "status": container.status,
                 "image": container.image.tags,
-                "started_at": started_at_dt,  # Время запуска контейнера
-                "finished_at": finished_at_dt,  # Время завершения работы (если остановлен)
+                "started_at": state["StartedAt"],  # Время запуска контейнера
+                "finished_at": finished_at,  # Время завершения работы (если остановлен)
             }
         )
 
