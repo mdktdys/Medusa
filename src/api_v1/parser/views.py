@@ -45,6 +45,11 @@ async def parse_zamena(
     return await crud.parse_zamena(request)
 
 
+@router.options("/containers")
+def test():
+    return get_containers()
+
+
 @router.get("/containers")
 def get_containers():
     client = docker.from_env()  # Используем Docker SDK для Python

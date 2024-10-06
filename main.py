@@ -38,16 +38,17 @@ app = FastAPI(
 origins = [
     "http://telegram_bot",
     "http://localhost",
+    "http://127.0.0.1:64038",
     "https://admin.uksivt.xyz",
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_headers=["*"],
-    allow_methods=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     allow_credentials=True,
+#     allow_headers=["*"],
+#     allow_methods=["*"],
+# )
 
 app.include_router(router=router)
 
