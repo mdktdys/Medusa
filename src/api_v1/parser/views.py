@@ -50,12 +50,38 @@ def get_containers():
     client = docker.from_env()  # Используем Docker SDK для Python
     containers = client.containers.list(all=True)  # Получаем список всех контейнеров
     container_info = []
+
     for container in containers:
+        # Получаем атрибуты контейнера (включает информацию о состоянии)
+        container_attrs = container.attrs
+        print(container_attrs)
+        state = container_attrs["State"]
+
+        # Время запуска контейнера
+        started_at = state["StartedAt"]
+        # Время завершения контейнера (если остановлен)
+        finished_at = (
+            state["FinishedAt"]
+            if state["FinishedAt"] != "0001-01-01T00:00:00Z"
+            else None
+        )
+
+        # Преобразование времени в читаемый формат
+        started_at_dt = datetime.datetime.strptime(started_at, "%Y-%m-%dT%H:%M:%S.%fZ")
+        finished_at_dt = None
+        if finished_at:
+            finished_at_dt = datetime.datetime.strptime(
+                finished_at, "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
+
         container_info.append(
             {
                 "name": container.name,
                 "status": container.status,
                 "image": container.image.tags,
+                "started_at": started_at_dt,  # Время запуска контейнера
+                "finished_at": finished_at_dt,  # Время завершения работы (если остановлен)
             }
         )
+
     return container_info
