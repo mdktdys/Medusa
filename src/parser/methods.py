@@ -186,8 +186,8 @@ async def check_new():
                         return {"res": "err", "mes": str(error.__str__())}
                     pass
         else:
-            links = [{'link':link} for link in new_links]
-            sup.table("AlreadyFoundsLinks").insert(links).execute()
+            links = [{"link": link} for link in new_links]
+            sup.client.table("AlreadyFoundsLinks").insert(links).execute()
             return {"res": "add to database"}
             # for link in new_links:
             #     zam = [x for x in tables if x.links.__contains__(link)][0]
