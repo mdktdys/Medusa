@@ -7,4 +7,4 @@ COPY . .
 
 RUN pip install celery
 
-CMD uvicorn main:app --host 0.0.0.0 --port 5000 && celery -A src.parser.tasks worker --loglevel=INFO --pool=solo
+CMD uvicorn main:app --host 0.0.0.0 --port 5000 & celery -A src.parser.tasks worker --loglevel=INFO --pool=solo
