@@ -294,6 +294,9 @@ async def check_new() -> CheckResult:
                 return result
         return CheckResult(result="Checked")
     except Exception as e:
+        print(e)
         return CheckResultError(
-            result="Error", trace=Html.escape(str(traceback.format_exc())[0:100]), error=str(e)
+            result="Error",
+            trace=Html.escape(str(traceback.format_exc())[0:100]),
+            error=Html.escape(str(e)),
         )
