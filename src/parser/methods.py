@@ -125,6 +125,7 @@ async def check_new():
             - set([x.link for x in database_links])
             - set(already_found_links)
         )
+        print(new_links)
         new_links.reverse()
         if len(new_links) < 1:
             print("NO NEW")
@@ -177,9 +178,17 @@ async def check_new():
                         return {"res": "err", "mes": str(traceback.format_exc())}
                     pass
         else:
-            links = [{"link": link} for link in new_links]
-            sup.client.table("AlreadyFoundsLinks").insert(links).execute()
-            return {"res": "add to database"}
+            # links = [
+            #     {
+            #         "link": link,
+            #     }
+            #     for link in new_links
+            # ]
+            # sup.client.table("AlreadyFoundsLinks").insert(links).execute()
+            # return {"res": "add to database"}
+
+            return {"res": "new_links", "links": new_links}
+
             # for link in new_links:
             #     zam = [x for x in tables if x.links.__contains__(link)][0]
             #     zamm = [x for x in zam.zamenas if x.link == link][0]
