@@ -52,12 +52,3 @@ app.add_middleware(
 )
 
 app.include_router(router=router)
-
-
-# @app.get("/", include_in_schema=False)
-# async def custom_swagger_ui_html_cdn():
-#     return get_swagger_ui_html(
-#         openapi_url=app.openapi_url,
-#         title=f"{app.title} - Swagger UI",
-#         swagger_css_url="https://cdn.jsdelivr.net/gh/Itz-fork/Fastapi-Swagger-UI-Dark/assets/swagger_ui_dark.min.css",
-#     )
