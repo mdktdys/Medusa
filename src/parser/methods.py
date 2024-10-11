@@ -126,7 +126,8 @@ async def check_new():
     tables: List[ZamTable] = getAllMonthTables(soup=soup)
     site_links = getAllTablesLinks(tables)
     database_links: List[ParsedDate] = sup.get_zamena_file_links()
-    already_found_links = []
+    already_found_links = sup.get_already_found_links()
+    print(already_found_links)
     # await on_check(bot=bot)
     if not site_links.__eq__(database_links):
         # alreadyFound = await r.lrange("alreadyFound", 0, -1)
@@ -136,7 +137,6 @@ async def check_new():
             - set(already_found_links)
         )
         new_links.reverse()
-        print(new_links)
         if len(new_links) < 1:
             for i in tables[0].zamenas:
                 if i.date > datetime.date.today():

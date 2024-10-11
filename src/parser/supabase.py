@@ -246,8 +246,17 @@ class SupaBaseWorker:
 
     def _getCourses(self):
         client = self.client
-        data, _ = client.table("Courses").select("id", "name", "synonyms").execute()
+        data, _ = (
+            client.table("AlreadyFoundsLinks")
+            .select("id", "name", "synonyms")
+            .execute()
+        )
         return [Course(item["id"], item["name"], item["synonyms"]) for item in data[1]]
+
+    def get_already_found_links(self):
+        client = self.client
+        data, _ = client.table("AlreadyFoundsLinks").select("link").execute()
+        return [link["link"] for link in data[1]]
 
     def get_course_from_synonyms(
         self, search_text: str, courses: List[Course]
