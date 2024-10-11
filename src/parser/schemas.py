@@ -28,7 +28,7 @@ class CheckZamenaResultFailed(CheckZamenaResult):
 class CheckZamenaResultSuccess(CheckZamenaResult):
     result: str = "Success"
     link: str
-    images: List[bytes]
+    images: List[str]
     # date: datetime.date
 
 

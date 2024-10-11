@@ -215,7 +215,7 @@ async def check_new() -> CheckResult:
                         file_stream = BytesIO()
                         file_stream.write(file_bytes)
                         extension = define_file_format(stream=file_stream)
-                        screenshots_base64: List[bytes] = []
+                        screenshots_base64: List[str] = []
                         print(extension)
 
                         match extension:
