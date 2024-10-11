@@ -272,7 +272,7 @@ async def save_pixmap(pixmap, screenshot_path):
 
 def create_pdf_screenshots_bytes(data_bytes) -> List[str]:
     screenshots_bytes = []
-    pdf_document: fitz.Document = fitz.open(stream=data_bytes)
+    pdf_document: fitz.Document = fitz.open(data_bytes)
     for i in range(pdf_document.page_count):
         page: fitz.Page = pdf_document.load_page(i)
         zoom_x = 2  # horizontal zoom
