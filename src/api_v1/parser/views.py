@@ -10,6 +10,7 @@ from . import crud
 import docker
 
 from .schemas import ParseZamenaRequest
+from ...parser.schemas import CheckResult
 
 router = APIRouter(tags=["Parser"])
 
@@ -30,8 +31,8 @@ async def get_founded_links(
     return await crud.get_founded_links(session=session)
 
 
-@router.get("/check_new", response_model=dict)
-async def check_new() -> dict:
+@router.get("/check_new", response_model=CheckResult)
+async def check_new() -> CheckResult:
     return await crud.check_new()
 
 

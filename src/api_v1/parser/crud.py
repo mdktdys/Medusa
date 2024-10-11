@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 from src.api_v1.parser.schemas import ParseZamenaRequest
 from src.parser import tasks
+from src.parser.schemas import CheckResult
 
 
 async def parse_zamena(request: ParseZamenaRequest):
@@ -25,7 +26,7 @@ async def get_latest_zamena_link():
     return task.get()
 
 
-async def check_new():
+async def check_new() -> CheckResult:
     task: AsyncResult = tasks.check_new.delay()
     return task.get()
 

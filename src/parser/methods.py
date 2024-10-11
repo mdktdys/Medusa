@@ -59,6 +59,13 @@ from src.parser.parsers import (
     get_file_stream,
     get_remote_file_bytes,
 )
+from src.parser.schemas import (
+    CheckResult,
+    CheckResultError,
+    CheckResultFoundNew,
+    CheckZamenaResultFailed,
+    CheckZamenaResultSuccess,
+)
 from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import (
     get_remote_file_hash,
@@ -109,145 +116,176 @@ def get_latest_zamena_link():
         return {"message": "failed", "reason": str(e)}
 
 
-async def check_new():
-    html = urlopen(SCHEDULE_URL).read()
-    soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
-    tables: List[ZamTable] = getAllMonthTables(soup=soup)
-    site_links = getAllTablesLinks(tables)
-    database_links: List[ParsedDate] = sup.get_zamena_file_links()
-    print(f"database_links : {database_links}")
-    already_found_links: List[str] = sup.get_already_found_links()
-    # await on_check(bot=bot)
-    if not site_links.__eq__(database_links):
-        # alreadyFound = await r.lrange("alreadyFound", 0, -1)
-        new_links = list(
-            set(site_links)
-            - set([x.link for x in database_links])
-            - set(already_found_links)
-        )
-        print(new_links)
-        new_links.reverse()
-        if len(new_links) < 1:
-            print("NO NEW")
-            print("CHECK EXISTING")
-            for i in tables[0].zamenas:
-                if i.date > datetime.date.today():
-                    file_bytes = get_remote_file_bytes(link=i.link)
-                    file_hash = get_bytes_hash(file_bytes)
+async def check_new() -> CheckResult:
+    try:
+        html = urlopen(SCHEDULE_URL).read()
+        soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
+        tables: List[ZamTable] = getAllMonthTables(soup=soup)
+        site_links = getAllTablesLinks(tables)
+        database_links: List[ParsedDate] = sup.get_zamena_file_links()
+        print(f"database_links : {database_links}")
+        already_found_links: List[str] = sup.get_already_found_links()
+        # await on_check(bot=bot)
+        if not site_links.__eq__(database_links):
+
+            # alreadyFound = await r.lrange("alreadyFound", 0, -1)
+            new_links = list(
+                set(site_links)
+                - set([x.link for x in database_links])
+                - set(already_found_links)
+            )
+            new_links.reverse()
+            if len(new_links) < 1:
+                print("NO NEW")
+                print("CHECK EXISTING")
+                for i in tables[0].zamenas:
+                    if i.date > datetime.date.today():
+                        file_bytes = get_remote_file_bytes(link=i.link)
+                        file_hash = get_bytes_hash(file_bytes)
+                        try:
+                            old_hash = [x for x in database_links if x.link == i.link][
+                                0
+                            ].hash
+                            if file_hash != old_hash:
+                                file_date = datetime.datetime(
+                                    year=i.date.year, month=i.date.month, day=i.date.day
+                                )
+                                file_stream = BytesIO()
+                                file_stream.write(file_bytes)
+                                extension = define_file_format(stream=file_stream)
+
+                                screenshots_bytes: List[bytes] = []
+
+                                if extension == "pdf":
+                                    screenshots_bytes = create_pdf_screenshots_bytes(
+                                        data_bytes=file_bytes
+                                    )
+                                if extension == "docx":
+                                    filename = i.link.split("/")[-1].split(".")[0]
+                                    convert(f"{filename}.{extension}")
+                                    screenshot_paths = await create_pdf_screenshots(
+                                        filename
+                                    )
+                                    cleanup_temp_files(screenshot_paths)
+                                    os.remove(f"{filename}.pdf")
+                                sup.table("Zamenas").delete().eq(
+                                    "date", file_date
+                                ).execute()
+                                sup.table("ZamenasFull").delete().eq(
+                                    "date", file_date
+                                ).execute()
+                                res = (
+                                    sup.table("ZamenaFileLinks")
+                                    .update({"hash": hash})
+                                    .eq("link", i.link)
+                                    .execute()
+                                )
+                                parse_zamenas(url=i.link, date_=file_date)
+                        except Exception as error:
+                            print(error)
+                            return {"res": "err", "mes": str(traceback.format_exc())}
+                        pass
+            else:
+                result = CheckResultFoundNew(result="FoundNew")
+                # links = [
+                #     {
+                #         "link": link,
+                #     }
+                #     for link in new_links
+                # ]
+                # sup.client.table("AlreadyFoundsLinks").insert(links).execute()
+                # return {"res": "add to database"}
+
+                # return {"res": "new_links", "links": new_links}
+
+                for link in new_links:
+                    zamena_table = [x for x in tables if x.links.__contains__(link)][0]
+                    zamena_cell = [x for x in zamena_table.zamenas if x.link == link][0]
                     try:
-                        old_hash = [x for x in database_links if x.link == i.link][
-                            0
-                        ].hash
-                        if file_hash != old_hash:
-                            file_date = datetime.datetime(
-                                year=i.date.year, month=i.date.month, day=i.date.day
-                            )
-                            file_stream = BytesIO()
-                            file_stream.write(file_bytes)
-                            extension = define_file_format(stream=file_stream)
+                        # await r.lpush("alreadyFound", str(zamm.link))
+                        if link.__contains__("google.com") or link.__contains__(
+                            "yadi.sk"
+                        ):
+                            continue
 
-                            screenshots_bytes: List[bytes] = []
+                        file_bytes = get_remote_file_bytes(link=zamena_cell.link)
+                        file_hash = get_bytes_hash(file_bytes)
+                        file_stream = BytesIO()
+                        file_stream.write(file_bytes)
+                        extension = define_file_format(stream=file_stream)
+                        screenshots_bytes: List[bytes] = []
 
-                            if extension == "pdf":
+                        match extension:
+                            case "application/pdf":
                                 screenshots_bytes = create_pdf_screenshots_bytes(
-                                    data_bytes=file_bytes
+                                    file_bytes
                                 )
-                            if extension == "docx":
-                                filename = i.link.split("/")[-1].split(".")[0]
-                                convert(f"{filename}.{extension}")
-                                screenshot_paths = await create_pdf_screenshots(
-                                    filename
-                                )
-                                cleanup_temp_files(screenshot_paths)
-                                os.remove(f"{filename}.pdf")
-                            sup.table("Zamenas").delete().eq(
-                                "date", file_date
-                            ).execute()
-                            sup.table("ZamenasFull").delete().eq(
-                                "date", file_date
-                            ).execute()
-                            res = (
-                                sup.table("ZamenaFileLinks")
-                                .update({"hash": hash})
-                                .eq("link", i.link)
-                                .execute()
+
+                            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                                raise Exception("invalid format word")
+                                # cleanup_temp_files(screenshot_paths)
+                                # os.remove(f"{filename}.pdf")
+                            case _:
+                                raise Exception("invalid format word")
+
+                        result.checks.append(
+                            CheckZamenaResultSuccess(
+                                date=zamena_cell.date,
+                                images=screenshots_bytes,
+                                link=zamena_cell.link,
                             )
-                            parse_zamenas(url=i.link, date_=file_date)
-                    except Exception as error:
-                        print(error)
-                        return {"res": "err", "mes": str(traceback.format_exc())}
+                        )
+                        # if extension == "docx":
+                        #     filename = zamena_cell.link.split("/")[-1].split(".")[0]
+                        #     convert(f"{filename}.{extension}")
+                        #     screenshot_paths = await create_pdf_screenshots(filename)
+
+                        # media_group = MediaGroupBuilder(
+                        #     caption=f"Новые замены на <a href='{zamm.link}'>{zamm.date}</a>  "
+                        # )
+                        # for i in screenshot_paths:
+                        #     image = FSInputFile(i)
+                        #     media_group.add_photo(image)
+                        # try:
+                        #     # await bot.send_media_group(chat_id=admins[0], media=media_group.build())
+                        #     await bot.send_media_group(
+                        #         -1002035415883, media=media_group.build()
+                        #     )
+                        #     send_message_to_topic(
+                        #         "Новые замены", f"Новые замены на {zamm.date}", sup=sup
+                        #     )
+                        # except Exception as error:
+                        #     await bot.send_message(chat_id=admins[0], text=str(error))
+                        # subs = await r.lrange("subs", 0, -1)
+                        # for i in subs:
+                        #     try:
+                        #         await bot.send_media_group(i, media=media_group.build())
+                        #     except Exception as error:
+                        #         try:
+                        #             await bot.send_message(
+                        #                 chat_id=admins[0], text=str(error)
+                        #             )
+                        #         except:
+                        #             continue
+
+                        # datess = datetime.date(
+                        #     zamm.date.year, zamm.date.month, zamm.date.day
+                        # )
+                        # sup.table("Zamenas").delete().eq("date", datess).execute()
+                        # sup.table("ZamenasFull").delete().eq("date", datess).execute()
+                        # sup.table("ZamenaFileLinks").delete().eq("date", datess).execute()
+                        # parse_zamenas(url=zamm.link, date_=datess)
+                        # await bot.send_message(chat_id=admins[0], text="parsed")
+                    except Exception as e:
+                        result.checks.append(
+                            CheckZamenaResultFailed(
+                                error=str(e), trace=str(traceback.format_exc())
+                            )
+                        )
                     pass
-        else:
-            # links = [
-            #     {
-            #         "link": link,
-            #     }
-            #     for link in new_links
-            # ]
-            # sup.client.table("AlreadyFoundsLinks").insert(links).execute()
-            # return {"res": "add to database"}
-
-            return {"res": "new_links", "links": new_links}
-
-            # for link in new_links:
-            #     zam = [x for x in tables if x.links.__contains__(link)][0]
-            #     zamm = [x for x in zam.zamenas if x.link == link][0]
-            #     try:
-            #         # await r.lpush("alreadyFound", str(zamm.link))
-            #         if link.__contains__("google.com") or link.__contains__("yadi.sk"):
-            #
-            #             continue
-            #         extension = get_file_extension(zamm.link)
-            #         filename = zamm.link.split("/")[-1].split(".")[0]
-            #         download_file(link=zamm.link, filename=f"{filename}.{extension}")
-            #         if extension == "pdf":
-            #             screenshot_paths = await create_pdf_screenshots(filename)
-            #         if extension == "docx":
-            #             convert(f"{filename}.{extension}")
-            #             screenshot_paths = await create_pdf_screenshots(filename)
-            #         # media_group = MediaGroupBuilder(
-            #         #     caption=f"Новые замены на <a href='{zamm.link}'>{zamm.date}</a>  "
-            #         # )
-            #         # for i in screenshot_paths:
-            #         #     image = FSInputFile(i)
-            #         #     media_group.add_photo(image)
-            #         # try:
-            #         #     # await bot.send_media_group(chat_id=admins[0], media=media_group.build())
-            #         #     await bot.send_media_group(
-            #         #         -1002035415883, media=media_group.build()
-            #         #     )
-            #         #     send_message_to_topic(
-            #         #         "Новые замены", f"Новые замены на {zamm.date}", sup=sup
-            #         #     )
-            #         # except Exception as error:
-            #         #     await bot.send_message(chat_id=admins[0], text=str(error))
-            #         # subs = await r.lrange("subs", 0, -1)
-            #         # for i in subs:
-            #         #     try:
-            #         #         await bot.send_media_group(i, media=media_group.build())
-            #         #     except Exception as error:
-            #         #         try:
-            #         #             await bot.send_message(
-            #         #                 chat_id=admins[0], text=str(error)
-            #         #             )
-            #         #         except:
-            #         #             continue
-            #         cleanup_temp_files(screenshot_paths)
-            #         os.remove(f"{filename}.pdf")
-            #         datess = datetime.date(
-            #             zamm.date.year, zamm.date.month, zamm.date.day
-            #         )
-            #         sup.table("Zamenas").delete().eq("date", datess).execute()
-            #         sup.table("ZamenasFull").delete().eq("date", datess).execute()
-            #         sup.table("ZamenaFileLinks").delete().eq("date", datess).execute()
-            #         parse_zamenas(url=zamm.link, date_=datess)
-            #         # await bot.send_message(chat_id=admins[0], text="parsed")
-            #     except Exception as error:
-            #         pass
-            #     #     await bot.send_message(
-            #     #         chat_id=admins[0],
-            #     #         text=f"{str(error)}\n{str(error.__traceback__)}",
-            #     #     )
-            #     pass
-            # return {"res": "found_new", "links": len(new_links)}
-    return {"res": "ok"}
+                return result
+        return CheckResult(result="Checked")
+    except Exception as e:
+        return CheckResultError(
+            result="Error", trace=str(traceback.format_exc()), error=str(e)
+        )
