@@ -32,7 +32,7 @@ async def get_founded_links(
     return await crud.get_founded_links(session=session)
 
 
-@router.get("/check_new", response_model=JSONResponse)
+@router.get("/check_new")
 async def check_new() -> CheckResult:
     return await crud.check_new()
 
