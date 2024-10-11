@@ -34,7 +34,7 @@ async def get_founded_links(
 async def check_new(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> dict:
-    return await crud.check_new(session=session)
+    return await crud.check_new()
 
 
 @router.post("/parse_zamena", response_model=dict)
