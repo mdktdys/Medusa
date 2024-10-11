@@ -44,6 +44,9 @@ from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 
+from src.parser.core import getLastZamenaLink
+from src.parser.parsers import parse_zamenas
+
 
 # async def send_task(celery_app, task_name: str, args: list = list) -> AsyncResult:
 #     max_retries = 5
@@ -83,44 +86,8 @@ def get_latest_zamena_link():
         return {"message": "failed", "reason": str(e)}
 
 
-async def get_latest_zamena_link_telegram(chat_id: int) -> None:
-    try:
-        print("test")
-        # parser_celery_app.send_task(
-        #     "telegram.tasks.send_message_via_bot", args=[chat_id, "Получено в очередь"]
-        # )
-        # Парсим страницу
-        html = urlopen("https://www.uksivt.ru/zameny").read()
-        soup = BeautifulSoup(html, "html.parser")
-        link, date = getLastZamenaLink(soup=soup)
-
-        # Отправляем второе сообщение
-        # parser_celery_app.send_task(
-        #     "telegram.tasks.send_message_via_bot", args=[chat_id, f"{link}\n{date}"]
-        # )
-    except Exception as e:
-        print(str(e))
-        # В случае ошибки отправляем сообщение об ошибке
-        # parser_celery_app.send_task(
-        #     "telegram.tasks.send_message_via_bot", args=[chat_id, f"Ошибка\n{str(e)}"]
-        # )
-
-
 def check_new():
-    # send_message_to_rabbitmq(message="Я БЛЯТЬ КРОЛИК")
-    return
-    # asyncio.run(
-    #     send_task(
-    #         parser_celery_app,
-    #         "telegram.tasks.send_message_via_bot",
-    #         args=[DEBUG_CHANNEL, f"Начал проверять замены"],
-    #     )
-    # )
-    # parser_celery_app.send_task(
-    #     "telegram.tasks.send_message_via_bot",
-    #     args=[DEBUG_CHANNEL, f"1"],
-    #     retries=5,
-    # )
+    return {"res": "ok"}
 
     # r = redis.Redis(
     #     host=REDIS_HOST_URL,
@@ -129,31 +96,11 @@ def check_new():
     #     password=REDIS_PASSWORD,
     #     username=REDIS_USERNAME,
     # )
-    # asyncio.run(
-    #     send_task(
-    #         parser_celery_app,
-    #         "telegram.tasks.send_message_via_bot",
-    #         args=[DEBUG_CHANNEL, f"1"],
-    #     )
-    # )
+
     # res = await r.lrange("alreadyFound", 0, -1)
-    # asyncio.run(
-    #     send_task(
-    #         parser_celery_app,
-    #         "telegram.tasks.send_message_via_bot",
-    #         args=[DEBUG_CHANNEL, f"2"],
-    #     )
-    # )
-    # print(type(res))
     # return res
     html = urlopen(SCHEDULE_URL).read()
-    # asyncio.run(
-    #     send_task(
-    #         parser_celery_app,
-    #         "telegram.tasks.send_message_via_bot",
-    #         args=[DEBUG_CHANNEL, f"3"],
-    #     )
-    # )
+
     soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
     # asyncio.run(
     #     send_task(

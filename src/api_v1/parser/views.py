@@ -16,9 +16,9 @@ router = APIRouter(tags=["Parser"])
 pass_ = os.environ.get("API_SECRET")
 
 
-@router.get("/get_latest_zamena_link_celery", response_model=dict)
+@router.get("/get_latest_zamena_link", response_model=dict)
 @cache(300)
-async def get_latest_zamena_link_celery() -> dict:
+async def get_latest_zamena_link() -> dict:
     return await crud.get_latest_zamena_link()
 
 
