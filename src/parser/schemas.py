@@ -27,7 +27,7 @@ class CheckZamenaResultFailed(CheckZamenaResult):
     trace: str
 
 
-class CheckZamenaResultSuccess(CheckZamenaResult):
+class CheckZamenaResultSuccess(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     result: str
     link: str
