@@ -4,6 +4,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_cache.decorator import cache
+from starlette.responses import JSONResponse
 
 from src.alchemy.db_helper import *
 from . import crud
@@ -31,7 +32,7 @@ async def get_founded_links(
     return await crud.get_founded_links(session=session)
 
 
-@router.get("/check_new", response_model=CheckResult)
+@router.get("/check_new", response_model=JSONResponse)
 async def check_new() -> CheckResult:
     return await crud.check_new()
 

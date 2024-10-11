@@ -48,6 +48,9 @@ from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 from docx2pdf import convert
+from fastapi.encoders import jsonable_encoder
+from starlette.responses import JSONResponse
+
 from my_secrets import SCHEDULE_URL
 from src.parser.core import getLastZamenaLink, getAllMonthTables, getAllTablesLinks
 from src.parser.models.parsed_date_model import ParsedDate
@@ -287,7 +290,7 @@ async def check_new() -> CheckResult:
                             )
                         )
                 print(result)
-                return result
+                return JSONResponse(content=jsonable_encoder(result), status_code=200)
         return CheckResult(result="Checked")
     except Exception as e:
         print(e)
