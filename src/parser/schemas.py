@@ -35,7 +35,7 @@ class CheckZamenaResultSuccess(BaseModel):
     # date: datetime.date
 
 
-class CheckResultFoundNew(CheckResult):
+class CheckResultFoundNew(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     result: str = "FoundNew"
     checks: List[
