@@ -10,6 +10,7 @@ class CheckResult(BaseModel):
 
 
 class CheckResultError(CheckResult):
+    model_config = ConfigDict(from_attributes=True)
     error: str
     trace: str
 
@@ -20,12 +21,14 @@ class CheckZamenaResult(BaseModel):
 
 
 class CheckZamenaResultFailed(CheckZamenaResult):
+    model_config = ConfigDict(from_attributes=True)
     result: str = "Failed"
     error: str
     trace: str
 
 
 class CheckZamenaResultSuccess(CheckZamenaResult):
+    model_config = ConfigDict(from_attributes=True)
     result: str = "Success"
     link: str
     images: List[bytes]
@@ -33,5 +36,6 @@ class CheckZamenaResultSuccess(CheckZamenaResult):
 
 
 class CheckResultFoundNew(CheckResult):
+    model_config = ConfigDict(from_attributes=True)
     result: str
     checks: List[CheckZamenaResult] = []
