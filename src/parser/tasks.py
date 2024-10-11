@@ -5,7 +5,7 @@ from celery import Celery
 
 from my_secrets import BACKEND_URL, BROKER_URL
 from src.parser import methods
-
+from src.parser.schemas import CheckResult
 
 parser_celery_app = Celery(
     "parser",
@@ -25,5 +25,5 @@ def get_latest_zamena_link() -> dict:
 
 
 @parser_celery_app.task
-def check_new() -> dict:
+def check_new() -> CheckResult:
     return asyncio.run(methods.check_new())
