@@ -113,15 +113,17 @@ def check_new():
     # await on_check(bot=bot)
     if not site_links.__eq__(database_links):
         # alreadyFound = await r.lrange("alreadyFound", 0, -1)
-        new = list(
+        new_links = list(
             set(site_links)
             - set([x.link for x in database_links])
             - set(already_found_links)
         )
-        new.reverse()
-        print(new)
-        if len(new) < 1:
-            return {"res": "found_new", "links": new}
+        new_links.reverse()
+        print(new_links)
+        if len(new_links) < 1:
+            return {"res": "no_new_links"}
+        return {"res": "found_new", "links": new_links}
+        # for i in link
     #         for i in tables[0].zamenas:
     #             if (i.date > datetime.date.today()):
     #                 hash = get_remote_file_hash(i.link)
