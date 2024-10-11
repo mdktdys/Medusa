@@ -1,7 +1,9 @@
 from celery import Celery
 
+from my_secrets import BROKER_URL, BACKEND_URL
+
 fastapi_celery_app = Celery(
     "fastapi",
-    broker="amqp://guest:guest@rabbitmq:5672//",  # Используйте 127.0.0.1 для RabbitMQ
-    backend="redis://redis:6379/0",  # Используйте 127.0.0.1 для Redis
+    broker=BROKER_URL,
+    backend=BACKEND_URL,
 )
