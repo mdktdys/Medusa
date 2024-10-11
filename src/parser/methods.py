@@ -287,6 +287,7 @@ async def check_new() -> CheckResult:
                                 trace=Html.escape(str(traceback.format_exc())[0:100]),
                             )
                         )
+                print(result)
                 print(result.model_dump_json())
                 return result
         return CheckResult(result="Checked")
