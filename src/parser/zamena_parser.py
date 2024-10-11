@@ -2,10 +2,14 @@
 Модуль содержит в себе парсер замен и вспомогательные методы для него
 """
 
+import asyncio
 import hashlib
+import os
 import re
 from io import BytesIO
+from typing import List
 
+import fitz
 import requests
 from docx import Document
 from docx.table import Table
@@ -227,6 +231,12 @@ def map_entities_to_ids(
             row[6] = cabinet.id
 
 
+def get_bytes_hash(bytes_data: bytes):
+    hasher = hashlib.new("sha256")
+    hasher.update(bytes_data)
+    return hasher.hexdigest()
+
+
 def get_remote_file_hash(url, algorithm="sha256"):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
@@ -237,6 +247,64 @@ def get_remote_file_hash(url, algorithm="sha256"):
         return hasher.hexdigest()
     else:
         return None
+
+
+def get_file_extension(url):
+    parts = url.split("/")
+    file_name = parts[-1]
+    file_parts = file_name.split(".")
+    if len(file_parts) > 1:
+        return file_parts[-1]
+    else:
+        return ""
+
+
+def cleanup_temp_files(file_paths):
+    for file_path in file_paths:
+        os.remove(file_path)
+
+
+async def save_pixmap(pixmap, screenshot_path):
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, pixmap.save, screenshot_path, "png")
+
+
+def create_pdf_screenshots_bytes(data_bytes: bytes) -> List[bytes]:
+    screenshots_bytes = []
+    pdf_document: fitz.Document = fitz.open(stream=data_bytes, filetype="pdf")
+    for i in range(pdf_document.page_count):
+        page: fitz.Page = pdf_document.load_page(i)
+        zoom_x = 2  # horizontal zoom
+        zoom_y = 2  # vertical zoom
+        mat = fitz.Matrix(zoom_x, zoom_y)
+        pix: fitz.Pixmap = page.get_pixmap(matrix=mat)
+        screenshots_bytes.append(pix.pil_tobytes())
+    return screenshots_bytes
+
+
+async def create_pdf_screenshots(pdf_path):
+    screenshot_paths = []
+    pdf_document: fitz.Document = fitz.open(f"{pdf_path}.pdf")
+    for i in range(pdf_document.page_count):
+        page: fitz.Page = pdf_document.load_page(i)
+        zoom_x = 2  # horizontal zoom
+        zoom_y = 2  # vertical zoom
+        mat = fitz.Matrix(zoom_x, zoom_y)
+        pix: fitz.Pixmap = page.get_pixmap(matrix=mat)
+        screenshot_path = f"{pdf_path}_page_{i + 1}.png"
+        await save_pixmap(pix, screenshot_path)
+        screenshot_paths.append(screenshot_path)
+    return screenshot_paths
+
+
+def download_file(link: str, filename: str):
+    response = requests.get(link)
+    if response.status_code == 200:
+        with open(filename, "wb") as file:
+            file.write(response.content)
+        print(f"File '{filename}' has been downloaded successfully.")
+    else:
+        print("Failed to download the file.")
 
 
 def prepare_and_send_supabase_entries(

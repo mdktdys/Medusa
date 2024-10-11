@@ -14,7 +14,7 @@ from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import parseZamenas
 
 
-def _init_date_model() -> Data:
+def init_date_model() -> Data:
     data_model = Data
     supabase_client = SupaBaseWorker()
 
@@ -28,7 +28,7 @@ def _init_date_model() -> Data:
     return data_model
 
 
-def _get_file_stream(link: str) -> BytesIO:
+def get_file_stream(link: str) -> BytesIO:
     response = requests.get(link)
 
     if response.status_code == HTTPStatus.OK.value:
@@ -39,7 +39,15 @@ def _get_file_stream(link: str) -> BytesIO:
     return stream
 
 
-def _get_file_bytes(link: str) -> bytes:
+def get_remote_file_bytes(link: str) -> bytes:
+    response = requests.get(link)
+    if response.status_code == HTTPStatus.OK.value:
+        return response.content
+    else:
+        raise Exception("Данные не получены")
+
+
+def get_file_bytes(link: str) -> bytes:
     response = requests.get(link)
 
     if response.status_code == HTTPStatus.OK.value:
@@ -48,7 +56,7 @@ def _get_file_bytes(link: str) -> bytes:
         raise Exception("Данные не получены")
 
 
-def _define_file_format(stream: BytesIO):
+def define_file_format(stream: BytesIO):
     data = stream.getvalue()
     mime = magic.Magic(mime=True)
     file_type = mime.from_buffer(data)
@@ -58,9 +66,9 @@ def _define_file_format(stream: BytesIO):
 
 def parse_zamenas(url: str, date_: date):
     supabase_client = SupaBaseWorker()
-    data_model = _init_date_model()
-    stream = _get_file_stream(link=url)
-    file_type = _define_file_format(stream)
+    data_model = init_date_model()
+    stream = get_file_stream(link=url)
+    file_type = define_file_format(stream)
 
     match file_type:
         case "application/pdf":
@@ -76,10 +84,10 @@ def parse_zamenas(url: str, date_: date):
 
 def parse_schedule(url: str, date_: date):
     supabase_client = SupaBaseWorker()
-    data_model = _init_date_model()
-    stream = _get_file_stream(link=url)
-    file_type = _define_file_format(stream)
-    bytes = _get_file_bytes(link=url)
+    data_model = init_date_model()
+    stream = get_file_stream(link=url)
+    file_type = define_file_format(stream)
+    bytes = get_file_bytes(link=url)
 
     # cv = Converter(pdf_file='fixed.pdf')
     # cv.convert(docx_filename=f"schedule {date_}.docx")
