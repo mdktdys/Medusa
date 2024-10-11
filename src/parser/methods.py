@@ -284,6 +284,11 @@ async def check_new() -> CheckResult:
                             )
                         )
                     pass
+                print(result)
+                print(result.result)
+                print(result.checks)
+                print(result.checks[0].result)
+                print(result.checks[0].images)
                 return result
         return CheckResult(result="Checked")
     except Exception as e:
