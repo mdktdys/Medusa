@@ -122,7 +122,7 @@ def check_new():
         print(new_links)
         if len(new_links) < 1:
             return {"res": "no_new_links"}
-        return {"res": "found_new", "links": new_links}
+        return {"res": "found_new", "links": len(new_links)}
         # for i in link
     #         for i in tables[0].zamenas:
     #             if (i.date > datetime.date.today()):
