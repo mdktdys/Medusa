@@ -15,7 +15,7 @@ class CheckResultError(CheckResult):
 
 
 class CheckZamenaResult(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True,ser_json_bytes="base64")
     result: str
 
 
