@@ -108,14 +108,14 @@ def check_new():
     soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
     tables: List[ZamTable] = getAllMonthTables(soup=soup)
     site_links = getAllTablesLinks(tables)
-    databaseLinks: List[ParsedDate] = sup.get_zamena_file_links()
+    database_links: List[ParsedDate] = sup.get_zamena_file_links()
     already_found_links = []
     # await on_check(bot=bot)
-    if not site_links.__eq__(databaseLinks):
+    if not site_links.__eq__(database_links):
         # alreadyFound = await r.lrange("alreadyFound", 0, -1)
         new = list(
             set(site_links)
-            - set([x.link for x in databaseLinks])
+            - set([x.link for x in database_links])
             - set(already_found_links)
         )
         new.reverse()
