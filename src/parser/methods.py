@@ -40,14 +40,19 @@
 #     rabbitmq_channel.basic_publish(exchange="", routing_key="parser", body=message)
 #     print(f" [x] Sent '{message}' to queue 'parser'")
 import datetime
+from typing import List
 from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 
-from src.parser.core import getLastZamenaLink
+from my_secrets import SCHEDULE_URL
+from src.parser.core import getLastZamenaLink, getAllMonthTables, getAllTablesLinks
+from src.parser.models.parsed_date_model import ParsedDate
+from src.parser.models.zamena_table_model import ZamTable
 from src.parser.parsers import parse_zamenas
+from src.parser.supabase import SupaBaseWorker
 
-
+sup =  SupaBaseWorker()
 # async def send_task(celery_app, task_name: str, args: list = list) -> AsyncResult:
 #     max_retries = 5
 #     retries = 0
@@ -87,7 +92,6 @@ def get_latest_zamena_link():
 
 
 def check_new():
-    return {"res": "ok"}
 
     # r = redis.Redis(
     #     host=REDIS_HOST_URL,
@@ -104,7 +108,8 @@ def check_new():
     soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
     tables: List[ZamTable] = getAllMonthTables(soup=soup)
     site_links = getAllTablesLinks(tables)
-    # databaseLinks: List[ParsedDate] = sup.get_zamena_file_links()
+    databaseLinks: List[ParsedDate] = sup.get_zamena_file_links()
+
     # await on_check(bot=bot)
     # if not site_links.__eq__(databaseLinks):
     #     alreadyFound = await r.lrange("alreadyFound", 0, -1)
@@ -204,3 +209,4 @@ def check_new():
     #             await bot.send_message(chat_id=admins[0], text='parsed')
     #         except Exception as error:
     #             await bot.send_message(chat_id=admins[0], text=f'{str(error)}\n{str(error.__traceback__)}')
+    return {"res": "ok"}
