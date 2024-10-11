@@ -40,6 +40,7 @@
 #     rabbitmq_channel.basic_publish(exchange="", routing_key="parser", body=message)
 #     print(f" [x] Sent '{message}' to queue 'parser'")
 import datetime
+import json
 import os
 import traceback
 from io import BytesIO
@@ -188,7 +189,7 @@ async def check_new() -> CheckResult:
                             return {"res": "err", "mes": str(traceback.format_exc())}
                         pass
             else:
-                result = CheckResultFoundNew(result="FoundNew")
+                result = CheckResultFoundNew()
                 # links = [
                 #     {
                 #         "link": link,
@@ -287,8 +288,9 @@ async def check_new() -> CheckResult:
                                 trace=Html.escape(str(traceback.format_exc())[0:100]),
                             )
                         )
-                print(result)
-                print(result.model_dump_json())
+                result_dict = result.model_dump()
+                result_json = json.dumps(result_dict, ensure_ascii=False, default=str)
+                print(result_json)
                 return result
         return CheckResult(result="Checked")
     except Exception as e:
