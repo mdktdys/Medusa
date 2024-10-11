@@ -48,9 +48,6 @@ from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
 from docx2pdf import convert
-from fastapi.encoders import jsonable_encoder
-from starlette.responses import JSONResponse
-
 from my_secrets import SCHEDULE_URL
 from src.parser.core import getLastZamenaLink, getAllMonthTables, getAllTablesLinks
 from src.parser.models.parsed_date_model import ParsedDate
@@ -223,9 +220,10 @@ async def check_new() -> CheckResult:
 
                         match extension:
                             case "application/pdf":
-                                screenshots_base64 = create_pdf_screenshots_bytes(
-                                    file_bytes
-                                )
+                                screenshots_base64 = ["asd"]
+                                # screenshots_base64 = create_pdf_screenshots_bytes(
+                                #     file_bytes
+                                # )
 
                             case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                                 raise Exception("invalid format word")
@@ -289,8 +287,7 @@ async def check_new() -> CheckResult:
                                 trace=Html.escape(str(traceback.format_exc())[0:100]),
                             )
                         )
-                print(result)
-                return JSONResponse(content=jsonable_encoder(result), status_code=200)
+                return result
         return CheckResult(result="Checked")
     except Exception as e:
         print(e)

@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class CheckResult(BaseModel):
-    model_config = ConfigDict(from_attributes=True, ser_json_bytes="base64")
+    model_config = ConfigDict(from_attributes=True)
     result: str
 
 
@@ -15,7 +15,7 @@ class CheckResultError(CheckResult):
 
 
 class CheckZamenaResult(BaseModel):
-    model_config = ConfigDict(from_attributes=True, ser_json_bytes="base64")
+    model_config = ConfigDict(from_attributes=True)
     result: str
 
 
