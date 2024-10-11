@@ -28,8 +28,8 @@ class CheckZamenaResultFailed(CheckZamenaResult):
 class CheckZamenaResultSuccess(CheckZamenaResult):
     result: str = "Success"
     link: str
-    images: List[str]
-    date: datetime.date
+    images: List[bytes]
+    # date: datetime.date
 
 
 class CheckResultFoundNew(CheckResult):

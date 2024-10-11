@@ -215,7 +215,7 @@ async def check_new() -> CheckResult:
                         file_stream = BytesIO()
                         file_stream.write(file_bytes)
                         extension = define_file_format(stream=file_stream)
-                        screenshots_base64: List[str] = []
+                        screenshots_base64: List[bytes] = []
                         print(extension)
 
                         match extension:
@@ -233,7 +233,7 @@ async def check_new() -> CheckResult:
 
                         result.checks.append(
                             CheckZamenaResultSuccess(
-                                date=zamena_cell.date,
+                                # date=zamena_cell.date,
                                 images=screenshots_base64,
                                 link=zamena_cell.link,
                             )
