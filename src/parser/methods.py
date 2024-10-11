@@ -221,7 +221,7 @@ async def check_new() -> CheckResult:
                         match extension:
                             case "application/pdf":
                                 screenshots_base64 = create_pdf_screenshots_bytes(
-                                    file_bytes
+                                    file_stream
                                 )
 
                             case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
