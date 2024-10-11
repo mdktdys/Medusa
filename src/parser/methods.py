@@ -216,6 +216,7 @@ async def check_new() -> CheckResult:
                         file_stream.write(file_bytes)
                         extension = define_file_format(stream=file_stream)
                         screenshots_base64: List[str] = []
+                        print(extension)
 
                         match extension:
                             case "application/pdf":
@@ -282,15 +283,9 @@ async def check_new() -> CheckResult:
                         result.checks.append(
                             CheckZamenaResultFailed(
                                 error=str(e),
-                                trace=Html.escape(str(traceback.format_exc())),
+                                trace=Html.escape(str(traceback.format_exc())[0:100]),
                             )
                         )
-                    pass
-                print(result)
-                print(result.result)
-                print(result.checks)
-                print(result.checks[0].result)
-                print(result.checks[0].images)
                 return result
         return CheckResult(result="Checked")
     except Exception as e:

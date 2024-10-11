@@ -60,7 +60,6 @@ def define_file_format(stream: BytesIO):
     data = stream.getvalue()
     mime = magic.Magic(mime=True)
     file_type = mime.from_buffer(data)
-
     return file_type
 
 
