@@ -1,10 +1,11 @@
 import datetime
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class CheckResult(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     result: str
 
 
@@ -14,6 +15,7 @@ class CheckResultError(CheckResult):
 
 
 class CheckZamenaResult(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
     result: str
 
 
