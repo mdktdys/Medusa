@@ -119,6 +119,7 @@ def check_new():
             - set(already_found_links)
         )
         new.reverse()
+        print(new)
         if len(new) < 1:
             return {"res": "found_new", "links": new}
     #         for i in tables[0].zamenas:
