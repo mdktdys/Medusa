@@ -77,6 +77,7 @@ from src.parser.zamena_parser import (
     get_bytes_hash,
     create_pdf_screenshots_bytes,
 )
+import html as Html
 
 sup = SupaBaseWorker()
 # async def send_task(celery_app, task_name: str, args: list = list) -> AsyncResult:
@@ -280,7 +281,8 @@ async def check_new() -> CheckResult:
                     except Exception as e:
                         result.checks.append(
                             CheckZamenaResultFailed(
-                                error=str(e), trace=str(traceback.format_exc())
+                                error=str(e),
+                                trace=Html.escape(str(traceback.format_exc())),
                             )
                         )
                     pass
@@ -293,5 +295,5 @@ async def check_new() -> CheckResult:
         return CheckResult(result="Checked")
     except Exception as e:
         return CheckResultError(
-            result="Error", trace=str(traceback.format_exc()), error=str(e)
+            result="Error", trace=Html.escape(str(traceback.format_exc())), error=str(e)
         )
