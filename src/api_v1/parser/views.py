@@ -30,10 +30,8 @@ async def get_founded_links(
     return await crud.get_founded_links(session=session)
 
 
-@router.get("/check_new", response_model=List[str])
-async def check_new(
-    session: AsyncSession = Depends(db_helper.session_dependency),
-) -> dict:
+@router.get("/check_new", response_model=dict)
+async def check_new() -> dict:
     return await crud.check_new()
 
 
