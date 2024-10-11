@@ -41,6 +41,7 @@
 #     print(f" [x] Sent '{message}' to queue 'parser'")
 import datetime
 import os
+import traceback
 from io import BytesIO
 from typing import List
 from urllib.request import urlopen
@@ -126,8 +127,7 @@ async def check_new():
     tables: List[ZamTable] = getAllMonthTables(soup=soup)
     site_links = getAllTablesLinks(tables)
     database_links: List[ParsedDate] = sup.get_zamena_file_links()
-    already_found_links = sup.get_already_found_links()
-    print(already_found_links)
+    already_found_links: List[str] = sup.get_already_found_links()
     # await on_check(bot=bot)
     if not site_links.__eq__(database_links):
         # alreadyFound = await r.lrange("alreadyFound", 0, -1)
@@ -138,6 +138,8 @@ async def check_new():
         )
         new_links.reverse()
         if len(new_links) < 1:
+            print("NO NEW")
+            print("CHECK EXISTING")
             for i in tables[0].zamenas:
                 if i.date > datetime.date.today():
                     file_bytes = get_remote_file_bytes(link=i.link)
@@ -183,7 +185,7 @@ async def check_new():
                             parse_zamenas(url=i.link, date_=file_date)
                     except Exception as error:
                         print(error)
-                        return {"res": "err", "mes": str(error.__str__())}
+                        return {"res": "err", "mes": str(traceback.format_exc())}
                     pass
         else:
             links = [{"link": link} for link in new_links]
