@@ -8,7 +8,6 @@ from fastapi import HTTPException
 from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from fastapicelery import fastapi_celery_app
 from src.alchemy import database
 from src.api_v1.parser.schemas import ParseZamenaRequest
 from src.parser import tasks
