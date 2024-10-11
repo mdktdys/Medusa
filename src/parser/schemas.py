@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 
 class CheckResult(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, ser_json_bytes="base64")
     result: str
 
 
