@@ -110,23 +110,12 @@ def get_latest_zamena_link():
 
 
 async def check_new():
-
-    # r = redis.Redis(
-    #     host=REDIS_HOST_URL,
-    #     port=REDIS_PORT,
-    #     decode_responses=True,
-    #     password=REDIS_PASSWORD,
-    #     username=REDIS_USERNAME,
-    # )
-
-    # res = await r.lrange("alreadyFound", 0, -1)
-    # return res
     html = urlopen(SCHEDULE_URL).read()
-
     soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
     tables: List[ZamTable] = getAllMonthTables(soup=soup)
     site_links = getAllTablesLinks(tables)
     database_links: List[ParsedDate] = sup.get_zamena_file_links()
+    print(f"database_links : {database_links}")
     already_found_links: List[str] = sup.get_already_found_links()
     # await on_check(bot=bot)
     if not site_links.__eq__(database_links):
