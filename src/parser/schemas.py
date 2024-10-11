@@ -9,8 +9,9 @@ class CheckResult(BaseModel):
     result: str
 
 
-class CheckResultError(CheckResult):
+class CheckResultError(BaseModel):
     model_config = ConfigDict(from_attributes=True)
+    result: str
     error: str
     trace: str
 
@@ -20,7 +21,7 @@ class CheckZamenaResult(BaseModel):
     result: str
 
 
-class CheckZamenaResultFailed(CheckZamenaResult):
+class CheckZamenaResultFailed(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     result: str = "Failed"
     error: str

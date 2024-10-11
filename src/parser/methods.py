@@ -119,7 +119,7 @@ def get_latest_zamena_link():
         return {"message": "failed", "reason": str(e)}
 
 
-async def check_new() -> CheckResult | CheckResultFoundNew:
+async def check_new() -> CheckResult | CheckResultFoundNew | CheckResultError:
     try:
         html = urlopen(SCHEDULE_URL).read()
         soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
