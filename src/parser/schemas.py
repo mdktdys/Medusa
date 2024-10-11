@@ -38,4 +38,6 @@ class CheckZamenaResultSuccess(BaseModel):
 class CheckResultFoundNew(CheckResult):
     model_config = ConfigDict(from_attributes=True)
     result: str = "FoundNew"
-    checks: List[CheckZamenaResult] = []
+    checks: List[
+        CheckZamenaResult | CheckZamenaResultSuccess | CheckZamenaResultFailed
+    ] = []
