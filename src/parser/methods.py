@@ -66,6 +66,7 @@ from src.parser.schemas import (
     CheckZamenaResultFailed,
     CheckZamenaResultSuccess,
 )
+import base64
 from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import (
     get_remote_file_hash,
@@ -213,11 +214,11 @@ async def check_new() -> CheckResult:
                         file_stream = BytesIO()
                         file_stream.write(file_bytes)
                         extension = define_file_format(stream=file_stream)
-                        screenshots_bytes: List[bytes] = []
+                        screenshots_base64: List[str] = []
 
                         match extension:
                             case "application/pdf":
-                                screenshots_bytes = create_pdf_screenshots_bytes(
+                                screenshots_base64 = create_pdf_screenshots_bytes(
                                     file_bytes
                                 )
 
@@ -231,7 +232,7 @@ async def check_new() -> CheckResult:
                         result.checks.append(
                             CheckZamenaResultSuccess(
                                 date=zamena_cell.date,
-                                images=screenshots_bytes,
+                                images=screenshots_base64,
                                 link=zamena_cell.link,
                             )
                         )
