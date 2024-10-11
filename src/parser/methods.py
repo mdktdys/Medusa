@@ -52,7 +52,7 @@ from src.parser.models.zamena_table_model import ZamTable
 from src.parser.parsers import parse_zamenas
 from src.parser.supabase import SupaBaseWorker
 
-sup =  SupaBaseWorker()
+sup = SupaBaseWorker()
 # async def send_task(celery_app, task_name: str, args: list = list) -> AsyncResult:
 #     max_retries = 5
 #     retries = 0
@@ -109,13 +109,18 @@ def check_new():
     tables: List[ZamTable] = getAllMonthTables(soup=soup)
     site_links = getAllTablesLinks(tables)
     databaseLinks: List[ParsedDate] = sup.get_zamena_file_links()
-
+    already_found_links = []
     # await on_check(bot=bot)
-    # if not site_links.__eq__(databaseLinks):
-    #     alreadyFound = await r.lrange("alreadyFound", 0, -1)
-    #     new = list(set(site_links) - set([x.link for x in databaseLinks]) - set(alreadyFound))
-    #     new.reverse()
-    #     if (len(new) < 1):
+    if not site_links.__eq__(databaseLinks):
+        # alreadyFound = await r.lrange("alreadyFound", 0, -1)
+        new = list(
+            set(site_links)
+            - set([x.link for x in databaseLinks])
+            - set(already_found_links)
+        )
+        new.reverse()
+        if len(new) < 1:
+            return {"res": "found_new", "links": new}
     #         for i in tables[0].zamenas:
     #             if (i.date > datetime.date.today()):
     #                 hash = get_remote_file_hash(i.link)
