@@ -29,7 +29,7 @@ class CheckZamenaResultFailed(CheckZamenaResult):
 
 class CheckZamenaResultSuccess(CheckZamenaResult):
     model_config = ConfigDict(from_attributes=True)
-    result: str = "Success"
+    result: str
     link: str
     images: List[str]
     # date: datetime.date
