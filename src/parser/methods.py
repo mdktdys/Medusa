@@ -160,7 +160,7 @@ async def check_new() -> dict[str, Any]:
                                 screenshots_bytes: List[bytes] = []
 
                                 if extension == "pdf":
-                                    screenshots_bytes = create_pdf_screenshots_bytes(
+                                    screenshots_bytes = create_pdf_screenshots(
                                         data_bytes=file_bytes
                                     )
                                 if extension == "docx":
@@ -211,76 +211,80 @@ async def check_new() -> dict[str, Any]:
                         ):
                             continue
 
-                        file_bytes = get_remote_file_bytes(link=zamena_cell.link)
-                        file_hash = get_bytes_hash(file_bytes)
-                        file_stream = BytesIO()
-                        file_stream.write(file_bytes)
-                        extension = define_file_format(stream=file_stream)
-                        screenshots_base64: List[str] = []
-                        print(extension)
+                        screenshot_paths: List[str] = []
 
+                        extension = get_file_extension(zamena_cell.link)
+                        filename = zamena_cell.link.split("/")[-1].split(".")[0]
+
+                        download_file(
+                            link=zamena_cell.link, filename=f"{filename}.{extension}"
+                        )
                         match extension:
-                            case "application/pdf":
-                                # screenshots_base64 = ["asd"]
-                                screenshots_base64 = create_pdf_screenshots_bytes(
-                                    file_bytes
+                            case "pdf":
+                                screenshot_paths = await create_pdf_screenshots_bytes(
+                                    filename
                                 )
 
-                            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                                raise Exception("invalid format word")
-                                # cleanup_temp_files(screenshot_paths)
-                                # os.remove(f"{filename}.pdf")
+                            case "docx":
+                                convert(f"{filename}.{extension}")
+                                screenshot_paths = await create_pdf_screenshots_bytes(
+                                    filename
+                                )
+
                             case _:
                                 raise Exception("invalid format word")
 
                         result.checks.append(
                             CheckZamenaResultSuccess(
                                 date=zamena_cell.date,
-                                images=screenshots_base64,
+                                images=screenshot_paths,
                                 link=zamena_cell.link,
                             )
                         )
-                        # if extension == "docx":
-                        #     filename = zamena_cell.link.split("/")[-1].split(".")[0]
-                        #     convert(f"{filename}.{extension}")
-                        #     screenshot_paths = await create_pdf_screenshots(filename)
+                        cleanup_temp_files(screenshot_paths)
+                        os.remove(f"{filename}.pdf")
 
-                        # media_group = MediaGroupBuilder(
-                        #     caption=f"Новые замены на <a href='{zamm.link}'>{zamm.date}</a>  "
-                        # )
-                        # for i in screenshot_paths:
-                        #     image = FSInputFile(i)
-                        #     media_group.add_photo(image)
-                        # try:
-                        #     # await bot.send_media_group(chat_id=admins[0], media=media_group.build())
-                        #     await bot.send_media_group(
-                        #         -1002035415883, media=media_group.build()
-                        #     )
-                        #     send_message_to_topic(
-                        #         "Новые замены", f"Новые замены на {zamm.date}", sup=sup
-                        #     )
-                        # except Exception as error:
-                        #     await bot.send_message(chat_id=admins[0], text=str(error))
-                        # subs = await r.lrange("subs", 0, -1)
-                        # for i in subs:
-                        #     try:
-                        #         await bot.send_media_group(i, media=media_group.build())
-                        #     except Exception as error:
-                        #         try:
-                        #             await bot.send_message(
-                        #                 chat_id=admins[0], text=str(error)
-                        #             )
-                        #         except:
-                        #             continue
+                    # if extension == "docx":
+                    #     filename = zamena_cell.link.split("/")[-1].split(".")[0]
+                    #     convert(f"{filename}.{extension}")
+                    #     screenshot_paths = await create_pdf_screenshots(filename)
 
-                        # datess = datetime.date(
-                        #     zamm.date.year, zamm.date.month, zamm.date.day
-                        # )
-                        # sup.table("Zamenas").delete().eq("date", datess).execute()
-                        # sup.table("ZamenasFull").delete().eq("date", datess).execute()
-                        # sup.table("ZamenaFileLinks").delete().eq("date", datess).execute()
-                        # parse_zamenas(url=zamm.link, date_=datess)
-                        # await bot.send_message(chat_id=admins[0], text="parsed")
+                    # media_group = MediaGroupBuilder(
+                    #     caption=f"Новые замены на <a href='{zamm.link}'>{zamm.date}</a>  "
+                    # )
+                    # for i in screenshot_paths:
+                    #     image = FSInputFile(i)
+                    #     media_group.add_photo(image)
+                    # try:
+                    #     # await bot.send_media_group(chat_id=admins[0], media=media_group.build())
+                    #     await bot.send_media_group(
+                    #         -1002035415883, media=media_group.build()
+                    #     )
+                    #     send_message_to_topic(
+                    #         "Новые замены", f"Новые замены на {zamm.date}", sup=sup
+                    #     )
+                    # except Exception as error:
+                    #     await bot.send_message(chat_id=admins[0], text=str(error))
+                    # subs = await r.lrange("subs", 0, -1)
+                    # for i in subs:
+                    #     try:
+                    #         await bot.send_media_group(i, media=media_group.build())
+                    #     except Exception as error:
+                    #         try:
+                    #             await bot.send_message(
+                    #                 chat_id=admins[0], text=str(error)
+                    #             )
+                    #         except:
+                    #             continue
+
+                    # datess = datetime.date(
+                    #     zamm.date.year, zamm.date.month, zamm.date.day
+                    # )
+                    # sup.table("Zamenas").delete().eq("date", datess).execute()
+                    # sup.table("ZamenasFull").delete().eq("date", datess).execute()
+                    # sup.table("ZamenaFileLinks").delete().eq("date", datess).execute()
+                    # parse_zamenas(url=zamm.link, date_=datess)
+                    # await bot.send_message(chat_id=admins[0], text="parsed")
                     except Exception as e:
                         result.checks.append(
                             CheckZamenaResultFailed(
