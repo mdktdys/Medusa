@@ -234,7 +234,7 @@ async def check_new() -> dict[str, Any]:
                             year=zamena_cell.date.year,
                             month=zamena_cell.date.month,
                             day=zamena_cell.date.day,
-                        ).strftime("%d-%m-%y")
+                        ).strftime("%y-%m-%d")
                         sup.add_already_found_link(link=link, date=date)
 
                     # sup.table("Zamenas").delete().eq("date", datess).execute()
@@ -245,7 +245,7 @@ async def check_new() -> dict[str, Any]:
                         result.checks.append(
                             CheckZamenaResultFailed(
                                 error=str(e),
-                                trace=Html.escape(str(traceback.format_exc())[0:100]),
+                                trace=Html.escape(str(traceback.format_exc())[0:200]),
                             )
                         )
                 return result.model_dump()
