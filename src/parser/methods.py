@@ -221,13 +221,13 @@ async def check_new() -> dict[str, Any]:
                         )
                         match extension:
                             case "pdf":
-                                screenshot_paths = await create_pdf_screenshots_bytes(
+                                screenshot_paths = create_pdf_screenshots_bytes(
                                     filename
                                 )
 
                             case "docx":
                                 convert(f"{filename}.{extension}")
-                                screenshot_paths = await create_pdf_screenshots_bytes(
+                                screenshot_paths = create_pdf_screenshots_bytes(
                                     filename
                                 )
 
