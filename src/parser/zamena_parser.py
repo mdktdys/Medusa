@@ -290,6 +290,7 @@ def create_pdf_screenshots_bytes(pdf_path) -> List[str]:
                 pix.pil_tobytes(format="WEBP", optimize=True, dpi=(150, 150))
             ).decode("utf-8")
         )
+        print("7")
     return screenshots_bytes
 
 
