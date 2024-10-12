@@ -190,16 +190,6 @@ async def check_new() -> dict[str, Any]:
                         pass
             else:
                 result = CheckResultFoundNew()
-                # links = [
-                #     {
-                #         "link": link,
-                #     }
-                #     for link in new_links
-                # ]
-                # sup.client.table("AlreadyFoundsLinks").insert(links).execute()
-                # return {"res": "add to database"}
-
-                # return {"res": "new_links", "links": new_links}
 
                 for link in new_links:
                     zamena_table = [x for x in tables if x.links.__contains__(link)][0]
@@ -210,8 +200,6 @@ async def check_new() -> dict[str, Any]:
                             "yadi.sk"
                         ):
                             continue
-
-                        screenshot_paths: List[str] = []
 
                         extension = get_file_extension(zamena_cell.link)
                         filename = zamena_cell.link.split("/")[-1].split(".")[0]
@@ -242,15 +230,12 @@ async def check_new() -> dict[str, Any]:
                             )
                         )
                         os.remove(f"{filename}.pdf")
+                        sup.add_already_found_link(link=link, date=zamena_cell.date)
 
-                    # datess = datetime.date(
-                    #     zamm.date.year, zamm.date.month, zamm.date.day
-                    # )
                     # sup.table("Zamenas").delete().eq("date", datess).execute()
                     # sup.table("ZamenasFull").delete().eq("date", datess).execute()
                     # sup.table("ZamenaFileLinks").delete().eq("date", datess).execute()
                     # parse_zamenas(url=zamm.link, date_=datess)
-                    # await bot.send_message(chat_id=admins[0], text="parsed")
                     except Exception as e:
                         result.checks.append(
                             CheckZamenaResultFailed(
