@@ -275,13 +275,13 @@ def create_pdf_screenshots_bytes(pdf_path) -> List[str]:
     pdf_document: fitz.Document = fitz.open(f"{pdf_path}.pdf", filetype="pdf")
     for i in range(pdf_document.page_count):
         page: fitz.Page = pdf_document.load_page(i)
-        zoom_x = 2  # horizontal zoom
-        zoom_y = 2  # vertical zoom
+        zoom_x = 4  # horizontal zoom
+        zoom_y = 4  # vertical zoom
         mat = fitz.Matrix(zoom_x, zoom_y)
         pix: fitz.Pixmap = page.get_pixmap(matrix=mat)
         screenshots_bytes.append(
             base64.b64encode(
-                pix.pil_tobytes(format="WEBP", optimize=True, dpi=(200, 200))
+                pix.pil_tobytes(format="WEBP", optimize=True, dpi=(400, 400))
             ).decode("utf-8")
         )
     return screenshots_bytes
