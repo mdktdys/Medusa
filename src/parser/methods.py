@@ -190,20 +190,16 @@ async def check_new() -> dict[str, Any]:
                         pass
             else:
                 result = CheckResultFoundNew()
-
                 for link in new_links:
                     zamena_table = [x for x in tables if x.links.__contains__(link)][0]
                     zamena_cell = [x for x in zamena_table.zamenas if x.link == link][0]
                     try:
-                        # await r.lpush("alreadyFound", str(zamm.link))
                         if link.__contains__("google.com") or link.__contains__(
                             "yadi.sk"
                         ):
                             continue
-
                         extension = get_file_extension(zamena_cell.link)
                         filename = zamena_cell.link.split("/")[-1].split(".")[0]
-
                         download_file(
                             link=zamena_cell.link, filename=f"{filename}.{extension}"
                         )
@@ -212,16 +208,13 @@ async def check_new() -> dict[str, Any]:
                                 screenshot_paths = create_pdf_screenshots_bytes(
                                     filename
                                 )
-
                             case "docx":
                                 convert(f"{filename}.{extension}")
                                 screenshot_paths = create_pdf_screenshots_bytes(
                                     filename
                                 )
-
                             case _:
                                 raise Exception("invalid format word")
-
                         result.checks.append(
                             CheckZamenaResultSuccess(
                                 date=zamena_cell.date,
@@ -234,9 +227,9 @@ async def check_new() -> dict[str, Any]:
                             year=zamena_cell.date.year,
                             month=zamena_cell.date.month,
                             day=zamena_cell.date.day,
-                        ).strftime("%y-%m-%d")
+                        ).strftime("%Y-%m-%d")
+                        print(date)
                         sup.add_already_found_link(link=link, date=date)
-
                     # sup.table("Zamenas").delete().eq("date", datess).execute()
                     # sup.table("ZamenasFull").delete().eq("date", datess).execute()
                     # sup.table("ZamenaFileLinks").delete().eq("date", datess).execute()
