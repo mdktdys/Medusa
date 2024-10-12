@@ -221,10 +221,10 @@ async def check_new() -> dict[str, Any]:
 
                         match extension:
                             case "application/pdf":
-                                screenshots_base64 = ["asd"]
-                                # screenshots_base64 = create_pdf_screenshots_bytes(
-                                #     file_bytes
-                                # )
+                                # screenshots_base64 = ["asd"]
+                                screenshots_base64 = create_pdf_screenshots_bytes(
+                                    file_bytes
+                                )
 
                             case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                                 raise Exception("invalid format word")
@@ -236,7 +236,7 @@ async def check_new() -> dict[str, Any]:
                         result.checks.append(
                             CheckZamenaResultSuccess(
                                 result="ok",
-                                # date=zamena_cell.date,
+                                date=zamena_cell.date,
                                 images=screenshots_base64,
                                 link=zamena_cell.link,
                             )
@@ -289,7 +289,6 @@ async def check_new() -> dict[str, Any]:
                                 trace=Html.escape(str(traceback.format_exc())[0:100]),
                             )
                         )
-                result_dict = result.model_dump()
                 return result.model_dump()
         return CheckResult(result="Checked").model_dump()
     except Exception as e:

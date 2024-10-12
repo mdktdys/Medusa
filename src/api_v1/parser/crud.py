@@ -1,5 +1,6 @@
 from typing import Any
 
+import docker
 from celery.result import AsyncResult
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,3 +32,33 @@ async def get_founded_links(session: AsyncSession):
         (await session.execute(select(database.AlreadyFoundsLinks))).scalars().all()
     )
     return [link.link for link in links]
+
+
+def get_containers():
+    client = docker.from_env()  # Используем Docker SDK для Python
+    containers = client.containers.list(all=True)  # Получаем список всех контейнеров
+    container_info = []
+
+    for container in containers:
+        # Получаем атрибуты контейнера (включает информацию о состоянии)
+        container_attrs = container.attrs
+        state = container_attrs["State"]
+
+        # Время завершения контейнера (если остановлен)
+        finished_at = (
+            state["FinishedAt"]
+            if state["FinishedAt"] != "0001-01-01T00:00:00Z"
+            else None
+        )
+
+        container_info.append(
+            {
+                "name": container.name,
+                "status": container.status,
+                "image": container.image.tags,
+                "started_at": state["StartedAt"],  # Время запуска контейнера
+                "finished_at": finished_at,  # Время завершения работы (если остановлен)
+            }
+        )
+
+    return {"containers": container_info}

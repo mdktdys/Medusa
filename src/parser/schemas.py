@@ -33,7 +33,7 @@ class CheckZamenaResultSuccess(BaseModel):
     result: str
     link: str
     images: List[str]
-    # date: datetime.date
+    date: datetime.date
 
 
 class CheckResultFoundNew(BaseModel):

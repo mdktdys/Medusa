@@ -270,7 +270,7 @@ async def save_pixmap(pixmap, screenshot_path):
     await loop.run_in_executor(None, pixmap.save, screenshot_path, "png")
 
 
-def create_pdf_screenshots_bytes(data_bytes) -> List[bytes]:
+def create_pdf_screenshots_bytes(data_bytes) -> List[str]:
     screenshots_bytes = []
     pdf_document: fitz.Document = fitz.open(data_bytes)
     for i in range(pdf_document.page_count):
@@ -279,7 +279,7 @@ def create_pdf_screenshots_bytes(data_bytes) -> List[bytes]:
         zoom_y = 2  # vertical zoom
         mat = fitz.Matrix(zoom_x, zoom_y)
         pix: fitz.Pixmap = page.get_pixmap(matrix=mat)
-        screenshots_bytes.append(pix.pil_tobytes())
+        screenshots_bytes.append(base64.b64encode(pix.pil_tobytes()).decode("utf-8"))
     return screenshots_bytes
 
 
