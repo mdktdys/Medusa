@@ -234,7 +234,7 @@ async def check_new() -> dict[str, Any]:
                             year=zamena_cell.date.year,
                             month=zamena_cell.date.month,
                             day=zamena_cell.date.day,
-                        )
+                        ).strftime("%d-%m-%y")
                         sup.add_already_found_link(link=link, date=date)
 
                     # sup.table("Zamenas").delete().eq("date", datess).execute()
