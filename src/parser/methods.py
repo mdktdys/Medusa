@@ -241,41 +241,7 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        cleanup_temp_files(screenshot_paths)
                         os.remove(f"{filename}.pdf")
-
-                    # if extension == "docx":
-                    #     filename = zamena_cell.link.split("/")[-1].split(".")[0]
-                    #     convert(f"{filename}.{extension}")
-                    #     screenshot_paths = await create_pdf_screenshots(filename)
-
-                    # media_group = MediaGroupBuilder(
-                    #     caption=f"Новые замены на <a href='{zamm.link}'>{zamm.date}</a>  "
-                    # )
-                    # for i in screenshot_paths:
-                    #     image = FSInputFile(i)
-                    #     media_group.add_photo(image)
-                    # try:
-                    #     # await bot.send_media_group(chat_id=admins[0], media=media_group.build())
-                    #     await bot.send_media_group(
-                    #         -1002035415883, media=media_group.build()
-                    #     )
-                    #     send_message_to_topic(
-                    #         "Новые замены", f"Новые замены на {zamm.date}", sup=sup
-                    #     )
-                    # except Exception as error:
-                    #     await bot.send_message(chat_id=admins[0], text=str(error))
-                    # subs = await r.lrange("subs", 0, -1)
-                    # for i in subs:
-                    #     try:
-                    #         await bot.send_media_group(i, media=media_group.build())
-                    #     except Exception as error:
-                    #         try:
-                    #             await bot.send_message(
-                    #                 chat_id=admins[0], text=str(error)
-                    #             )
-                    #         except:
-                    #             continue
 
                     # datess = datetime.date(
                     #     zamm.date.year, zamm.date.month, zamm.date.day
