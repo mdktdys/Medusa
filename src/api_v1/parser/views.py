@@ -3,6 +3,7 @@ from typing import List, Any
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
+from DTOmodels.schemas import MyModel
 from src.alchemy.db_helper import *
 from . import crud
 
@@ -30,6 +31,11 @@ async def get_founded_links(
 @router.get("/check_new")
 async def check_new() -> dict[str, Any]:
     return await crud.check_new()
+
+
+@router.get("/ping")
+async def check_new() -> MyModel:
+    return MyModel(result="pong")
 
 
 @router.post("/parse_zamena", response_model=dict)
