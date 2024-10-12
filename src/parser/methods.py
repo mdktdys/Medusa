@@ -44,7 +44,7 @@ import json
 import os
 import traceback
 from io import BytesIO
-from typing import List
+from typing import List, Any
 from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
@@ -119,7 +119,7 @@ def get_latest_zamena_link():
         return {"message": "failed", "reason": str(e)}
 
 
-async def check_new() -> CheckResult | CheckResultFoundNew | CheckResultError:
+async def check_new() -> dict[str, Any]:
     try:
         html = urlopen(SCHEDULE_URL).read()
         soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
@@ -290,14 +290,12 @@ async def check_new() -> CheckResult | CheckResultFoundNew | CheckResultError:
                             )
                         )
                 result_dict = result.model_dump()
-                result_json = json.dumps(result_dict, ensure_ascii=False, default=str)
-                print(result_json)
-                return result
-        return CheckResult(result="Checked")
+                return result.model_dump()
+        return CheckResult(result="Checked").model_dump()
     except Exception as e:
         print(e)
         return CheckResultError(
             result="Error",
             trace=Html.escape(str(traceback.format_exc())[0:100]),
             error=Html.escape(str(e)),
-        )
+        ).model_dump()

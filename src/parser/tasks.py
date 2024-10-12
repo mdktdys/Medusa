@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+from typing import Any
 
 from celery import Celery
 
@@ -25,5 +26,5 @@ def get_latest_zamena_link() -> dict:
 
 
 @parser_celery_app.task
-def check_new() -> CheckResult:
+def check_new() -> dict[str, Any]:
     return asyncio.run(methods.check_new())

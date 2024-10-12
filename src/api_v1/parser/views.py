@@ -1,17 +1,13 @@
-import datetime
-import os
-from typing import List
+from typing import List, Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
-from starlette.responses import JSONResponse
 
 from src.alchemy.db_helper import *
 from . import crud
 import docker
 
 from .schemas import ParseZamenaRequest
-from ...parser.schemas import CheckResult
 
 router = APIRouter(tags=["Parser"])
 
@@ -33,7 +29,7 @@ async def get_founded_links(
 
 
 @router.get("/check_new")
-async def check_new() -> CheckResult:
+async def check_new() -> dict[str, Any]:
     return await crud.check_new()
 
 
