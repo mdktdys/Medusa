@@ -286,7 +286,9 @@ def create_pdf_screenshots_bytes(pdf_path) -> List[str]:
         pix: fitz.Pixmap = page.get_pixmap(matrix=mat)
         print("6")
         screenshots_bytes.append(
-            base64.b64encode(pix.pil_tobytes(format="WEBP", optimize=True, dpi=(150, 150))).decode("utf-8")
+            base64.b64encode(
+                pix.pil_tobytes(format="WEBP", optimize=True, dpi=(150, 150))
+            ).decode("utf-8")
         )
     return screenshots_bytes
 
