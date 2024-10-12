@@ -235,7 +235,6 @@ async def check_new() -> dict[str, Any]:
 
                         result.checks.append(
                             CheckZamenaResultSuccess(
-                                result="ok",
                                 date=zamena_cell.date,
                                 images=screenshots_base64,
                                 link=zamena_cell.link,
