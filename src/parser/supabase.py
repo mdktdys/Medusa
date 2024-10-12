@@ -162,7 +162,7 @@ class SupaBaseWorker:
         response = client.table("ZamenasFull").insert(groups).execute()
         print(response)
 
-    def add_already_found_link(self, link: str, date: datetime.date):
+    def add_already_found_link(self, link: str, date):
         client = self.client
         response = (
             client.table("AlreadyFoundsLinks")

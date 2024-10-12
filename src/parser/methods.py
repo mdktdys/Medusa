@@ -171,19 +171,19 @@ async def check_new() -> dict[str, Any]:
                                     )
                                     cleanup_temp_files(screenshot_paths)
                                     os.remove(f"{filename}.pdf")
-                                sup.table("Zamenas").delete().eq(
-                                    "date", file_date
-                                ).execute()
-                                sup.table("ZamenasFull").delete().eq(
-                                    "date", file_date
-                                ).execute()
-                                res = (
-                                    sup.table("ZamenaFileLinks")
-                                    .update({"hash": hash})
-                                    .eq("link", i.link)
-                                    .execute()
-                                )
-                                parse_zamenas(url=i.link, date_=file_date)
+                                # sup.table("Zamenas").delete().eq(
+                                #     "date", file_date
+                                # ).execute()
+                                # sup.table("ZamenasFull").delete().eq(
+                                #     "date", file_date
+                                # ).execute()
+                                # res = (
+                                #     sup.table("ZamenaFileLinks")
+                                #     .update({"hash": hash})
+                                #     .eq("link", i.link)
+                                #     .execute()
+                                # )
+                                # parse_zamenas(url=i.link, date_=file_date)
                         except Exception as error:
                             print(error)
                             return {"res": "err", "mes": str(traceback.format_exc())}
@@ -230,6 +230,11 @@ async def check_new() -> dict[str, Any]:
                             )
                         )
                         os.remove(f"{filename}.pdf")
+                        datetime.datetime(
+                            year=zamena_cell.date.year,
+                            month=zamena_cell.date.month,
+                            day=zamena_cell.date.day,
+                        )
                         sup.add_already_found_link(link=link, date=zamena_cell.date)
 
                     # sup.table("Zamenas").delete().eq("date", datess).execute()
