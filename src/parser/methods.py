@@ -66,6 +66,8 @@ from src.parser.schemas import (
     CheckResultFoundNew,
     CheckZamenaResultFailed,
     CheckZamenaResultSuccess,
+    CheckResultCheckExisting,
+    CheckZamenaResultHashChanged,
 )
 import base64
 from src.parser.supabase import SupaBaseWorker
@@ -126,12 +128,8 @@ async def check_new() -> dict[str, Any]:
         tables: List[ZamTable] = getAllMonthTables(soup=soup)
         site_links = getAllTablesLinks(tables)
         database_links: List[ParsedDate] = sup.get_zamena_file_links()
-        print(f"database_links : {database_links}")
         already_found_links: List[str] = sup.get_already_found_links()
-        # await on_check(bot=bot)
         if not site_links.__eq__(database_links):
-
-            # alreadyFound = await r.lrange("alreadyFound", 0, -1)
             new_links = list(
                 set(site_links)
                 - set([x.link for x in database_links])
@@ -139,38 +137,63 @@ async def check_new() -> dict[str, Any]:
             )
             new_links.reverse()
             if len(new_links) < 1:
-                print("NO NEW")
-                print("CHECK EXISTING")
-                for i in tables[0].zamenas:
-                    if i.date > datetime.date.today():
-                        file_bytes = get_remote_file_bytes(link=i.link)
+                result = CheckResultCheckExisting()
+                for zamena in tables[0].zamenas:
+                    if zamena.date > datetime.date.today():
+                        file_bytes = get_remote_file_bytes(link=zamena.link)
                         file_hash = get_bytes_hash(file_bytes)
                         try:
-                            old_hash = [x for x in database_links if x.link == i.link][
-                                0
-                            ].hash
-                            if file_hash != old_hash:
-                                file_date = datetime.datetime(
-                                    year=i.date.year, month=i.date.month, day=i.date.day
+                            old_hash = [
+                                x for x in database_links if x.link == zamena.link
+                            ]
+                            if len(old_hash) == 0:
+                                result.checks.append(
+                                    CheckZamenaResultFailed(
+                                        error="Не смог проверить хеш замены",
+                                        trace=f"возможно распес нет парсинга\n{zamena.link}\n{zamena.date}",
+                                    )
                                 )
-                                file_stream = BytesIO()
-                                file_stream.write(file_bytes)
-                                extension = define_file_format(stream=file_stream)
-
-                                screenshots_bytes: List[bytes] = []
-
-                                if extension == "pdf":
-                                    screenshots_bytes = create_pdf_screenshots(
-                                        data_bytes=file_bytes
+                                continue
+                            old_hash = old_hash[0].hash
+                            if file_hash != old_hash:
+                                extension = get_file_extension(zamena.link)
+                                filename = zamena.link.split("/")[-1].split(".")[0]
+                                download_file(
+                                    link=zamena.link, filename=f"{filename}.{extension}"
+                                )
+                                match extension:
+                                    case "pdf":
+                                        screenshot_paths = create_pdf_screenshots_bytes(
+                                            filename
+                                        )
+                                    case "docx":
+                                        convert(f"{filename}.{extension}")
+                                        screenshot_paths = create_pdf_screenshots_bytes(
+                                            filename
+                                        )
+                                    case _:
+                                        raise Exception("invalid format word")
+                                result.checks.append(
+                                    CheckZamenaResultSuccess(
+                                        date=zamena.date,
+                                        images=screenshot_paths,
+                                        link=zamena.link,
                                     )
-                                if extension == "docx":
-                                    filename = i.link.split("/")[-1].split(".")[0]
-                                    convert(f"{filename}.{extension}")
-                                    screenshot_paths = await create_pdf_screenshots(
-                                        filename
+                                )
+                                os.remove(f"{filename}.pdf")
+                                date = datetime.datetime(
+                                    year=zamena.date.year,
+                                    month=zamena.date.month,
+                                    day=zamena.date.day,
+                                ).strftime("%Y-%m-%d")
+
+                                result.checks.append(
+                                    CheckZamenaResultHashChanged(
+                                        date=zamena.date,
+                                        images=screenshot_paths,
+                                        link=zamena.link,
                                     )
-                                    cleanup_temp_files(screenshot_paths)
-                                    os.remove(f"{filename}.pdf")
+                                )
                                 # sup.table("Zamenas").delete().eq(
                                 #     "date", file_date
                                 # ).execute()
@@ -184,10 +207,14 @@ async def check_new() -> dict[str, Any]:
                                 #     .execute()
                                 # )
                                 # parse_zamenas(url=i.link, date_=file_date)
-                        except Exception as error:
-                            print(error)
-                            return {"res": "err", "mes": str(traceback.format_exc())}
-                        pass
+                        except Exception as e:
+                            print(e)
+                            return CheckResultError(
+                                result="Error",
+                                trace=Html.escape(str(traceback.format_exc())[0:100]),
+                                error=Html.escape(str(e)),
+                            ).model_dump()
+                return result.model_dump()
             else:
                 result = CheckResultFoundNew()
                 for link in new_links:

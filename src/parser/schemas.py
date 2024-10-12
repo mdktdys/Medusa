@@ -35,9 +35,28 @@ class CheckZamenaResultSuccess(BaseModel):
     date: datetime.date
 
 
+class CheckZamenaResultHashChanged(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    result: str = "HashChanged"
+    link: str
+    images: List[str]
+    date: datetime.date
+
+
 class CheckResultFoundNew(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     result: str = "FoundNew"
     checks: List[
         CheckZamenaResult | CheckZamenaResultSuccess | CheckZamenaResultFailed
+    ] = []
+
+
+class CheckResultCheckExisting(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    result: str = "CheckExisting"
+    checks: List[
+        CheckZamenaResult
+        | CheckZamenaResultSuccess
+        | CheckZamenaResultFailed
+        | CheckZamenaResultHashChanged
     ] = []
