@@ -230,6 +230,7 @@ async def check_new() -> dict[str, Any]:
                         download_file(
                             link=zamena_cell.link, filename=f"{filename}.{extension}"
                         )
+                        print(extension)
                         match extension:
                             case "pdf":
                                 screenshot_paths = create_pdf_screenshots_bytes(
@@ -269,7 +270,9 @@ async def check_new() -> dict[str, Any]:
                             )
                         )
                 return result.model_dump()
-        return CheckResult(result="Checked").model_dump()
+        else:
+
+            return CheckResult(result="Checked").model_dump()
     except Exception as e:
         print(e)
         return CheckResultError(
