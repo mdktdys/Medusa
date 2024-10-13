@@ -1,7 +1,9 @@
 from src.parser.methods import sup
 
 
-def subscribe_zamena_notifications(chat_id: str, target_type: int, target_id: int):
+async def subscribe_zamena_notifications(
+    chat_id: str, target_type: int, target_id: int
+):
     result = (
         sup.client.table("Subscribers")
         .insert(
@@ -13,7 +15,9 @@ def subscribe_zamena_notifications(chat_id: str, target_type: int, target_id: in
     print(result.dict)
 
 
-def unsubscribe_zamena_notifications(chat_id: str, target_type: int, target_id: int):
+async def unsubscribe_zamena_notifications(
+    chat_id: str, target_type: int, target_id: int
+):
     result = (
         sup.client.table("Subscribers")
         .delete()
