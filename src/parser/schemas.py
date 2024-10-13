@@ -43,6 +43,13 @@ class CheckZamenaResultInvalidFormat(BaseModel):
     date: datetime.date
 
 
+class CheckZamenaResultFailedDownload(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    result: str = "FailedDownload"
+    link: str
+    date: datetime.date
+
+
 class CheckZamenaResultHashChanged(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     result: str = "HashChanged"
@@ -59,6 +66,7 @@ class CheckResultFoundNew(BaseModel):
         | CheckZamenaResultSuccess
         | CheckZamenaResultFailed
         | CheckZamenaResultInvalidFormat
+        | CheckZamenaResultFailedDownload
     ] = []
 
 
@@ -71,4 +79,5 @@ class CheckResultCheckExisting(BaseModel):
         | CheckZamenaResultFailed
         | CheckZamenaResultHashChanged
         | CheckZamenaResultInvalidFormat
+        | CheckZamenaResultFailedDownload
     ] = []

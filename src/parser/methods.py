@@ -69,6 +69,7 @@ from src.parser.schemas import (
     CheckResultCheckExisting,
     CheckZamenaResultHashChanged,
     CheckZamenaResultInvalidFormat,
+    CheckZamenaResultFailedDownload,
 )
 import base64
 from src.parser.supabase import SupaBaseWorker
@@ -227,21 +228,37 @@ async def check_new() -> dict[str, Any]:
                 for link in new_links:
                     zamena_table = [x for x in tables if x.links.__contains__(link)][0]
                     zamena_cell = [x for x in zamena_table.zamenas if x.link == link][0]
+                    date = datetime.datetime(
+                        year=zamena_cell.date.year,
+                        month=zamena_cell.date.month,
+                        day=zamena_cell.date.day,
+                    ).strftime("%Y-%m-%d")
                     try:
-                        if link.__contains__("google.com") or link.__contains__(
-                            "yadi.sk"
-                        ):
-                            continue
+                        # if link.__contains__("google.com") or link.__contains__(
+                        #     "yadi.sk"
+                        # ):
+                        #     continue
                         extension = get_file_extension(zamena_cell.link)
                         filename = zamena_cell.link.split("/")[-1].replace(
                             f".{extension}", ""
                         )
-                        download_file(
+                        file_downloaded = download_file(
                             link=zamena_cell.link, filename=f"{filename}.{extension}"
                         )
-                        print(extension)
-                        print(filename)
-                        print(zamena_cell.link)
+                        if not file_downloaded:
+                            print("Fail to download")
+                            print(extension)
+                            print(filename)
+                            print(zamena_cell.link)
+                            result.checks.append(
+                                CheckZamenaResultFailedDownload(
+                                    date=zamena_cell.date,
+                                    link=zamena_cell.link,
+                                )
+                            )
+                            sup.add_already_found_link(link=link, date=date)
+                            continue
+
                         match extension:
                             case "pdf":
                                 screenshot_paths = create_pdf_screenshots_bytes(
@@ -269,11 +286,7 @@ async def check_new() -> dict[str, Any]:
                                         link=zamena_cell.link,
                                     )
                                 )
-                                date = datetime.datetime(
-                                    year=zamena_cell.date.year,
-                                    month=zamena_cell.date.month,
-                                    day=zamena_cell.date.day,
-                                ).strftime("%Y-%m-%d")
+
                                 sup.add_already_found_link(link=link, date=date)
                                 continue
                         result.checks.append(
@@ -283,12 +296,6 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        date = datetime.datetime(
-                            year=zamena_cell.date.year,
-                            month=zamena_cell.date.month,
-                            day=zamena_cell.date.day,
-                        ).strftime("%Y-%m-%d")
-                        print(date)
                         sup.add_already_found_link(link=link, date=date)
                         os.remove(f"{filename}.{extension}")
                     # sup.table("Zamenas").delete().eq("date", datess).execute()

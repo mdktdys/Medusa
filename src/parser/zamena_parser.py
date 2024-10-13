@@ -314,8 +314,10 @@ def download_file(link: str, filename: str):
         with open(filename, "wb") as file:
             file.write(response.content)
         print(f"File '{filename}' has been downloaded successfully.")
+        return True
     else:
         print("Failed to download the file.")
+        return False
 
 
 def prepare_and_send_supabase_entries(
