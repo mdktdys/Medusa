@@ -1,0 +1,17 @@
+from src.parser.methods import sup
+
+
+def subscribe_zamena_notifications(chat_id: str, target_type: int, target_id: int):
+    result = sup.client.table("Subscribers").insert(
+        {"chat_id": chat_id, "target_type": target_type, "target_id": target_id}
+    ).execute()
+    print(result)
+    print(result.dict)
+
+
+def unsubscribe_zamena_notifications(chat_id: str, target_type: int, target_id: int):
+    result = sup.client.table("Subscribers").insert(
+        {"chat_id": chat_id, "target_type": target_type, "target_id": target_id}
+    ).execute()
+    print(result)
+    print(result.dict)

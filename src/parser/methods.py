@@ -213,7 +213,9 @@ async def check_new() -> dict[str, Any]:
                                         link=zamena.link,
                                     )
                                 )
-                                sup.update_hash_already_found_link(link=zamena.link, new_hash=None)
+                                sup.update_hash_already_found_link(
+                                    link=zamena.link, new_hash=None
+                                )
                                 continue
                             match extension:
                                 case "pdf":
