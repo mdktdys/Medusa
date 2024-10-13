@@ -15,6 +15,7 @@ async def subscribe_zamena_notifications(
         .execute()
     )
 
+    print(res.data)
     if len(res.data) != 0:
         return status.HTTP_202_ACCEPTED
 
