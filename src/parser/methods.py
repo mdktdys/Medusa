@@ -241,6 +241,12 @@ async def check_new() -> dict[str, Any]:
                                 screenshot_paths = create_pdf_screenshots_bytes(
                                     filename
                                 )
+                            case "jpeg":
+                                with open(
+                                    f"{filename}.{extension}", "rb"
+                                ) as image_file:
+                                    data = base64.b64encode(image_file.read())
+                                    screenshot_paths = [data]
                             case _:
                                 raise Exception("invalid format word")
                         result.checks.append(
