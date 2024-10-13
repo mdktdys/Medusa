@@ -28,4 +28,4 @@ async def unsubscribe_zamena_notifications(
         .execute()
     )
     print(result)
-    print(result.dict)
+    print(result)
