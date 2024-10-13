@@ -234,10 +234,17 @@ async def check_new() -> dict[str, Any]:
                         day=zamena_cell.date.day,
                     ).strftime("%Y-%m-%d")
                     try:
-                        # if link.__contains__("google.com") or link.__contains__(
-                        #     "yadi.sk"
-                        # ):
-                        #     continue
+                        if link.__contains__("google.com") or link.__contains__(
+                            "yadi.sk"
+                        ):
+                            result.checks.append(
+                                CheckZamenaResultFailedDownload(
+                                    date=zamena_cell.date,
+                                    link=zamena_cell.link,
+                                )
+                            )
+                            sup.add_already_found_link(link=link, date=date)
+                            continue
                         extension = get_file_extension(zamena_cell.link)
                         filename = zamena_cell.link.split("/")[-1].replace(
                             f".{extension}", ""
