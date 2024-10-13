@@ -190,6 +190,7 @@ async def check_new() -> dict[str, Any]:
                     )
             return result.model_dump()
         else:
+            print("check in existing links")
             result = CheckResultCheckExisting()
             for zamena in tables[0].zamenas:
                 if zamena.date > datetime.date.today():
@@ -209,6 +210,7 @@ async def check_new() -> dict[str, Any]:
                             continue
                         old_hash = old_hash[0].hash
                         if file_hash != old_hash:
+                            print(f"hash changed {zamena.link}")
                             extension = get_file_extension(zamena.link)
                             filename = zamena.link.split("/")[-1].split(".")[0]
                             download_file(
@@ -240,8 +242,8 @@ async def check_new() -> dict[str, Any]:
                                 day=zamena.date.day,
                             ).strftime("%Y-%m-%d")
 
-                            sup.add_already_found_link(
-                                link=zamena.link, date=date, hash=file_hash
+                            sup.update_hash_already_found_link(
+                                link=zamena.link, new_hash=file_hash
                             )
 
                             result.checks.append(

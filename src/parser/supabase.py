@@ -172,6 +172,16 @@ class SupaBaseWorker:
         )
         print(response)
 
+    def update_hash_already_found_link(self, link: str, new_hash: str | None):
+        client = self.client
+        response = (
+            client.table("AlreadyFoundsLinks")
+            .update({"hash": new_hash})
+            .eq("link", link)
+            .execute()
+        )
+        print(response)
+
     def addHoliday(self, date, name):
         client = self.client
         response = (
