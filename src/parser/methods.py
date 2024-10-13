@@ -267,9 +267,7 @@ async def check_new() -> dict[str, Any]:
                                     month=zamena_cell.date.month,
                                     day=zamena_cell.date.day,
                                 ).strftime("%Y-%m-%d")
-                                sup.add_already_found_link(
-                                    link=link, date=date.date
-                                )
+                                sup.add_already_found_link(link=link, date=date)
                                 continue
                         result.checks.append(
                             CheckZamenaResultSuccess(
