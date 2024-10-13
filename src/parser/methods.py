@@ -262,7 +262,10 @@ async def check_new() -> dict[str, Any]:
                                         link=zamena_cell.link,
                                     )
                                 )
-                                raise Exception("invalid format word")
+                                sup.add_already_found_link(
+                                    link=link, date=zamena_cell.date
+                                )
+                                continue
                         result.checks.append(
                             CheckZamenaResultSuccess(
                                 date=zamena_cell.date,
