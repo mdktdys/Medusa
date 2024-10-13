@@ -92,7 +92,7 @@ async def check_new() -> dict[str, Any]:
             link.link for link in already_found_links
         ]:
             new_links = list(
-                set(site_links)
+                set([x.link for x in site_links])
                 - set([x.link for x in database_links])
                 - set([x.link for x in already_found_links])
             )
