@@ -1,9 +1,9 @@
 from src.parser.methods import sup
-from starlette import status
+from fastapi import Response, status
 
 
 async def subscribe_zamena_notifications(
-    chat_id: str, target_type: int, target_id: int
+    chat_id: str, target_type: int, target_id: int, response: Response
 ):
     res = (
         sup.client.table("Subscribers")
@@ -16,8 +16,9 @@ async def subscribe_zamena_notifications(
     )
 
     print(res.data)
-    if len(res.data) != 0:
-        return status.HTTP_202_ACCEPTED
+    if len(res.data) > 0:
+        response.status_code = status.HTTP_202_ACCEPTED
+        return
 
     result = (
         sup.client.table("Subscribers")
@@ -28,11 +29,12 @@ async def subscribe_zamena_notifications(
     )
     print(result)
     print(result.dict)
-    return status.HTTP_201_CREATED
+    response.status_code = status.HTTP_201_CREATED
+    return
 
 
 async def unsubscribe_zamena_notifications(
-    chat_id: str, target_type: int, target_id: int
+    chat_id: str, target_type: int, target_id: int, response: Response
 ):
     result = (
         sup.client.table("Subscribers")
@@ -45,4 +47,5 @@ async def unsubscribe_zamena_notifications(
     )
     print(result)
     print(result)
-    return status.HTTP_201_CREATED
+    response.status_code = status.HTTP_201_CREATED
+    return
