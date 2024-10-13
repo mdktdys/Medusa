@@ -233,7 +233,9 @@ async def check_new() -> dict[str, Any]:
                         ):
                             continue
                         extension = get_file_extension(zamena_cell.link)
-                        filename = zamena_cell.link.split("/")[-1].split(".")[0]
+                        filename = zamena_cell.link.split("/")[-1].replace(
+                            f".{extension}", ""
+                        )
                         download_file(
                             link=zamena_cell.link, filename=f"{filename}.{extension}"
                         )
