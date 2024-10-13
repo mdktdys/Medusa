@@ -142,14 +142,6 @@ async def check_new() -> dict[str, Any]:
                     match extension:
                         case "pdf":
                             screenshot_paths = create_pdf_screenshots_bytes(filename)
-                        # case "docx":
-                        # convert(f"{filename}.{extension}")
-                        # print(filename)
-                        # print(f"{filename}.{extension}")
-                        # screenshot_paths = create_word_screenshots_bytes(
-                        #     f"{filename}.{extension}"
-                        # )
-
                         case "jpeg":
                             with open(f"{filename}.{extension}", "rb") as image_file:
                                 data = base64.b64encode(image_file.read())
@@ -175,10 +167,6 @@ async def check_new() -> dict[str, Any]:
                     )
                     sup.add_already_found_link(link=link, date=date, hash=file_hash)
                     os.remove(f"{filename}.{extension}")
-                # sup.table("Zamenas").delete().eq("date", datess).execute()
-                # sup.table("ZamenasFull").delete().eq("date", datess).execute()
-                # sup.table("ZamenaFileLinks").delete().eq("date", datess).execute()
-                # parse_zamenas(url=zamm.link, date_=datess)
                 except Exception as e:
                     result.checks.append(
                         CheckZamenaResultFailed(
@@ -211,9 +199,22 @@ async def check_new() -> dict[str, Any]:
                             print(f"hash changed {zamena.link}")
                             extension = get_file_extension(zamena.link)
                             filename = zamena.link.split("/")[-1].split(".")[0]
-                            download_file(
+                            file_downloaded = download_file(
                                 link=zamena.link, filename=f"{filename}.{extension}"
                             )
+                            if not file_downloaded:
+                                print("Fail to download")
+                                print(extension)
+                                print(filename)
+                                print(zamena.link)
+                                result.checks.append(
+                                    CheckZamenaResultFailedDownload(
+                                        date=zamena.date,
+                                        link=zamena.link,
+                                    )
+                                )
+                                sup.update_hash_already_found_link(link=zamena.link, new_hash=None)
+                                continue
                             match extension:
                                 case "pdf":
                                     screenshot_paths = create_pdf_screenshots_bytes(
@@ -225,38 +226,28 @@ async def check_new() -> dict[str, Any]:
                                         filename
                                     )
                                 case _:
-                                    raise Exception("invalid format word")
+                                    result.checks.append(
+                                        CheckZamenaResultInvalidFormat(
+                                            date=zamena.date,
+                                            file=zamena.link,
+                                            link=zamena.link,
+                                        )
+                                    )
+                                    sup.update_hash_already_found_link(
+                                        link=zamena.link, new_hash=file_hash
+                                    )
+                                    continue
                             result.checks.append(
-                                CheckZamenaResultHashChanged(
+                                CheckZamenaResultSuccess(
                                     date=zamena.date,
                                     images=screenshot_paths,
                                     link=zamena.link,
                                 )
                             )
                             os.remove(f"{filename}.pdf")
-                            date = datetime.datetime(
-                                year=zamena.date.year,
-                                month=zamena.date.month,
-                                day=zamena.date.day,
-                            ).strftime("%Y-%m-%d")
-
                             sup.update_hash_already_found_link(
                                 link=zamena.link, new_hash=file_hash
                             )
-
-                            # sup.table("Zamenas").delete().eq(
-                            #     "date", file_date
-                            # ).execute()
-                            # sup.table("ZamenasFull").delete().eq(
-                            #     "date", file_date
-                            # ).execute()
-                            # res = (
-                            #     sup.table("ZamenaFileLinks")
-                            #     .update({"hash": hash})
-                            #     .eq("link", i.link)
-                            #     .execute()
-                            # )
-                            # parse_zamenas(url=i.link, date_=file_date)
                     except Exception as e:
                         print(e)
                         return CheckResultError(
