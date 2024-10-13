@@ -239,6 +239,7 @@ async def check_new() -> dict[str, Any]:
                         )
                         print(extension)
                         print(filename)
+                        print(zamena_cell.link)
                         match extension:
                             case "pdf":
                                 screenshot_paths = create_pdf_screenshots_bytes(
