@@ -256,7 +256,6 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        os.remove(f"{filename}.pdf")
                         date = datetime.datetime(
                             year=zamena_cell.date.year,
                             month=zamena_cell.date.month,
@@ -264,6 +263,7 @@ async def check_new() -> dict[str, Any]:
                         ).strftime("%Y-%m-%d")
                         print(date)
                         sup.add_already_found_link(link=link, date=date)
+                        os.remove(f"{filename}.{extension}")
                     # sup.table("Zamenas").delete().eq("date", datess).execute()
                     # sup.table("ZamenasFull").delete().eq("date", datess).execute()
                     # sup.table("ZamenaFileLinks").delete().eq("date", datess).execute()
