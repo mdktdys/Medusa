@@ -238,10 +238,11 @@ async def check_new() -> dict[str, Any]:
                             link=zamena_cell.link, filename=f"{filename}.{extension}"
                         )
                         print(extension)
+                        print(filename)
                         match extension:
                             case "pdf":
                                 screenshot_paths = create_pdf_screenshots_bytes(
-                                    f"{filename}.{extension}"
+                                    filename
                                 )
                             # case "docx":
                             # convert(f"{filename}.{extension}")
