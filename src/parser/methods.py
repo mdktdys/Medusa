@@ -189,6 +189,8 @@ async def check_new() -> dict[str, Any]:
                                     day=zamena.date.day,
                                 ).strftime("%Y-%m-%d")
 
+                                sup.add_already_found_link(link=zamena.link, date=date)
+
                                 result.checks.append(
                                     CheckZamenaResultHashChanged(
                                         date=zamena.date,
