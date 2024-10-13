@@ -7,7 +7,7 @@ import urllib
 from urllib.request import urlopen
 
 import requests
-
+from src.parser.models.zamena_model import Zamena
 from src.parser import supabase as supabase_worker
 import docx as Docx
 from src.models.models import *
@@ -626,6 +626,13 @@ def getAllTablesLinks(tables: List[ZamTable]) -> List[str]:
     for table in tables:
         links.extend(table.links)
     return links
+
+
+def get_all_tables_zamenas(tables: List[ZamTable]) -> List[Zamena]:
+    zamenas: List[Zamena] = []
+    for table in tables:
+        zamenas.extend(table.zamenas)
+    return zamenas
 
 
 def getMonthAvalibleDays(soup: BeautifulSoup, monthIndex: int):
