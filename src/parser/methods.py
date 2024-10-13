@@ -93,7 +93,7 @@ async def check_new() -> dict[str, Any]:
         ]:
             new_links = list(
                 set([x.link for x in site_links])
-                - set([x.link for x in database_links])
+                # - set([x.link for x in database_links])
                 - set([x.link for x in already_found_links])
             )
             print("not equal links")
