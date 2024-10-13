@@ -18,3 +18,4 @@ pdf2docx==0.5.8
 python-magic
 beautifulsoup4~=4.12.3
 docx2pdf==0.1.8
+aspose-words

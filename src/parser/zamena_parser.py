@@ -15,7 +15,7 @@ import requests
 from docx import Document
 from docx.table import Table
 from datetime import date
-
+import aspose.words as aw
 from src.parser.models.cabinet_model import Cabinet
 from src.parser.models.course_model import Course
 from src.parser.models.data_model import Data
@@ -268,6 +268,12 @@ def cleanup_temp_files(file_paths):
 async def save_pixmap(pixmap, screenshot_path):
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, pixmap.save, screenshot_path, "png")
+
+
+def create_word_screenshots_bytes(word_path) -> List[str]:
+    doc = aw.Document(word_path)
+    doc.save(f"{word_path}.pdf")
+    return create_pdf_screenshots_bytes(f"{word_path}.pdf")
 
 
 def create_pdf_screenshots_bytes(pdf_path) -> List[str]:

@@ -79,6 +79,7 @@ from src.parser.zamena_parser import (
     cleanup_temp_files,
     get_bytes_hash,
     create_pdf_screenshots_bytes,
+    create_word_screenshots_bytes,
 )
 import html as Html
 
@@ -237,8 +238,8 @@ async def check_new() -> dict[str, Any]:
                                     filename
                                 )
                             case "docx":
-                                convert(f"{filename}.{extension}")
-                                screenshot_paths = create_pdf_screenshots_bytes(
+                                # convert(f"{filename}.{extension}")
+                                screenshot_paths = create_word_screenshots_bytes(
                                     filename
                                 )
                             case "jpeg":
