@@ -239,8 +239,10 @@ async def check_new() -> dict[str, Any]:
                                 )
                             case "docx":
                                 # convert(f"{filename}.{extension}")
+                                print(filename)
+                                print(f"{filename}.{extension}")
                                 screenshot_paths = create_word_screenshots_bytes(
-                                    filename
+                                    f"{filename}.{extension}"
                                 )
                             case "jpeg":
                                 with open(
