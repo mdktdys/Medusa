@@ -68,6 +68,7 @@ from src.parser.schemas import (
     CheckZamenaResultSuccess,
     CheckResultCheckExisting,
     CheckZamenaResultHashChanged,
+    CheckZamenaResultInvalidFormat,
 )
 import base64
 from src.parser.supabase import SupaBaseWorker
@@ -237,13 +238,14 @@ async def check_new() -> dict[str, Any]:
                                 screenshot_paths = create_pdf_screenshots_bytes(
                                     filename
                                 )
-                            case "docx":
-                                # convert(f"{filename}.{extension}")
-                                print(filename)
-                                print(f"{filename}.{extension}")
-                                screenshot_paths = create_word_screenshots_bytes(
-                                    f"{filename}.{extension}"
-                                )
+                            # case "docx":
+                            # convert(f"{filename}.{extension}")
+                            # print(filename)
+                            # print(f"{filename}.{extension}")
+                            # screenshot_paths = create_word_screenshots_bytes(
+                            #     f"{filename}.{extension}"
+                            # )
+
                             case "jpeg":
                                 with open(
                                     f"{filename}.{extension}", "rb"
@@ -251,6 +253,13 @@ async def check_new() -> dict[str, Any]:
                                     data = base64.b64encode(image_file.read())
                                     screenshot_paths = [data]
                             case _:
+                                result.checks.append(
+                                    CheckZamenaResultInvalidFormat(
+                                        date=zamena_cell.date,
+                                        file=zamena_cell.link,
+                                        link=zamena_cell.link,
+                                    )
+                                )
                                 raise Exception("invalid format word")
                         result.checks.append(
                             CheckZamenaResultSuccess(

@@ -1,8 +1,6 @@
-import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.middleware.cors import CORSMiddleware
 
 from src.alchemy import *
@@ -12,8 +10,6 @@ from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 
 from src.alchemy.db_helper import local_db_helper
-from src.api_v1 import router as router_v1
-from src.core.config import settings
 from router import router
 
 
