@@ -4,6 +4,8 @@ RUN apt-get update && \
       apt-get install -y libmagic1 libmagic-dev && \
     apt-get install -y libgl1-mesa-glx libglib2.0-0
 
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
