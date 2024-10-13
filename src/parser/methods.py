@@ -193,7 +193,7 @@ async def check_new() -> dict[str, Any]:
                                     day=zamena.date.day,
                                 ).strftime("%Y-%m-%d")
 
-                                sup.add_already_found_link(link=zamena.link, date=date)
+                                sup.add_already_found_link(link=zamena.link, date=date,hash=file_hash)
 
                                 result.checks.append(
                                     CheckZamenaResultHashChanged(
@@ -243,7 +243,7 @@ async def check_new() -> dict[str, Any]:
                                     link=zamena_cell.link,
                                 )
                             )
-                            sup.add_already_found_link(link=link, date=date)
+                            sup.add_already_found_link(link=link, date=date,hash=None)
                             continue
                         extension = get_file_extension(zamena_cell.link)
                         filename = zamena_cell.link.split("/")[-1].replace(
@@ -263,9 +263,10 @@ async def check_new() -> dict[str, Any]:
                                     link=zamena_cell.link,
                                 )
                             )
-                            sup.add_already_found_link(link=link, date=date)
+                            sup.add_already_found_link(link=link, date=date,hash=None)
                             continue
 
+                        file_hash = get_remote_file_hash(url=zamena_cell.link)
                         match extension:
                             case "pdf":
                                 screenshot_paths = create_pdf_screenshots_bytes(
@@ -293,8 +294,7 @@ async def check_new() -> dict[str, Any]:
                                         link=zamena_cell.link,
                                     )
                                 )
-
-                                sup.add_already_found_link(link=link, date=date)
+                                sup.add_already_found_link(link=link, date=date,hash=file_hash)
                                 continue
                         result.checks.append(
                             CheckZamenaResultSuccess(
@@ -303,7 +303,7 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        sup.add_already_found_link(link=link, date=date)
+                        sup.add_already_found_link(link=link, date=date,hash=file_hash)
                         os.remove(f"{filename}.{extension}")
                     # sup.table("Zamenas").delete().eq("date", datess).execute()
                     # sup.table("ZamenasFull").delete().eq("date", datess).execute()

@@ -238,10 +238,10 @@ def get_bytes_hash(bytes_data: bytes):
     return hasher.hexdigest()
 
 
-def get_remote_file_hash(url, algorithm="sha256"):
+def get_remote_file_hash(url):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
-        hasher = hashlib.new(algorithm)
+        hasher = hashlib.new("sha256")
         for chunk in response.iter_content(chunk_size=1024):
             if chunk:
                 hasher.update(chunk)
