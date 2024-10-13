@@ -132,11 +132,14 @@ async def check_new() -> dict[str, Any]:
         database_links: List[ParsedDate] = sup.get_zamena_file_links()
         already_found_links: List[str] = sup.get_already_found_links()
         if not site_links.__eq__(database_links):
+            print("not equal links")
             new_links = list(
                 set(site_links)
                 - set([x.link for x in database_links])
                 - set(already_found_links)
             )
+            print(len(new_links))
+            print(new_links)
             new_links.reverse()
             if len(new_links) < 1:
                 result = CheckResultCheckExisting()
