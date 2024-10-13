@@ -88,22 +88,12 @@ async def check_new() -> dict[str, Any]:
         site_links = get_all_tables_zamenas(tables)
         database_links = sup.get_zamena_file_links()
         already_found_links = sup.get_already_found_links()
-        print(len(set([link.link for link in site_links])))
-        print(len(set([link.link for link in already_found_links])))
-        print(
-            list(
-                set([link.link for link in site_links])
-                - set([link.link for link in already_found_links])
-            )
+        new_links = list(
+            set([x.link for x in site_links])
+            # - set([x.link for x in database_links])
+            - set([x.link for x in already_found_links])
         )
-        if [link.link for link in site_links] != [
-            link.link for link in already_found_links
-        ]:
-            new_links = list(
-                set([x.link for x in site_links])
-                # - set([x.link for x in database_links])
-                - set([x.link for x in already_found_links])
-            )
+        if len(new_links) != 0:
             print("not equal links")
             print(len(new_links))
             print(new_links)
