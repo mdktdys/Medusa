@@ -1,49 +1,6 @@
-# import asyncio
-# import datetime
-# from urllib.request import urlopen
-# from bs4 import BeautifulSoup
-# from typing import List
-# from aiogram.fsm.storage import redis
-#
-# # from celery import signature
-# # from celery.result import AsyncResult
-#
-# from bot_worker import parse_zamenas
-# from bot_worker.bot import admins
-# from broker import rabbitmq_channel
-#
-# # from broker import sup, parser_celery_app
-# from parser_secrets import (
-#     DEBUG_CHANNEL,
-#     REDIS_HOST_URL,
-#     REDIS_PORT,
-#     REDIS_PASSWORD,
-#     REDIS_USERNAME,
-#     SCHEDULE_URL,
-# )
-# from src.code.core.schedule_parser import (
-#     getLastZamenaLink,
-#     getAllMonthTables,
-#     getAllTablesLinks,
-# )
-# from src.code.models.parsed_date_model import ParsedDate
-# from src.code.models.zamena_table_model import ZamTable
-#
-#
-# # Функция для отправки сообщений в очередь
-# def send_message_to_rabbitmq(message: str) -> None:
-#     print(rabbitmq_channel)
-#     if rabbitmq_channel is None:
-#         print("RabbitMQ channel is not initialized")
-#         raise Exception("RabbitMQ channel is not initialized")
-#
-#     rabbitmq_channel.basic_publish(exchange="", routing_key="parser", body=message)
-#     print(f" [x] Sent '{message}' to queue 'parser'")
 import datetime
-import json
 import os
 import traceback
-from io import BytesIO
 from typing import List, Any
 from urllib.request import urlopen
 
@@ -55,9 +12,6 @@ from src.parser.models.parsed_date_model import ParsedDate
 from src.parser.models.zamena_table_model import ZamTable
 from src.parser.parsers import (
     parse_zamenas,
-    get_file_bytes,
-    define_file_format,
-    get_file_stream,
     get_remote_file_bytes,
 )
 from src.parser.schemas import (
@@ -77,11 +31,8 @@ from src.parser.zamena_parser import (
     get_remote_file_hash,
     get_file_extension,
     download_file,
-    create_pdf_screenshots,
-    cleanup_temp_files,
     get_bytes_hash,
     create_pdf_screenshots_bytes,
-    create_word_screenshots_bytes,
 )
 import html as Html
 
@@ -131,14 +82,14 @@ async def check_new() -> dict[str, Any]:
         tables: List[ZamTable] = getAllMonthTables(soup=soup)
         site_links = getAllTablesLinks(tables)
         database_links: List[ParsedDate] = sup.get_zamena_file_links()
-        already_found_links: List[str] = sup.get_already_found_links()
+        already_found_links = sup.get_already_found_links()
         if not site_links.__eq__(database_links):
-            print("not equal links")
             new_links = list(
                 set(site_links)
                 - set([x.link for x in database_links])
-                - set(already_found_links)
+                - set([x.link for x in already_found_links])
             )
+            print("not equal links")
             print(len(new_links))
             print(new_links)
             new_links.reverse()
@@ -193,7 +144,9 @@ async def check_new() -> dict[str, Any]:
                                     day=zamena.date.day,
                                 ).strftime("%Y-%m-%d")
 
-                                sup.add_already_found_link(link=zamena.link, date=date,hash=file_hash)
+                                sup.add_already_found_link(
+                                    link=zamena.link, date=date, hash=file_hash
+                                )
 
                                 result.checks.append(
                                     CheckZamenaResultHashChanged(
@@ -243,7 +196,7 @@ async def check_new() -> dict[str, Any]:
                                     link=zamena_cell.link,
                                 )
                             )
-                            sup.add_already_found_link(link=link, date=date,hash=None)
+                            sup.add_already_found_link(link=link, date=date, hash=None)
                             continue
                         extension = get_file_extension(zamena_cell.link)
                         filename = zamena_cell.link.split("/")[-1].replace(
@@ -263,7 +216,7 @@ async def check_new() -> dict[str, Any]:
                                     link=zamena_cell.link,
                                 )
                             )
-                            sup.add_already_found_link(link=link, date=date,hash=None)
+                            sup.add_already_found_link(link=link, date=date, hash=None)
                             continue
 
                         file_hash = get_remote_file_hash(url=zamena_cell.link)
@@ -294,7 +247,9 @@ async def check_new() -> dict[str, Any]:
                                         link=zamena_cell.link,
                                     )
                                 )
-                                sup.add_already_found_link(link=link, date=date,hash=file_hash)
+                                sup.add_already_found_link(
+                                    link=link, date=date, hash=file_hash
+                                )
                                 continue
                         result.checks.append(
                             CheckZamenaResultSuccess(
@@ -303,7 +258,7 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        sup.add_already_found_link(link=link, date=date,hash=file_hash)
+                        sup.add_already_found_link(link=link, date=date, hash=file_hash)
                         os.remove(f"{filename}.{extension}")
                     # sup.table("Zamenas").delete().eq("date", datess).execute()
                     # sup.table("ZamenasFull").delete().eq("date", datess).execute()

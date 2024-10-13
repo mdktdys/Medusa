@@ -9,6 +9,7 @@ from datetime import datetime
 from supabase import create_client, Client
 
 from my_secrets import SUPABASE_URL, SUPABASE_ANON_KEY
+from src.models.AlreadyFoundLink import AlreadyFoundLink
 from src.parser.models.cabinet_model import Cabinet
 from src.parser.models.course_model import Course
 from src.parser.models.data_model import Data
@@ -166,7 +167,7 @@ class SupaBaseWorker:
         client = self.client
         response = (
             client.table("AlreadyFoundsLinks")
-            .insert({"link": link, "date": date,'hash':hash})
+            .insert({"link": link, "date": date, "hash": hash})
             .execute()
         )
         print(response)
@@ -262,10 +263,19 @@ class SupaBaseWorker:
         )
         return [Course(item["id"], item["name"], item["synonyms"]) for item in data[1]]
 
-    def get_already_found_links(self):
+    def get_already_found_links(self) -> List[AlreadyFoundLink]:
         client = self.client
-        data, _ = client.table("AlreadyFoundsLinks").select("link").execute()
-        return [link["link"] for link in data[1]]
+        data, _ = (
+            client.table("AlreadyFoundsLinks")
+            .select("id", "link", "date", "hash")
+            .execute()
+        )
+        return [
+            AlreadyFoundLink(
+                link=item["link"], hash=item["hash"], date=item["date"], id=item["id"]
+            )
+            for item in data[1]
+        ]
 
     def get_course_from_synonyms(
         self, search_text: str, courses: List[Course]
