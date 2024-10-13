@@ -227,7 +227,7 @@ async def check_new() -> dict[str, Any]:
                                 case _:
                                     raise Exception("invalid format word")
                             result.checks.append(
-                                CheckZamenaResultSuccess(
+                                CheckZamenaResultHashChanged(
                                     date=zamena.date,
                                     images=screenshot_paths,
                                     link=zamena.link,
@@ -244,13 +244,6 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena.link, new_hash=file_hash
                             )
 
-                            result.checks.append(
-                                CheckZamenaResultHashChanged(
-                                    date=zamena.date,
-                                    images=screenshot_paths,
-                                    link=zamena.link,
-                                )
-                            )
                             # sup.table("Zamenas").delete().eq(
                             #     "date", file_date
                             # ).execute()
