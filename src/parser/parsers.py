@@ -2,6 +2,8 @@
 Модуль описывающий работу бота телеграм
 """
 
+from typing import List
+
 import magic
 import requests
 from io import BytesIO
@@ -63,7 +65,7 @@ def define_file_format(stream: BytesIO):
     return file_type
 
 
-def parse_zamenas(url: str, date_: date):
+def parse_zamenas(url: str, date_: date, force: bool):
     supabase_client = SupaBaseWorker()
     data_model = init_date_model()
     stream = get_file_stream(link=url)
@@ -76,9 +78,13 @@ def parse_zamenas(url: str, date_: date):
             cv.convert(stream_converted)
             cv.close()
 
-            parseZamenas(stream_converted, date_, data_model, url, supabase_client)
+            return parseZamenas(
+                stream_converted, date_, data_model, url, supabase_client, force=force
+            )
         case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            parseZamenas(stream, date_, data_model, url, supabase_client)
+            return parseZamenas(
+                stream, date_, data_model, url, supabase_client, force=force
+            )
 
 
 def parse_schedule(url: str, date_: date):

@@ -1,7 +1,7 @@
 import datetime
 import os
 import traceback
-from typing import List, Any
+from typing import Any
 from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
@@ -10,27 +10,25 @@ from my_secrets import SCHEDULE_URL
 from src.parser.core import (
     getLastZamenaLink,
     getAllMonthTables,
-    getAllTablesLinks,
     get_all_tables_zamenas,
 )
-from src.parser.models.parsed_date_model import ParsedDate
-from src.parser.models.zamena_table_model import ZamTable
 from src.parser.parsers import (
     parse_zamenas,
     get_remote_file_bytes,
 )
-from src.parser.schemas import (
-    CheckResult,
-    CheckResultError,
-    CheckResultFoundNew,
-    CheckZamenaResultFailed,
-    CheckZamenaResultSuccess,
-    CheckResultCheckExisting,
-    CheckZamenaResultHashChanged,
-    CheckZamenaResultInvalidFormat,
-    CheckZamenaResultFailedDownload,
-)
+
 import base64
+
+from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult
+from src.parser.site_schecker.schemas import (
+    CheckResultFoundNew,
+    CheckZamenaResultFailedDownload,
+    CheckZamenaResultInvalidFormat,
+    CheckZamenaResultSuccess,
+    CheckZamenaResultFailed,
+    CheckResultCheckExisting,
+    CheckResultError,
+)
 from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import (
     get_remote_file_hash,
@@ -40,7 +38,6 @@ from src.parser.zamena_parser import (
     create_pdf_screenshots_bytes,
 )
 import html as Html
-from src.parser.models.zamena_model import Zamena
 
 sup = SupaBaseWorker()
 # async def send_task(celery_app, task_name: str, args: list = list) -> AsyncResult:
@@ -63,12 +60,8 @@ sup = SupaBaseWorker()
 #         raise Exception("Хз что произошло")
 
 
-def parse_zamena(url: str, date: datetime.datetime):
-    try:
-        parse_zamenas(url=url, date_=date)
-        return {"res": "ok"}
-    except Exception as e:
-        return {"res": f"{str(e)}"}
+def parse_zamena(url: str, date: datetime.datetime) -> ZamenaParseResult:
+    return parse_zamenas(url=url, date_=date, force=False)
 
 
 def get_latest_zamena_link():
@@ -86,7 +79,7 @@ async def check_new() -> dict[str, Any]:
         soup = BeautifulSoup(urlopen(SCHEDULE_URL).read(), "html.parser")
         tables = getAllMonthTables(soup=soup)
         site_links = get_all_tables_zamenas(tables)
-        database_links = sup.get_zamena_file_links()
+        # database_links = sup.get_zamena_file_links()
         already_found_links = sup.get_already_found_links()
         new_links = list(
             set([x.link for x in site_links])
@@ -115,7 +108,7 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        sup.add_already_found_link(link=link, date=date, hash=None)
+                        # sup.add_already_found_link(link=link, date=date, hash=None)
                         continue
                     extension = get_file_extension(zamena_cell.link)
                     filename = zamena_cell.link.split("/")[-1].replace(
@@ -135,7 +128,7 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        sup.add_already_found_link(link=link, date=date, hash=None)
+                        # sup.add_already_found_link(link=link, date=date, hash=None)
                         continue
 
                     file_hash = get_remote_file_hash(url=zamena_cell.link)
@@ -154,9 +147,9 @@ async def check_new() -> dict[str, Any]:
                                     link=zamena_cell.link,
                                 )
                             )
-                            sup.add_already_found_link(
-                                link=link, date=date, hash=file_hash
-                            )
+                            # sup.add_already_found_link(
+                            #     link=link, date=date, hash=file_hash
+                            # )
                             continue
                     result.checks.append(
                         CheckZamenaResultSuccess(
@@ -165,7 +158,7 @@ async def check_new() -> dict[str, Any]:
                             link=zamena_cell.link,
                         )
                     )
-                    sup.add_already_found_link(link=link, date=date, hash=file_hash)
+                    # sup.add_already_found_link(link=link, date=date, hash=file_hash)
                     os.remove(f"{filename}.{extension}")
                 except Exception as e:
                     result.checks.append(
@@ -213,9 +206,9 @@ async def check_new() -> dict[str, Any]:
                                         link=zamena.link,
                                     )
                                 )
-                                sup.update_hash_already_found_link(
-                                    link=zamena.link, new_hash=None
-                                )
+                                # sup.update_hash_already_found_link(
+                                #     link=zamena.link, new_hash=None
+                                # )
                                 continue
                             match extension:
                                 case "pdf":
@@ -235,9 +228,9 @@ async def check_new() -> dict[str, Any]:
                                             link=zamena.link,
                                         )
                                     )
-                                    sup.update_hash_already_found_link(
-                                        link=zamena.link, new_hash=file_hash
-                                    )
+                                    # sup.update_hash_already_found_link(
+                                    #     link=zamena.link, new_hash=file_hash
+                                    # )
                                     continue
                             result.checks.append(
                                 CheckZamenaResultSuccess(
@@ -247,9 +240,9 @@ async def check_new() -> dict[str, Any]:
                                 )
                             )
                             os.remove(f"{filename}.pdf")
-                            sup.update_hash_already_found_link(
-                                link=zamena.link, new_hash=file_hash
-                            )
+                            # sup.update_hash_already_found_link(
+                            #     link=zamena.link, new_hash=file_hash
+                            # )
                     except Exception as e:
                         print(e)
                         return CheckResultError(

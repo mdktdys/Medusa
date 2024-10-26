@@ -7,6 +7,7 @@ from src.alchemy.db_helper import *
 from . import crud
 
 from .schemas import ParseZamenaRequest
+from ...parser.schemas.parse_zamena_schemas import ZamenaParseResult
 
 router = APIRouter(tags=["Parser"])
 
@@ -32,7 +33,7 @@ async def check_new() -> dict[str, Any]:
     return await crud.check_new()
 
 
-@router.post("/parse_zamena", response_model=dict)
+@router.post("/parse_zamena", response_model=ZamenaParseResult)
 async def parse_zamena(
     request: ParseZamenaRequest,
 ) -> dict:

@@ -12,3 +12,4 @@ SCHEDULE_URL = "https://www.uksivt.ru/zameny"
 BASEURL = "https://www.uksivt.ru/"
 SUPABASE_URL = os.environ["SCHEDULER_SUPABASE_URL"]
 SUPABASE_ANON_KEY = os.environ["SCHEDULER_SUPABASE_ANON_KEY"]
+SUPABASE_SECRET_KEY = os.environ.get("SUPABASE_SECRET_KEY")

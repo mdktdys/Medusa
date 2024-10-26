@@ -21,7 +21,16 @@ from src.parser.models.course_model import Course
 from src.parser.models.data_model import Data
 from src.parser.models.group_model import Group
 from src.parser.models.teacher_model import Teacher
+from src.parser.schemas.parse_zamena_schemas import (
+    ZamenaParseFailedNotFoundItems,
+    ZamenaParseResult,
+    ZamenaParseSucess,
+)
 from src.parser.supabase import SupaBaseWorker
+
+
+not_found_items: List[str] = []
+parse_result = None
 
 
 def parseZamenas(
@@ -30,7 +39,8 @@ def parseZamenas(
     data_model: Data,
     link: str,
     supabase_client: SupaBaseWorker,
-):
+    force: bool,
+) -> ZamenaParseResult:
     all_rows, header = _get_all_tables(stream)
     practice_groups = _extract_practice_groups(header, data_model)
     workRows = _prepare_work_rows(
@@ -45,6 +55,11 @@ def parseZamenas(
 
     map_entities_to_ids(workRows, data_model, supabase_client)
 
+    if len(not_found_items) > 0:
+        return ZamenaParseFailedNotFoundItems(
+            error="Not found items", items=not_found_items, result="error", trace=""
+        )
+
     prepare_and_send_supabase_entries(
         workRows,
         practice_groups,
@@ -55,6 +70,7 @@ def parseZamenas(
         data_model,
         supabase_client,
     )
+    return ZamenaParseSucess()
 
 
 def _extract_practice_groups(header, data_model: Data):
@@ -202,7 +218,7 @@ def map_entities_to_ids(
             row[0] = group.id
 
         course = get_course_by_id(
-            data_model.COURSES, row[2], data_model, supabase_client
+            data_model.COURSES, row[2], data_model, supabase_client, args=[group.name]
         )
         if course:
             row[2] = course.id
@@ -214,7 +230,7 @@ def map_entities_to_ids(
             row[3] = teacher.id
 
         course = get_course_by_id(
-            data_model.COURSES, row[4], data_model, supabase_client
+            data_model.COURSES, row[4], data_model, supabase_client, args=[group.name]
         )
         if course:
             row[4] = course.id
@@ -435,13 +451,14 @@ def find_entity_by_name(entities, target_name, name_key="name", normalize_func=N
     return None
 
 
-def add_and_get_entity(entity_type, add_func, entities, target_name, data_model):
+def add_and_get_entity(entity_type, add_func, entities, target_name, data_model, args):
     entity = find_entity_by_name(entities, target_name)
     if entity:
         return entity
     try:
-        # raise Exception(f"not found {target_name}")
-        add_func(target_name, data_model=data_model)
+        not_found_items.append(f"not found {target_name} args: {args}")
+        raise Exception(f"not found {target_name}")
+        # add_func(target_name, data_model=data_model)
         entities = getattr(data_model, entity_type)
         return find_entity_by_name(entities, target_name)
     except Exception as e:
@@ -458,6 +475,7 @@ def get_group_by_id(
         entities=groups,
         target_name=target_name.replace("_", "-").lower(),
         data_model=data_model,
+        args=[],
     )
 
 
@@ -473,11 +491,16 @@ def get_cabinet_by_id(
         entities=cabinets,
         target_name=target_name,
         data_model=data_model,
+        args=[],
     )
 
 
 def get_course_by_id(
-    courses, target_name, data_model: Data, supabase_client: SupaBaseWorker
+    courses,
+    target_name,
+    data_model: Data,
+    supabase_client: SupaBaseWorker,
+    args: List[str],
 ) -> Course:
     return add_and_get_entity(
         entity_type="COURSES",
@@ -485,6 +508,7 @@ def get_course_by_id(
         entities=courses,
         target_name=target_name,
         data_model=data_model,
+        args=args,
     )
 
 
@@ -505,6 +529,7 @@ def get_teacher_by_id(
         entities=teachers,
         target_name=target_name,
         data_model=data_model,
+        args=[],
     )
 
 
