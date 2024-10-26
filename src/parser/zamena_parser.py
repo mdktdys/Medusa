@@ -206,6 +206,42 @@ def process_multiple_entries(workRows: list[str]):
     return editet
 
 
+def clean_dirty_string(string: str):
+    return (
+        string.replace(" ", "")
+        .replace(".", "")
+        .replace(",", "")
+        .replace("-", "")
+        .replace("_", "")
+    ).lower()
+
+
+def get_teacher_from_string(string: str, teachers: List[Teacher]) -> Teacher:
+    string = clean_dirty_string(string)
+    finded_teachers_by_name = [
+        teacher
+        for teacher in teachers
+        if string.__contains__(clean_dirty_string(teacher.name))
+    ]
+    if len(finded_teachers_by_name) > 1:
+        # if string != "" and finded_teachers_by_name[0].name == "":
+        #     pass
+        # else:
+        return finded_teachers_by_name[0]
+    else:
+        founded_teachers_by_synonyms = []
+        for teacher in teachers:
+            for syn in teacher.synonyms:
+                if string.__contains__(clean_dirty_string(syn)):
+                    # print("found")
+                    founded_teachers_by_synonyms.append(teacher)
+                    break
+        try:
+            return founded_teachers_by_synonyms[0]
+        except:
+            raise Exception(f"Not found teacher in string {string}")
+
+
 def map_entities_to_ids(
     workRows: list, data_model: Data, supabase_client: SupaBaseWorker
 ):
@@ -223,11 +259,13 @@ def map_entities_to_ids(
         if course:
             row[2] = course.id
 
-        teacher = get_teacher_by_id(
-            data_model.TEACHERS, row[3], data_model, supabase_client
-        )
-        if teacher:
-            row[3] = teacher.id
+        teacher = get_teacher_from_string(teachers=data_model.TEACHERS, string=row[3])
+        row[3] = teacher.id
+        # teacher = get_teacher_by_id(
+        #     data_model.TEACHERS, row[3], data_model, supabase_client
+        # )
+        # if teacher:
+        #     row[3] = teacher.id
 
         course = get_course_by_id(
             data_model.COURSES, row[4], data_model, supabase_client, args=[group.name]
