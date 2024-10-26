@@ -60,8 +60,8 @@ sup = SupaBaseWorker()
 #         raise Exception("Хз что произошло")
 
 
-def parse_zamena(url: str, date: datetime.datetime) -> ZamenaParseResult:
-    return parse_zamenas(url=url, date_=date, force=False)
+def parse_zamena(url: str, date: datetime.datetime) -> dict:
+    return parse_zamenas(url=url, date_=date, force=False).model_dump()
 
 
 def get_latest_zamena_link():

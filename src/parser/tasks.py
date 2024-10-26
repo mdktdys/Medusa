@@ -6,7 +6,6 @@ from celery import Celery
 
 from my_secrets import BACKEND_URL, BROKER_URL
 from src.parser import methods
-from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult
 
 parser_celery_app = Celery(
     "parser",
@@ -16,7 +15,7 @@ parser_celery_app = Celery(
 
 
 @parser_celery_app.task
-def parse_zamena(url: str, date: datetime.datetime) -> ZamenaParseResult:
+def parse_zamena(url: str, date: datetime.datetime) -> dict:
     return methods.parse_zamena(url, date)
 
 

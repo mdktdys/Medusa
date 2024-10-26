@@ -33,7 +33,7 @@ async def check_new() -> dict[str, Any]:
     return await crud.check_new()
 
 
-@router.post("/parse_zamena", response_model=ZamenaParseResult)
+@router.post("/parse_zamena", response_model=dict)
 async def parse_zamena(
     request: ParseZamenaRequest,
 ) -> dict:
