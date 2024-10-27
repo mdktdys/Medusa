@@ -66,7 +66,7 @@ def define_file_format(stream: BytesIO):
     return file_type
 
 
-def parse_zamenas(url: str, date_: date, force: bool):
+async def parse_zamenas(url: str, date_: date, force: bool):
     supabase_client = SupaBaseWorker()
     data_model = init_date_model()
     stream = get_file_stream(link=url)

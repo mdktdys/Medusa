@@ -16,7 +16,7 @@ parser_celery_app = Celery(
 
 @parser_celery_app.task
 def parse_zamena(url: str, date: datetime.datetime) -> dict:
-    return methods.parse_zamena(url, date)
+    return asyncio.run(methods.parse_zamena(url, date))
 
 
 @parser_celery_app.task
