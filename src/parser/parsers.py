@@ -17,7 +17,7 @@ from src.parser.zamena_parser import parseZamenas
 
 
 def init_date_model(sup: SupaBaseWorker) -> Data:
-    data_model = Data(sup=sup.client)
+    data_model = Data(sup=sup)
 
     # (
     #     data_model.GROUPS,
