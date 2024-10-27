@@ -61,7 +61,7 @@ sup = SupaBaseWorker()
 
 
 async def parse_zamena(url: str, date: datetime.datetime) -> dict:
-    return await parse_zamenas(url=url, date_=date, force=False).model_dump()
+    return (await parse_zamenas(url=url, date_=date, force=False)).model_dump()
 
 
 def get_latest_zamena_link():
