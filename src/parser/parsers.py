@@ -16,18 +16,17 @@ from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import parseZamenas
 
 
-def init_date_model() -> Data:
-    data_model = Data
-    supabase_client = SupaBaseWorker()
+def init_date_model(sup: SupaBaseWorker) -> Data:
+    data_model = Data(sup=sup.client)
 
-    (
-        data_model.GROUPS,
-        _,
-        data_model.TEACHERS,
-        data_model.CABINETS,
-        data_model.COURSES,
-        data_model.LINKERS,
-    ) = supabase_client.get_data_models_list
+    # (
+    #     data_model.GROUPS,
+    #     _,
+    #     data_model.TEACHERS,
+    #     data_model.CABINETS,
+    #     data_model.COURSES,
+    #     data_model.LINKERS,
+    # ) = supabase_client.get_data_models_list
     return data_model
 
 
@@ -68,7 +67,7 @@ def define_file_format(stream: BytesIO):
 
 async def parse_zamenas(url: str, date_: date, force: bool):
     supabase_client = SupaBaseWorker()
-    data_model = init_date_model()
+    data_model = init_date_model(sup=supabase_client)
     stream = get_file_stream(link=url)
     file_type = define_file_format(stream)
 
@@ -90,7 +89,7 @@ async def parse_zamenas(url: str, date_: date, force: bool):
 
 def parse_schedule(url: str, date_: date):
     supabase_client = SupaBaseWorker()
-    data_model = init_date_model()
+    data_model = init_date_model(sup=supabase_client)
     stream = get_file_stream(link=url)
     file_type = define_file_format(stream)
     bytes = get_file_bytes(link=url)
