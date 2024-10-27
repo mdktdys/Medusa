@@ -26,6 +26,15 @@ from src.parser.schemas.parse_zamena_schemas import (
     ZamenaParseResult,
     ZamenaParseSucess,
 )
+from src.parser.shared import (
+    get_align_course_by_group,
+    get_teacher_from_string,
+    clean_dirty_string,
+    get_course_from_string,
+    get_empty_course,
+    is_empty_course,
+    get_cabinet_from_string,
+)
 from src.parser.supabase import SupaBaseWorker
 
 
@@ -43,28 +52,30 @@ def parseZamenas(
 ) -> ZamenaParseResult:
     all_rows, header = _get_all_tables(stream)
     practice_groups = _extract_practice_groups(header, data_model)
-    workRows = _prepare_work_rows(
-        all_rows
-    )  # Подговить все строки к дальнейшей фильтрации (см. след. строку)
-    workRows = _filter_and_clean_rows(workRows)
+    work_rows = _prepare_work_rows(all_rows)
+    work_rows = _filter_and_clean_rows(work_rows)
 
-    # Работа с готовымии элементами
-    workRows, fullzamenagroups, liquidation = handle_special_cases(workRows, data_model)
-    update_empty_group_column(workRows)
-    workRows = process_multiple_entries(workRows)
+    work_rows, full_zamena_groups, liquidation = handle_special_cases(
+        work_rows, data_model
+    )
+    update_empty_group_column(work_rows)
+    work_rows = process_multiple_entries(work_rows)
 
-    map_entities_to_ids(workRows, data_model, supabase_client)
+    map_entities_to_ids(work_rows, data_model, supabase_client)
 
     if len(not_found_items) > 0:
         return ZamenaParseFailedNotFoundItems(
-            error="Not found items", items=not_found_items, result="error", trace=""
+            error="Not found items",
+            items=not_found_items,
+            result="error",
+            trace=f"{link}",
         )
 
     prepare_and_send_supabase_entries(
-        workRows,
+        work_rows,
         practice_groups,
         liquidation,
-        fullzamenagroups,
+        full_zamena_groups,
         date_,
         link,
         data_model,
@@ -186,7 +197,6 @@ def process_multiple_entries(workRows: list[str]):
     for i in workRows:
         try:
             text = i[1].replace(".", ",")
-            print(text)
             if text[-1] == ",":
                 text = text[:-1]
             if text[0] == ",":
@@ -206,42 +216,6 @@ def process_multiple_entries(workRows: list[str]):
     return editet
 
 
-def clean_dirty_string(string: str):
-    return (
-        string.replace(" ", "")
-        .replace(".", "")
-        .replace(",", "")
-        .replace("-", "")
-        .replace("_", "")
-    ).lower()
-
-
-def get_teacher_from_string(string: str, teachers: List[Teacher]) -> Teacher:
-    string = clean_dirty_string(string)
-    finded_teachers_by_name = [
-        teacher
-        for teacher in teachers
-        if string.__contains__(clean_dirty_string(teacher.name))
-    ]
-    if len(finded_teachers_by_name) > 1:
-        # if string != "" and finded_teachers_by_name[0].name == "":
-        #     pass
-        # else:
-        return finded_teachers_by_name[0]
-    else:
-        founded_teachers_by_synonyms = []
-        for teacher in teachers:
-            for syn in teacher.synonyms:
-                if string.__contains__(clean_dirty_string(syn)):
-                    # print("found")
-                    founded_teachers_by_synonyms.append(teacher)
-                    break
-        try:
-            return founded_teachers_by_synonyms[0]
-        except:
-            raise Exception(f"Not found teacher in string {string}")
-
-
 def map_entities_to_ids(
     workRows: list, data_model: Data, supabase_client: SupaBaseWorker
 ):
@@ -253,37 +227,61 @@ def map_entities_to_ids(
         if group:
             row[0] = group.id
 
-        course = get_course_by_id(
-            data_model.COURSES, row[2], data_model, supabase_client, args=[group.name]
-        )
-        if course:
-            row[2] = course.id
+        # course = get_course_by_id(
+        #     data_model.COURSES, row[2], data_model, supabase_client, args=[group.name]
+        # )
+        empty_course = get_empty_course(data_model=data_model)
+
+        if is_empty_course(string=row[2], empty_course=empty_course):
+            row[2] = empty_course.id
+        else:
+            course = get_align_course_by_group(
+                course_name=row[2], data_model=data_model, group=group
+            )
+            if course:
+                row[2] = course.id
+            else:
+                not_found_items.append(
+                    f"Not found course in {row[2]} group {group.name}"
+                )
 
         teacher = get_teacher_from_string(teachers=data_model.TEACHERS, string=row[3])
-        row[3] = teacher.id
+        if teacher:
+            row[3] = teacher.id
+        else:
+            not_found_items.append(f"Not found teacher in {row[3]}")
         # teacher = get_teacher_by_id(
         #     data_model.TEACHERS, row[3], data_model, supabase_client
         # )
         # if teacher:
         #     row[3] = teacher.id
 
-        course = get_course_by_id(
-            data_model.COURSES, row[4], data_model, supabase_client, args=[group.name]
-        )
-        if course:
-            row[4] = course.id
+        if is_empty_course(string=row[4], empty_course=empty_course):
+            row[4] = empty_course.id
+        else:
+            course = get_align_course_by_group(
+                course_name=row[4], data_model=data_model, group=group
+            )
+            if course:
+                row[4] = course.id
+            else:
+                not_found_items.append(
+                    f"Not found course in {row[4]} group {group.name}"
+                )
 
-        teacher = get_teacher_by_id(
-            data_model.TEACHERS, row[5], data_model, supabase_client
-        )
+        teacher = get_teacher_from_string(teachers=data_model.TEACHERS, string=row[5])
         if teacher:
+            print(teacher)
+            print(row[5])
             row[5] = teacher.id
+        else:
+            not_found_items.append(f"Not found teacher in {row[5]}")
 
-        cabinet = get_cabinet_by_id(
-            data_model.CABINETS, row[6], data_model, supabase_client
-        )
+        cabinet = get_cabinet_from_string(string=row[6], cabinets=data_model.CABINETS)
         if cabinet:
             row[6] = cabinet.id
+        else:
+            not_found_items.append(f"Not found cabinet in {row[6]}")
 
 
 def get_bytes_hash(bytes_data: bytes):
@@ -500,7 +498,7 @@ def add_and_get_entity(entity_type, add_func, entities, target_name, data_model,
         entities = getattr(data_model, entity_type)
         return find_entity_by_name(entities, target_name)
     except Exception as e:
-        print(f"Error adding {entity_type}: {e}")
+        print(f"Error adding {entity_type}: {e} target_name:{target_name}")
         return None
 
 

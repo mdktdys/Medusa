@@ -26,6 +26,7 @@ def init_date_model() -> Data:
         data_model.TEACHERS,
         data_model.CABINETS,
         data_model.COURSES,
+        data_model.LINKERS,
     ) = supabase_client.get_data_models_list
     return data_model
 

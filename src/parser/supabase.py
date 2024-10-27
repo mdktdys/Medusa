@@ -14,6 +14,7 @@ from src.parser.models.cabinet_model import Cabinet
 from src.parser.models.course_model import Course
 from src.parser.models.data_model import Data
 from src.parser.models.group_model import Group
+from src.parser.models.loadlinker_model import LoadLinker
 from src.parser.models.parsed_date_model import ParsedDate
 from src.parser.models.subscriber_model import Subscriber
 from src.parser.models.teacher_model import Teacher
@@ -108,7 +109,12 @@ class SupaBaseWorker:
     def get_data_models_list(
         self,
     ) -> tuple[
-        list[Group], list[Subscriber], list[Teacher], list[Cabinet], list[Course]
+        list[Group],
+        list[Subscriber],
+        list[Teacher],
+        list[Cabinet],
+        list[Course],
+        List[LoadLinker],
     ]:
         """
         Возвращает кортеж данных с информацией о группах, подписчиках, преподах, кабинетов и курсах
@@ -119,6 +125,7 @@ class SupaBaseWorker:
             self._getTeachers(),
             self._getCabinets(),
             self._getCourses(),
+            self._getLinkers(),
         )
 
     def addZamena(self, group, number, course, teacher, cabinet, date):
@@ -261,13 +268,76 @@ class SupaBaseWorker:
 
     def _getCabinets(self):
         client = self.client
-        data, _ = client.table("Cabinets").select("id", "name").execute()
-        return [Cabinet(item["id"], item["name"]) for item in data[1]]
+        data, _ = client.table("Cabinets").select("id", "name", "synonyms").execute()
+        return [Cabinet(item["id"], item["name"], item["synonyms"]) for item in data[1]]
 
     def _getCourses(self):
         client = self.client
-        data, _ = client.table("Courses").select("id", "name", "synonyms").execute()
-        return [Course(item["id"], item["name"], item["synonyms"]) for item in data[1]]
+        data, _ = (
+            client.table("Courses")
+            .select("id", "name", "synonyms", "fullname")
+            .execute()
+        )
+        return [
+            Course(item["id"], item["name"], item["synonyms"], item["fullname"])
+            for item in data[1]
+        ]
+
+    def _getLinkers(self):
+        client = self.client
+        data, _ = (
+            client.table("loadlinkers")
+            .select(
+                "id",
+                "load",
+                "group",
+                "course",
+                "codediscipline",
+                "certificationformFirst",
+                "certificationformSecond",
+                "teacher",
+                "firstSemesterHours",
+                "secondSemesterHours",
+                "totalHours",
+                "srsHours",
+                "konspectHours",
+                "LandPHours",
+                "lecturesHours",
+                "practicesHours",
+                "lab1Hours",
+                "lab2Hours",
+                "KandPHours",
+                "ExamHours",
+            )
+            .execute()
+        )
+        print(len(data[1]))
+
+        return [
+            LoadLinker(
+                item["id"],
+                item["load"],
+                item["group"],
+                item["course"],
+                item["codediscipline"],
+                item["certificationformFirst"],
+                item["certificationformSecond"],
+                item["teacher"],
+                item["firstSemesterHours"],
+                item["secondSemesterHours"],
+                item["totalHours"],
+                item["srsHours"],
+                item["konspectHours"],
+                item["LandPHours"],
+                item["lecturesHours"],
+                item["practicesHours"],
+                item["lab1Hours"],
+                item["lab2Hours"],
+                item["KandPHours"],
+                item["ExamHours"],
+            )
+            for item in data[1]
+        ]
 
     def get_already_found_links(self) -> List[AlreadyFoundLink]:
         client = self.client

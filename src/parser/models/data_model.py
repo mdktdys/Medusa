@@ -3,12 +3,14 @@ class Data:
     CABINETS = []
     TEACHERS = []
     COURSES = []
+    LINKERS = []
 
     def __init__(self, sup):
         self.GROUPS = sup._getGroups()
         self.CABINETS = sup._getCabinets()
         self.TEACHERS = sup._getTeachers()
         self.COURSES = sup._getCourses()
+        self.LINKERS = sup._getLinkers()
 
 
 class DataMock(Data):
