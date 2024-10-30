@@ -1,3 +1,7 @@
+import datetime
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.parser.methods import sup
 from fastapi import Response, status
 
@@ -49,3 +53,13 @@ async def unsubscribe_zamena_notifications(
     print(result)
     response.status_code = status.HTTP_201_CREATED
     return
+
+
+async def get_day_schedule_by_date(
+    session: AsyncSession,
+    chat_id: int,
+    target_type: int,
+    target_id: int,
+    date: datetime.date,
+):
+    pass

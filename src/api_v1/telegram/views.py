@@ -1,7 +1,12 @@
-from fastapi import APIRouter, Response, status
+import datetime
 
+from fastapi import APIRouter, Response, status, Depends
+from fastapi_cache.decorator import cache
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.alchemy import db_helper
 from src.api_v1.telegram import crud
-from src.api_v1.telegram.schemas import Subscription
+from src.api_v1.telegram.schemas import Subscription, DaySchedule
 
 router = APIRouter(tags=["Telegram"])
 
@@ -23,4 +28,25 @@ async def unsubscribe_zamena_notifications(sub: Subscription, response: Response
         target_id=sub.target_id,
         target_type=sub.target_type,
         response=response,
+    )
+
+
+@router.get(
+    "/day_schedule/{target_type}/{target_id}/{date}/{chat_id}/",
+    response_model=DaySchedule,
+)
+@cache(expire=6000)
+async def get_day_schedule_by_date(
+    target_id: int,
+    target_type: int,
+    chat_id: int,
+    date: datetime.date,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+) -> DaySchedule:
+    return await crud.get_day_schedule_by_date(
+        session=session,
+        target_type=target_type,
+        target_id=target_id,
+        date=date,
+        chat_id=chat_id,
     )

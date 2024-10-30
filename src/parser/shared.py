@@ -15,7 +15,20 @@ def clean_dirty_string(string: str):
         .replace(",", "")
         .replace("-", "")
         .replace("_", "")
+        .replace("\n", "")
+        .replace("\t", "")
     ).lower()
+
+
+def get_group_from_string(string: str, groups: List[Group]) -> Group | None:
+    string = clean_dirty_string(string)
+    finded_groups_by_name = [
+        group for group in groups if string == clean_dirty_string(group.name)
+    ]
+    try:
+        return finded_groups_by_name[0]
+    except:
+        return None
 
 
 def get_course_from_string(string: str, courses: List[Course]) -> Course:

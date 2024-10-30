@@ -34,6 +34,7 @@ from src.parser.shared import (
     get_empty_course,
     is_empty_course,
     get_cabinet_from_string,
+    get_group_from_string,
 )
 from src.parser.supabase import SupaBaseWorker
 
@@ -223,10 +224,13 @@ def map_entities_to_ids(
     Применяет функцию к Ids и записывает их в строки workRows
     """
     for row in workRows:
-        group = get_group_by_id(data_model.GROUPS, row[0], data_model, supabase_client)
+        group = get_group_from_string(groups=data_model.GROUPS, string=row[0])
+        # if clean_dirty_string(row[0]) == clean_dirty_string("23З-2"):
+        #     group = [group for group in data_model.GROUPS if group.name == "24З-2"][0]
         if group:
             row[0] = group.id
-
+        else:
+            not_found_items.append(f"Not found group in {row[0]}")
         # course = get_course_by_id(
         #     data_model.COURSES, row[2], data_model, supabase_client, args=[group.name]
         # )
@@ -271,8 +275,6 @@ def map_entities_to_ids(
 
         teacher = get_teacher_from_string(teachers=data_model.TEACHERS, string=row[5])
         if teacher:
-            print(teacher)
-            print(row[5])
             row[5] = teacher.id
         else:
             not_found_items.append(f"Not found teacher in {row[5]}")

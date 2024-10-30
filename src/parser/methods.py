@@ -108,7 +108,7 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        # sup.add_already_found_link(link=link, date=date, hash=None)
+                        sup.add_already_found_link(link=link, date=date, hash=None)
                         continue
                     extension = get_file_extension(zamena_cell.link)
                     filename = zamena_cell.link.split("/")[-1].replace(
@@ -128,7 +128,7 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        # sup.add_already_found_link(link=link, date=date, hash=None)
+                        sup.add_already_found_link(link=link, date=date, hash=None)
                         continue
 
                     file_hash = get_remote_file_hash(url=zamena_cell.link)
@@ -147,9 +147,9 @@ async def check_new() -> dict[str, Any]:
                                     link=zamena_cell.link,
                                 )
                             )
-                            # sup.add_already_found_link(
-                            #     link=link, date=date, hash=file_hash
-                            # )
+                            sup.add_already_found_link(
+                                link=link, date=date, hash=file_hash
+                            )
                             continue
                     result.checks.append(
                         CheckZamenaResultSuccess(
@@ -158,7 +158,7 @@ async def check_new() -> dict[str, Any]:
                             link=zamena_cell.link,
                         )
                     )
-                    # sup.add_already_found_link(link=link, date=date, hash=file_hash)
+                    sup.add_already_found_link(link=link, date=date, hash=file_hash)
                     os.remove(f"{filename}.{extension}")
                 except Exception as e:
                     result.checks.append(
@@ -206,9 +206,9 @@ async def check_new() -> dict[str, Any]:
                                         link=zamena.link,
                                     )
                                 )
-                                # sup.update_hash_already_found_link(
-                                #     link=zamena.link, new_hash=None
-                                # )
+                                sup.update_hash_already_found_link(
+                                    link=zamena.link, new_hash=None
+                                )
                                 continue
                             match extension:
                                 case "pdf":
@@ -228,9 +228,9 @@ async def check_new() -> dict[str, Any]:
                                             link=zamena.link,
                                         )
                                     )
-                                    # sup.update_hash_already_found_link(
-                                    #     link=zamena.link, new_hash=file_hash
-                                    # )
+                                    sup.update_hash_already_found_link(
+                                        link=zamena.link, new_hash=file_hash
+                                    )
                                     continue
                             result.checks.append(
                                 CheckZamenaResultSuccess(
@@ -240,9 +240,9 @@ async def check_new() -> dict[str, Any]:
                                 )
                             )
                             os.remove(f"{filename}.pdf")
-                            # sup.update_hash_already_found_link(
-                            #     link=zamena.link, new_hash=file_hash
-                            # )
+                            sup.update_hash_already_found_link(
+                                link=zamena.link, new_hash=file_hash
+                            )
                     except Exception as e:
                         print(e)
                         return CheckResultError(
