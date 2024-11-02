@@ -2,8 +2,11 @@ import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.parser.methods import sup
 from fastapi import Response, status
+
+from src.parser.supabase import SupaBaseWorker
+
+sup = SupaBaseWorker()
 
 
 async def subscribe_zamena_notifications(
