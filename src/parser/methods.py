@@ -39,26 +39,6 @@ from src.parser.zamena_parser import (
 )
 import html as Html
 
-sup = SupaBaseWorker()
-# async def send_task(celery_app, task_name: str, args: list = list) -> AsyncResult:
-#     max_retries = 5
-#     retries = 0
-#     while retries < max_retries:
-#         task = celery_app.send_task(task_name, args=args)
-#         task_id = task.id
-#         result = AsyncResult(task_id)
-#
-#         while not result.ready():
-#             await asyncio.sleep(1)
-#
-#         if result.successful():
-#             return result
-#         elif result.failed():
-#             retries += 1
-#             if retries == max_retries:
-#                 raise Exception("Достигнут лимит попыток. Попробуйте позже.")
-#         raise Exception("Хз что произошло")
-
 
 async def parse_zamena(url: str, date: datetime.datetime) -> dict:
     return (await parse_zamenas(url=url, date_=date, force=False)).model_dump()
@@ -76,6 +56,7 @@ def get_latest_zamena_link():
 
 async def check_new() -> dict[str, Any]:
     try:
+        sup = SupaBaseWorker()
         soup = BeautifulSoup(urlopen(SCHEDULE_URL).read(), "html.parser")
         tables = getAllMonthTables(soup=soup)
         site_links = get_all_tables_zamenas(tables)
@@ -87,9 +68,6 @@ async def check_new() -> dict[str, Any]:
             - set([x.link for x in already_found_links])
         )
         if len(new_links) != 0:
-            print("not equal links")
-            print(len(new_links))
-            print(new_links)
             new_links.reverse()
             result = CheckResultFoundNew()
             for link in new_links:
