@@ -67,7 +67,7 @@ def parseZamenas(
     if len(not_found_items) > 0:
         return ZamenaParseFailedNotFoundItems(
             error="Not found items",
-            items=not_found_items,
+            items=list(set(not_found_items)),
             result="error",
             trace=f"{link}",
         )
