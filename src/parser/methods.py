@@ -161,6 +161,7 @@ async def check_new() -> dict[str, Any]:
                             trace=Html.escape(str(traceback.format_exc())[0:200]),
                         )
                     )
+            sup.client.table("checks").insert({"result": "new"}).execute()
             return result.model_dump()
         else:
             print("check in existing links")
@@ -244,6 +245,16 @@ async def check_new() -> dict[str, Any]:
                             trace=Html.escape(str(traceback.format_exc())[0:100]),
                             error=Html.escape(str(e)),
                         ).model_dump()
+            if any(
+                [
+                    True
+                    for check in result.checks
+                    if isinstance(check, CheckZamenaResultSuccess)
+                ]
+            ):
+                sup.client.table("checks").insert({"result": "new"}).execute()
+            else:
+                sup.client.table("checks").insert({"result": "ok"}).execute()
             return result.model_dump()
     except Exception as e:
         print(e)
