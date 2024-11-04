@@ -27,3 +27,8 @@ def get_latest_zamena_link() -> dict:
 @parser_celery_app.task
 def check_new() -> dict[str, Any]:
     return asyncio.run(methods.check_new())
+
+
+@parser_celery_app.task
+def delete_zamena(date: datetime.date) -> dict[str, Any]:
+    return asyncio.run(methods.delete_zamena(date=date))

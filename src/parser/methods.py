@@ -54,6 +54,22 @@ def get_latest_zamena_link():
         return {"message": "failed", "reason": str(e)}
 
 
+async def delete_zamena(date: datetime.date) -> dict[str, Any]:
+    try:
+        sup = SupaBaseWorker()
+        removed = []
+        removed.append(sup.client.table("Zamenas").delete().eq("date", date).execute())
+        removed.append(
+            sup.client.table("ZamenasFull").delete().eq("date", date).execute()
+        )
+        removed.append(
+            sup.client.table("ZamenaFileLinks").delete().eq("date", date).execute()
+        )
+        return {"res": "ok", "removed": str(len(removed))}
+    except Exception as e:
+        return {"message": "failed", "reason": str(e)}
+
+
 async def check_new() -> dict[str, Any]:
     try:
         sup = SupaBaseWorker()

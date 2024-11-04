@@ -6,10 +6,10 @@ from fastapi_cache.decorator import cache
 from src.alchemy.db_helper import *
 from . import crud
 
-from .schemas import ParseZamenaRequest
-from ...parser.schemas.parse_zamena_schemas import ZamenaParseResult
+from .schemas import ParseZamenaRequest, RemoveZamenaRequest
 
 router = APIRouter(tags=["Parser"])
+
 
 pass_ = os.environ.get("API_SECRET")
 
@@ -48,3 +48,8 @@ def test():
 @router.get("/containers")
 def get_containers():
     return crud.get_containers()
+
+
+@router.delete("/zamena")
+def delete_zamena(request: RemoveZamenaRequest):
+    return crud.delete_zamena(request)

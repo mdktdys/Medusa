@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy import database
-from src.api_v1.parser.schemas import ParseZamenaRequest
+from src.api_v1.parser.schemas import ParseZamenaRequest, RemoveZamenaRequest
 from src.parser import tasks
 
 
@@ -24,6 +24,11 @@ async def get_latest_zamena_link():
 
 async def check_new() -> dict[str, Any]:
     task: AsyncResult = tasks.check_new.delay()
+    return task.get()
+
+
+async def delete_zamena(request: RemoveZamenaRequest) -> dict[str, Any]:
+    task: AsyncResult = tasks.delete_zamena.delay(date=request.date)
     return task.get()
 
 
