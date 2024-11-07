@@ -115,7 +115,7 @@ def get_cabinet_from_string(string: str, cabinets: List[Cabinet]) -> Cabinet | N
         try:
             return founded_cabinets_by_synonyms[0]
         except:
-            raise None
+            return None
 
 
 def get_empty_course(data_model: Data) -> Course:
