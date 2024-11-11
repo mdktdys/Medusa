@@ -230,6 +230,7 @@ def map_entities_to_ids(
         if group:
             row[0] = group.id
         else:
+            print(f"Not found group in {row[0]}")
             not_found_items.append(f"Not found group in {row[0]}")
         # course = get_course_by_id(
         #     data_model.COURSES, row[2], data_model, supabase_client, args=[group.name]
@@ -511,7 +512,7 @@ def get_group_by_id(
         entity_type="GROUPS",
         add_func=supabase_client.addGroup,
         entities=groups,
-        target_name=target_name.replace("_", "-").lower(),
+        target_name=target_name.replace("_", "-").replace("—", "-").lower(),
         data_model=data_model,
         args=[],
     )

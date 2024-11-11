@@ -17,6 +17,8 @@ def clean_dirty_string(string: str):
         .replace("_", "")
         .replace("\n", "")
         .replace("\t", "")
+        .replace("—", "")
+        .replace("—", "")
     ).lower()
 
 
