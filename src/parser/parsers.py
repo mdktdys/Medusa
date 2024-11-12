@@ -65,6 +65,23 @@ def define_file_format(stream: BytesIO):
     return file_type
 
 
+def convert_pdf2word(url: str, file_name: str):
+    stream = get_file_stream(link=url)
+    cv = Converter(stream=stream, pdf_file="temp")
+    cv.convert(docx_filename=file_name)
+    cv.close()
+
+
+async def parse_zamenas_from_word(
+    file_bytes: BytesIO, date_: date, force: bool, url: str
+):
+    supabase_client = SupaBaseWorker()
+    data_model = init_date_model(sup=supabase_client)
+    return parseZamenas(
+        file_bytes, date_, data_model, url, supabase_client, force=force
+    )
+
+
 async def parse_zamenas(url: str, date_: date, force: bool):
     supabase_client = SupaBaseWorker()
     data_model = init_date_model(sup=supabase_client)

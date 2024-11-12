@@ -134,7 +134,7 @@ def handle_special_cases(workRows: list[str], data_model: Data):
     for i in workRows:
         if i[0] != "" and len(set(i)) == 1:
             if "ликвидация" not in i[0].strip().lower():
-                fullzamenagroups.append(i[0].strip().replace(" ", ""))
+                fullzamenagroups.append(i[0].strip().replace(" ", "").replace(".", ""))
                 workRows.remove(i)
             else:
                 try:
@@ -197,7 +197,10 @@ def process_multiple_entries(workRows: list[str]):
     editet = []
     for i in workRows:
         try:
-            text = i[1].replace(".", ",")
+            text = i[1]
+            # if text == "12":
+            #     text = "1,2"
+            text = text.replace(".", ",")
             if text[-1] == ",":
                 text = text[:-1]
             if text[0] == ",":
