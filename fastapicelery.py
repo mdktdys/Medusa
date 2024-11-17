@@ -11,19 +11,19 @@ from src.parser.supabase import SupaBaseWorker
 # from src.parser.zamena_parser import get_remote_file_hash
 
 #
-# url = "https://www.uksivt.ru/storage/files/all/ZAMENY/2024/Ноябрь/12.11.docx.pdf"
-# date = datetime.date(2024, 11, 12)
-#
-#
-# async def a():
-#     res = await parse_zamenas(url=url, date_=date, force=True)
-#     print(res)
-#
-#
-# a()
-# asyncio.run(a())
-#
-# sup = SupaBaseWorker()
+url = "https://www.uksivt.ru/storage/files/all/ZAMENY/2024/Ноябрь/18.11.pdf"
+date = datetime.date(2024, 11, 18)
+
+
+async def a():
+    res = await parse_zamenas(url=url, date_=date, force=True)
+    print(res)
+
+
+a()
+asyncio.run(a())
+
+sup = SupaBaseWorker()
 
 
 # convert_pdf2word(
@@ -31,21 +31,21 @@ from src.parser.supabase import SupaBaseWorker
 #     file_name="raspes.docx",
 # )
 
-from io import BytesIO
-
-
-async def b():
-    with open("raspes.docx", "rb") as fh:
-        buf = BytesIO(fh.read())
-        await parse_zamenas_from_word(
-            url="https://www.uksivt.ru/storage/files/all/ZAMENY/2024/Ноябрь/13.11.docx.pdf",
-            date_=datetime.date(2024, 11, 13),
-            file_bytes=buf,
-            force=False,
-        )
-
-
-asyncio.run(b())
+# from io import BytesIO
+#
+#
+# async def b():
+#     with open("raspes.docx", "rb") as fh:
+#         buf = BytesIO(fh.read())
+#         await parse_zamenas_from_word(
+#             url="https://www.uksivt.ru/storage/files/all/ZAMENY/2024/Ноябрь/13.11.docx.pdf",
+#             date_=datetime.date(2024, 11, 13),
+#             file_bytes=buf,
+#             force=False,
+#         )
+#
+#
+# asyncio.run(b())
 
 # print(res)
 #

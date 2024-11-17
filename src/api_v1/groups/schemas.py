@@ -46,4 +46,5 @@ class DaySchedule(BaseModel):
 
 class DayScheduleFormatted(BaseModel):
     search_name: str
+    full_zamena: bool
     paras: List[str] = []

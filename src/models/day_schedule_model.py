@@ -18,8 +18,10 @@ class Para:
 
 class DaySchedule:
     search_name: str
+    full_zamena: bool
     paras: List[Para] = []
 
-    def __init__(self, paras, search_name):
+    def __init__(self, paras, search_name, full_zamena):
         self.paras: List[Para] = paras
         self.search_name: str = search_name
+        self.full_zamena: bool = full_zamena

@@ -10,7 +10,7 @@ from src.api_v1.parser.schemas import ParseZamenaRequest, RemoveZamenaRequest
 from src.parser import tasks
 
 
-async def parse_zamena(request: ParseZamenaRequest) -> dict:
+async def xparse_zamena(request: ParseZamenaRequest) -> dict:
     url = request.url
     date = request.date
     task: AsyncResult = tasks.parse_zamena.delay(url=url, date=date)

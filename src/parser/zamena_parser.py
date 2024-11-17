@@ -228,8 +228,8 @@ def map_entities_to_ids(
     """
     for row in workRows:
         group = get_group_from_string(groups=data_model.GROUPS, string=row[0])
-        # if clean_dirty_string(row[0]) == clean_dirty_string("23Л-1"):
-        #     group = [group for group in data_model.GROUPS if group.name == "24Л-1"][0]
+        if clean_dirty_string(row[0]) == clean_dirty_string("24пд-5"):
+            group = [group for group in data_model.GROUPS if group.name == "24ПД-2"][0]
         if group:
             row[0] = group.id
         else:
