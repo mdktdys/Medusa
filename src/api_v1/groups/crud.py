@@ -4,6 +4,7 @@ from sqlalchemy import *
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 from src.api_v1.groups.schemas import Zamena, Paras, DayScheduleFormatted
+from src.api_v1.telegram.crud import get_chat_subscribers
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
 
@@ -84,12 +85,20 @@ async def get_group_day_schedule_by_date(
 
 
 async def get_group_day_schedule_by_date_formatted(
-    session: AsyncSession, group_id: int, date: datetime
+    session: AsyncSession, group_id: int, date: datetime, chat_id: int
 ) -> DayScheduleFormatted:
     schedule: DaySchedule = await get_group_day_schedule_by_date(
         session=session, group_id=group_id, date=date
     )
     rows = []
+    subscribed = any(
+        [
+            True
+            for sub in (await get_chat_subscribers(chat_id=chat_id, session=session))
+            if sub.target_id == group_id and sub.target_type == 1
+        ]
+    )
+
     for para in schedule.paras:
         if para.zamena is not None:
             if para.origin is None:
@@ -121,7 +130,10 @@ async def get_group_day_schedule_by_date_formatted(
                 f"\n{para.origin.scheduleTimetable.start}-{para.origin.scheduleTimetable.end}   {para.origin.Cabinets_.name}"
             )
     return DayScheduleFormatted(
-        paras=rows, search_name=schedule.search_name, full_zamena=schedule.full_zamena
+        paras=rows,
+        search_name=schedule.search_name,
+        full_zamena=schedule.full_zamena,
+        subscribed=subscribed,
     )
 
 

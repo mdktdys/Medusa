@@ -54,7 +54,7 @@ async def get_group_day_schedule_by_date_formatted(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> DayScheduleFormatted:
     return await crud.get_group_day_schedule_by_date_formatted(
-        session=session, group_id=group_id, date=date
+        session=session, group_id=group_id, date=date, chat_id=chat_id
     )
 
 

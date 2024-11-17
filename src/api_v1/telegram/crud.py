@@ -1,12 +1,23 @@
 import datetime
+from typing import List
 
+from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import Response, status
 
+from src.alchemy import database
 from src.parser.supabase import SupaBaseWorker
 
 sup = SupaBaseWorker()
+
+
+async def get_chat_subscribers(
+    session: AsyncSession, chat_id: int
+) -> List[database.Subscribers]:
+    query = select(database.Subscribers).where(database.Subscribers.chat_id == chat_id)
+    result: Result = await session.execute(query)
+    return list(result.scalars().all())
 
 
 async def subscribe_zamena_notifications(

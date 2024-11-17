@@ -59,7 +59,7 @@ async def get_teacher_day_schedule_by_date_formatted(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.get_teacher_day_schedule_by_date_formatted(
-        session=session, teacher_id=teacher_id, date=date
+        session=session, teacher_id=teacher_id, date=date, chat_id=chat_id
     )
 
 
