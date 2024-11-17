@@ -12,21 +12,21 @@ router = APIRouter(tags=["Telegram"])
 
 
 @router.post("/subscribe_zamena_notifications")
-async def subscribe_zamena_notifications(sub: dict, response: Response):
+async def subscribe_zamena_notifications(sub: Subscription, response: Response):
     return await crud.subscribe_zamena_notifications(
-        chat_id=sub["chat_id"],
-        target_id=sub["target_id"],
-        target_type=sub["target_type"],
+        chat_id=sub.chat_id,
+        target_id=sub.target_id,
+        target_type=sub.target_type,
         response=response,
     )
 
 
 @router.post("/unsubscribe_zamena_notifications")
-async def unsubscribe_zamena_notifications(sub: dict, response: Response):
+async def unsubscribe_zamena_notifications(sub: Subscription, response: Response):
     return await crud.unsubscribe_zamena_notifications(
-        chat_id=sub["chat_id"],
-        target_id=sub["target_id"],
-        target_type=sub["target_type"],
+        chat_id=sub.chat_id,
+        target_id=sub.target_id,
+        target_type=sub.target_type,
         response=response,
     )
 
