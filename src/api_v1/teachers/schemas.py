@@ -27,7 +27,9 @@ class DayScheduleTeacherPydantic(BaseModel):
 
 
 class DayScheduleFormatted(BaseModel):
+    subscribed: bool
     search_name: str
+    full_zamena: bool
     paras: List[str] = []
 
 
