@@ -29,7 +29,7 @@ async def get_group_by_id(
     return await crud.get_group_by_id(session=session, group_id=group_id)
 
 
-@router.get("/day_schedule/{group_id}/{date}/{chat_id}", response_model=DaySchedule)
+@router.get("/day_schedule/{group_id}/{date}/{chat_id}/", response_model=DaySchedule)
 @cache(expire=6000)
 async def get_group_day_schedule_by_date(
     group_id: int = -1,
@@ -43,7 +43,7 @@ async def get_group_day_schedule_by_date(
 
 
 @router.get(
-    "/day_schedule_formatted/{group_id}/{date}/{chat_id}",
+    "/day_schedule_formatted/{group_id}/{date}/{chat_id}/",
     response_model=DayScheduleFormatted,
 )
 @cache(expire=6000)
