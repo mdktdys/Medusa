@@ -10,5 +10,5 @@ router.include_router(
 router.include_router(
     api_v1_router,
     prefix="/api/v1",
-    # dependencies=[Depends(any_auth_method(roles=["Owner"]))],
+    dependencies=[Depends(any_auth_method(roles=["Owner"]))],
 )
