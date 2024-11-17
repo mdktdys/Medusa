@@ -74,7 +74,8 @@ async def get_group_day_schedule_by_date(
         lessons_list: List[Para] = []
         for i in range(1, 8):
             lesson_origin = next((x for x in zamenas_on_day if x.number == i), None)
-            lessons_list.append(Para(origin=lesson_origin, zamena=None))
+            if lesson_origin is not None:
+                lessons_list.append(Para(origin=lesson_origin, zamena=None))
 
     res = DaySchedule(
         paras=lessons_list, search_name=search_group.name, full_zamena=is_full_zamena
