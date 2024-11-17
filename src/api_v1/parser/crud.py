@@ -40,7 +40,7 @@ async def get_founded_links(session: AsyncSession):
 
 
 def get_containers():
-    client = docker.from_env()  # Используем Docker SDK для Python
+    client = docker.from_env()
     containers = client.containers.list(all=True)  # Получаем список всех контейнеров
     container_info = []
 
