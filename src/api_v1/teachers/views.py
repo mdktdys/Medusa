@@ -32,11 +32,12 @@ async def get_teacher_by_id(
 
 
 @router.get(
-    "/day_schedule/{teacher_id}/{date}/", response_model=DayScheduleTeacherPydantic
+    "/day_schedule/{teacher_id}/{date}/{chat_id}", response_model=DayScheduleTeacherPydantic
 )
 @cache(expire=6000)
 async def get_teacher_day_schedule_by_date(
     teacher_id: int = -1,
+    chat_id: int = -1,
     date: datetime = datetime.now(),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
@@ -46,11 +47,12 @@ async def get_teacher_day_schedule_by_date(
 
 
 @router.get(
-    "/day_schedule_formatted/{teacher_id}/{date}/", response_model=DayScheduleFormatted
+    "/day_schedule_formatted/{teacher_id}/{date}/{chat_id}", response_model=DayScheduleFormatted
 )
 @cache(expire=6000)
 async def get_teacher_day_schedule_by_date_formatted(
     teacher_id: int = -1,
+    chat_id: int = -1,
     date: datetime = datetime.now(),
     session: AsyncSession = Depends(db_helper.session_dependency),
 ):
