@@ -8,7 +8,7 @@ import hashlib
 import os
 import re
 from io import BytesIO
-from typing import List
+from typing import List, Tuple
 
 import fitz
 import requests
@@ -16,6 +16,8 @@ from docx import Document
 from docx.table import Table
 from datetime import date
 import aspose.words as aw
+
+from src.alchemy.database import Liquidation
 from src.parser.models.cabinet_model import Cabinet
 from src.parser.models.course_model import Course
 from src.parser.models.data_model import Data
@@ -118,7 +120,9 @@ def _filter_and_clean_rows(workRows: list[str]):
     return workRows
 
 
-def handle_special_cases(workRows: list[str], data_model: Data):
+def handle_special_cases(
+    workRows: list[str], data_model: Data
+) -> Tuple[list, list, List[Liquidation]]:
     """Handle specific cases such as liquidation and removing duplicate data."""
     iteration = 0
     liquidation = list()
@@ -130,15 +134,28 @@ def handle_special_cases(workRows: list[str], data_model: Data):
         if i[0] == "":
             i[0] = workRows[iteration - 2][0]
 
+    # for i in workRows:
+    #     iteration += 1
+    #     sample = i[0].strip().lower()
+    #     if sample != "" and len(set(i)) == 1:
+
     # Find full zamena groups
-    for i in workRows:
+    iteration = 0
+    for i in workRows[:]:
+        sample = i[0].strip().lower()
         if i[0] != "" and len(set(i)) == 1:
+            if "Ликвидация задолженностей".lower().strip() == sample:
+                for gr in data_model.GROUPS:
+                    if gr.name.lower().strip() in workRows[iteration - 1][0]:
+                        liquidation.append(gr.id)
+                print(f"REMOVED {i}")
+                workRows.remove(i)
+                continue
             if "ликвидация" not in i[0].strip().lower():
                 fullzamenagroups.append(i[0].strip().replace(" ", "").replace(".", ""))
                 workRows.remove(i)
             else:
                 try:
-                    sample = i[0].strip().lower()
                     for gr in data_model.GROUPS:
                         if gr.name.lower().strip() in sample:
                             liquidation.append(gr.id)
@@ -228,8 +245,8 @@ def map_entities_to_ids(
     """
     for row in workRows:
         group = get_group_from_string(groups=data_model.GROUPS, string=row[0])
-        if clean_dirty_string(row[0]) == clean_dirty_string("24пд-5"):
-            group = [group for group in data_model.GROUPS if group.name == "24ПД-2"][0]
+        if clean_dirty_string(row[0]) == clean_dirty_string("22пса-122пса-222пса-3"):
+            group = [group for group in data_model.GROUPS if group.name == "22ПСА-1"][0]
         if group:
             row[0] = group.id
         else:
@@ -381,7 +398,7 @@ def download_file(link: str, filename: str):
 def prepare_and_send_supabase_entries(
     workRows,
     practice_groups: list,
-    liquidation: list,
+    liquidation: List[Liquidation],
     fullzamenagroups: list,
     date_: date,
     link,
@@ -415,7 +432,7 @@ def prepare_and_send_supabase_entries(
         }
         for i in fullzamenagroups
     ]
-    liquidations = [{"group": i, "date": str(date)} for i in liquidation]
+    liquidations = [{"group": i, "date": str(date_)} for i in liquidation]
 
     supabase_client.addZamenas(zamenas=zamenas_supabase)
     if full_zamenas_groups:
@@ -441,14 +458,17 @@ def _extract_all_tables_to_rows(tables: list[Table]) -> list[list[str]]:
     for table in tables:
         for row in table.rows:
             data = []
-            for cell in row.cells:
-                cell_text = cell.text.strip()
-                if cell.tables:
-                    nested_table_rows = _extract_all_tables_to_rows(cell.tables)
-                    data.extend(nested_table_rows)
-                else:
-                    data.append(cell_text)
-            rows.append(data)
+            try:
+                for cell in row.cells:
+                    cell_text = cell.text.strip()
+                    if cell.tables:
+                        nested_table_rows = _extract_all_tables_to_rows(cell.tables)
+                        data.extend(nested_table_rows)
+                    else:
+                        data.append(cell_text)
+                rows.append(data)
+            except Exception as e:
+                print(e)
     return rows
 
 
@@ -511,6 +531,11 @@ def add_and_get_entity(entity_type, add_func, entities, target_name, data_model,
 def get_group_by_id(
     groups, target_name, data_model: Data, supabase_client: SupaBaseWorker
 ) -> Group:
+    if (
+        target_name.replace("_", "-").replace("—", "-").lower()
+        == "22пса-1,22пса-2,22пса-3"
+    ):
+        target_name = "22пса-1"
     return add_and_get_entity(
         entity_type="GROUPS",
         add_func=supabase_client.addGroup,

@@ -10,7 +10,6 @@ from .schemas import ParseZamenaRequest, RemoveZamenaRequest
 
 router = APIRouter(tags=["Parser"])
 
-
 pass_ = os.environ.get("API_SECRET")
 
 
@@ -22,9 +21,7 @@ async def get_latest_zamena_link() -> dict:
 
 @router.get("/get_founded_links", response_model=List[str])
 @cache(300)
-async def get_founded_links(
-    session: AsyncSession = Depends(db_helper.session_dependency),
-) -> List[str]:
+async def get_founded_links(session: AsyncSession = Depends(db_helper.session_dependency)) -> List[str]:
     return await crud.get_founded_links(session=session)
 
 
@@ -34,15 +31,8 @@ async def check_new() -> dict[str, Any]:
 
 
 @router.post("/parse_zamena", response_model=dict)
-async def parse_zamena(
-    request: ParseZamenaRequest,
-) -> dict:
+async def parse_zamena(request: ParseZamenaRequest) -> dict:
     return await crud.parse_zamena(request)
-
-
-@router.options("/containers")
-def test():
-    return get_containers()
 
 
 @router.get("/containers")

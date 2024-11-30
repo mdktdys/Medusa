@@ -10,7 +10,7 @@ from src.api_v1.parser.schemas import ParseZamenaRequest, RemoveZamenaRequest
 from src.parser import tasks
 
 
-async def xparse_zamena(request: ParseZamenaRequest) -> dict:
+async def parse_zamena(request: ParseZamenaRequest) -> dict:
     url = request.url
     date = request.date
     task: AsyncResult = tasks.parse_zamena.delay(url=url, date=date)
@@ -33,9 +33,7 @@ async def delete_zamena(request: RemoveZamenaRequest) -> dict[str, Any]:
 
 
 async def get_founded_links(session: AsyncSession):
-    links = list(
-        (await session.execute(select(database.AlreadyFoundsLinks))).scalars().all()
-    )
+    links = list((await session.execute(select(database.AlreadyFoundsLinks))).scalars().all())
     return [link.link for link in links]
 
 

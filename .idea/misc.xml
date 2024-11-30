@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Black">
-    <option name="enabledOnReformat" value="true" />
-    <option name="enabledOnSave" value="true" />
+    <option name="executionMode" value="BINARY" />
+    <option name="pathToExecutable" value="C:\Users\Danil\AppData\Local\Programs\Python\Python311\Scripts\black.exe" />
     <option name="sdkUUID" value="55648948-49d0-438d-8165-ea5954a42296" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (ScheduleApi)" project-jdk-type="Python SDK" />

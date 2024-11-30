@@ -24,27 +24,27 @@ def clean_dirty_string(string: str):
 
 def get_group_from_string(string: str, groups: List[Group]) -> Group | None:
     string = clean_dirty_string(string)
-    finded_groups_by_name = [
+    founded_groups_by_name = [
         group for group in groups if string == clean_dirty_string(group.name)
     ]
     try:
-        return finded_groups_by_name[0]
+        return founded_groups_by_name[0]
     except:
         return None
 
 
 def get_course_from_string(string: str, courses: List[Course]) -> Course:
     string = clean_dirty_string(string)
-    finded_courses_by_name = [
+    founded_courses_by_name = [
         course for course in courses if string == clean_dirty_string(course.name)
     ]
-    if len(finded_courses_by_name) > 0:
-        return finded_courses_by_name[0]
-    finded_courses_by_fullname = [
+    if len(founded_courses_by_name) > 0:
+        return founded_courses_by_name[0]
+    founded_courses_by_fullname = [
         course for course in courses if string == clean_dirty_string(course.fullname)
     ]
-    if len(finded_courses_by_fullname) > 0:
-        return finded_courses_by_fullname[0]
+    if len(founded_courses_by_fullname) > 0:
+        return founded_courses_by_fullname[0]
     else:
         founded_courses_by_synonyms = []
         for course in courses:
@@ -58,16 +58,10 @@ def get_course_from_string(string: str, courses: List[Course]) -> Course:
             raise Exception(f"Not found course in string {string}")
 
 
-def get_align_course_by_group(
-    group: Group, course_name: str, data_model: Data
-) -> Course:
-    group_links: List[LoadLinker] = [
-        link for link in data_model.LINKERS if link.group == group.id
-    ]
+def get_align_course_by_group(group: Group, course_name: str, data_model: Data) -> Course:
+    group_links: List[LoadLinker] = [link for link in data_model.LINKERS if link.group == group.id]
     links_courses_ids = [link.course for link in group_links]
-    courses = [
-        course for course in data_model.COURSES if course.id in links_courses_ids
-    ]
+    courses = [course for course in data_model.COURSES if course.id in links_courses_ids]
     try:
         course = get_course_from_string(courses=courses, string=course_name)
     except Exception as e:
@@ -78,14 +72,14 @@ def get_align_course_by_group(
 
 def get_teacher_from_string(string: str, teachers: List[Teacher]) -> Teacher | None:
     string = clean_dirty_string(string)
-    finded_teachers_by_name = [
+    founded_teachers_by_name = [
         teacher for teacher in teachers if string == clean_dirty_string(teacher.name)
     ]
-    if len(finded_teachers_by_name) > 1:
-        # if string != "" and finded_teachers_by_name[0].name == "":
+    if len(founded_teachers_by_name) > 1:
+        # if string != "" and founded_teachers_by_name[0].name == "":
         #     pass
         # else:
-        return finded_teachers_by_name[0]
+        return founded_teachers_by_name[0]
     else:
         founded_teachers_by_synonyms = []
         for teacher in teachers:
@@ -102,11 +96,11 @@ def get_teacher_from_string(string: str, teachers: List[Teacher]) -> Teacher | N
 
 def get_cabinet_from_string(string: str, cabinets: List[Cabinet]) -> Cabinet | None:
     string = clean_dirty_string(string)
-    finded_cabinets_by_name = [
+    founded_cabinets_by_name = [
         cabinet for cabinet in cabinets if string == clean_dirty_string(cabinet.name)
     ]
-    if len(finded_cabinets_by_name) > 0:
-        return finded_cabinets_by_name[0]
+    if len(founded_cabinets_by_name) > 0:
+        return founded_cabinets_by_name[0]
     else:
         founded_cabinets_by_synonyms = []
         for cabinet in cabinets:

@@ -35,19 +35,19 @@ def getParaNameAndTeacher(
     # в ячейке одно слово
     if len(cell_text.strip().split(" ")) == 1:
         print(f"ЧТО ЗА ХУЙНЯ {cell_text}")
-        finded_teachers = get_teachers_from_string(
+        founded_teachers = get_teachers_from_string(
             teachers=data_model.TEACHERS, shortName=cell_text
         )
-        if finded_teachers is None:
+        if founded_teachers is None:
             return ["", cell_text]
 
     sample = cell_text.replace(".", "").replace(" ", "").lower()
 
-    finded_teachers = get_teachers_from_string(
+    founded_teachers = get_teachers_from_string(
         teachers=data_model.TEACHERS, shortName=sample
     )
 
-    if finded_teachers is None:
+    if founded_teachers is None:
 
         founded_raw = get_teacher_from_synonyms_in_raw_text(
             teachers=data_model.TEACHERS, search_text=cell_text
@@ -70,14 +70,14 @@ def getParaNameAndTeacher(
                 return [accurate_teacher.name, founded_course.name]
 
     else:
-        if len(finded_teachers) == 1:
+        if len(founded_teachers) == 1:
             return [
-                finded_teachers[0].name,
-                _clean_teacher_name(sample, finded_teachers[0].name),
+                founded_teachers[0].name,
+                _clean_teacher_name(sample, founded_teachers[0].name),
             ]
 
-    # if len(finded_teachers) > 1:
-    #     return _handle_multiple_teachers(finded_teachers, sample)
+    # if len(founded_teachers) > 1:
+    #     return _handle_multiple_teachers(founded_teachers, sample)
 
     if "Резерв" in cell_text:
         print("see reserveed")
@@ -90,13 +90,13 @@ def _clean_teacher_name(sample: str, teacher_name: str):
     return sample.replace(teacher_name.replace(" ", "").replace(".", "").lower(), "")
 
 
-def _handle_multiple_teachers(finded_teachers: list[Teacher], sample: str):
+def _handle_multiple_teachers(founded_teachers: list[Teacher], sample: str):
     course_text = sample
-    for teacher in finded_teachers:
+    for teacher in founded_teachers:
         temp = teacher.name.split(" ")
         short_fio = f"{temp[0]}{temp[1][0]}{temp[2][0]}".lower()
         course_text = course_text.replace(short_fio, "")
-    return [finded_teachers[0].name, course_text]
+    return [founded_teachers[0].name, course_text]
 
 
 def _handle_reserved(ParaMonday: str):

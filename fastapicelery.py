@@ -11,8 +11,8 @@ from src.parser.supabase import SupaBaseWorker
 # from src.parser.zamena_parser import get_remote_file_hash
 
 #
-url = "https://www.uksivt.ru/storage/files/all/ZAMENY/2024/Ноябрь/18.11.pdf"
-date = datetime.date(2024, 11, 18)
+url = "https://www.uksivt.ru/storage/files/all/ZAMENY/2024/Декабрь/02.12.pdf"
+date = datetime.date(2024, 12, 2)
 
 
 async def a():
@@ -23,12 +23,12 @@ async def a():
 a()
 asyncio.run(a())
 
-sup = SupaBaseWorker()
+# sup = SupaBaseWorker()
 
 
 # convert_pdf2word(
-#     url="https://www.uksivt.ru/storage/files/all/ZAMENY/2024/Ноябрь/13.11.docx.pdf",
-#     file_name="raspes.docx",
+#     url=url,
+#     file_name="raspes1129.docx",
 # )
 
 # from io import BytesIO
