@@ -1,13 +1,16 @@
+from io import BytesIO
 from typing import Any
 
 import docker
 from celery.result import AsyncResult
+from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy import database
 from src.api_v1.parser.schemas import ParseZamenaRequest, RemoveZamenaRequest
 from src.parser import tasks
+from src.parser.parsers import convert_pdf_2_word
 
 
 async def parse_zamena(request: ParseZamenaRequest) -> dict:
@@ -35,6 +38,11 @@ async def delete_zamena(request: RemoveZamenaRequest) -> dict[str, Any]:
 async def get_founded_links(session: AsyncSession):
     links = list((await session.execute(select(database.AlreadyFoundsLinks))).scalars().all())
     return [link.link for link in links]
+
+
+async def pdf2docx(docx: UploadFile) -> BytesIO:
+    file_bytes = await docx.read()
+    return convert_pdf_2_word(file=file_bytes)
 
 
 def get_containers():

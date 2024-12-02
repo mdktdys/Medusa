@@ -72,8 +72,17 @@ def convert_pdf2word(url: str, file_name: str):
     cv.close()
 
 
+def convert_pdf_2_word(file: bytes) -> BytesIO:
+    stream_converted = BytesIO()
+
+    cv = Converter(stream=file, pdf_file="temp")
+    cv.convert(stream_converted)
+    cv.close()
+    return stream_converted
+
+
 async def parse_zamenas_from_word(
-    file_bytes: BytesIO, date_: date, force: bool, url: str
+        file_bytes: BytesIO, date_: date, force: bool, url: str
 ):
     supabase_client = SupaBaseWorker()
     data_model = init_date_model(sup=supabase_client)

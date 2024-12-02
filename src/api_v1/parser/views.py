@@ -1,7 +1,8 @@
 from typing import List, Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile
 from fastapi_cache.decorator import cache
+from fastapi.responses import StreamingResponse
 
 from src.alchemy.db_helper import *
 from . import crud
@@ -33,6 +34,20 @@ async def check_new() -> dict[str, Any]:
 @router.post("/parse_zamena", response_model=dict)
 async def parse_zamena(request: ParseZamenaRequest) -> dict:
     return await crud.parse_zamena(request)
+
+
+@router.post("/pdf2docx")
+async def pdf2docx(docx: UploadFile):
+    encoded_filename = f"attachment; filename=response.docx"
+    output_stream = await crud.pdf2docx(docx)
+    print(output_stream)
+    output_stream.seek(0)
+
+    return StreamingResponse(
+        output_stream,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": encoded_filename}
+    )
 
 
 @router.get("/containers")

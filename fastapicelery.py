@@ -10,36 +10,36 @@ from src.parser.supabase import SupaBaseWorker
 # from src.parser.supabase import SupaBaseWorker
 # from src.parser.zamena_parser import get_remote_file_hash
 
+# url = "https://ojbsikxdqcbuvamygezd.supabase.co/storage/v1/object/sign/zamenas/3.12.pdf?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ6YW1lbmFzLzMuMTIucGRmIiwiaWF0IjoxNzMzMTQwNTA0LCJleHAiOjE3NjQ2NzY1MDR9.4t-H4UnugKUX8LGhgg9XhYGylQ2Ahc-rClWeUmuO44s&t=2024-12-02T11%3A55%3A04.598Z"
+# date = datetime.date(2024, 12, 3)
 #
-url = "https://www.uksivt.ru/storage/files/all/ZAMENY/2024/Декабрь/02.12.pdf"
-date = datetime.date(2024, 12, 2)
-
-
-async def a():
-    res = await parse_zamenas(url=url, date_=date, force=True)
-    print(res)
-
-
-a()
-asyncio.run(a())
+#
+# async def a():
+#     res = await parse_zamenas(url=url, date_=date, force=True)
+#     print(res)
+#
+#
+# a()
+# asyncio.run(a())
 
 # sup = SupaBaseWorker()
 
 
-# convert_pdf2word(
-#     url=url,
-#     file_name="raspes1129.docx",
-# )
+url = 'https://ojbsikxdqcbuvamygezd.supabase.co/storage/v1/object/sign/zamenas/3.12.pdf?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ6YW1lbmFzLzMuMTIucGRmIiwiaWF0IjoxNzMzMTQwNTA0LCJleHAiOjE3NjQ2NzY1MDR9.4t-H4UnugKUX8LGhgg9XhYGylQ2Ahc-rClWeUmuO44s&t=2024-12-02T11%3A55%3A04.598Z'
+convert_pdf2word(
+    url=url,
+    file_name="raspes1203.docx",
+)
 
 # from io import BytesIO
 #
 #
 # async def b():
-#     with open("raspes.docx", "rb") as fh:
+#     with open("raspes1203.docx", "rb") as fh:
 #         buf = BytesIO(fh.read())
 #         await parse_zamenas_from_word(
-#             url="https://www.uksivt.ru/storage/files/all/ZAMENY/2024/Ноябрь/13.11.docx.pdf",
-#             date_=datetime.date(2024, 11, 13),
+#             url=url,
+#             date_=datetime.date(2024, 12, 3),
 #             file_bytes=buf,
 #             force=False,
 #         )
