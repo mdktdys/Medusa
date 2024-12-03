@@ -10,6 +10,14 @@ BROKER_URL = os.environ.get("BROKER_URL")
 SCHEDULE_URL = "https://www.uksivt.ru/zameny"
 # # SCHEDULE_URL = 'http://127.0.0.1:3000/c:/Users/Danil/Desktop/Uksivt/sample.html'
 BASEURL = "https://www.uksivt.ru/"
+
 SUPABASE_URL = os.environ["SCHEDULER_SUPABASE_URL"]
 SUPABASE_ANON_KEY = os.environ["SCHEDULER_SUPABASE_ANON_KEY"]
 SUPABASE_SECRET_KEY = os.environ.get("SUPABASE_SECRET_KEY")
+
+FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID")
+FIREBASE_PRIVATE_KEY_ID = os.environ.get("FIREBASE_PRIVATE_KEY_ID")
+FIREBASE_PRIVATE_KEY = os.environ.get("FIREBASE_PRIVATE_KEY")
+FIREBASE_CLIENT_ID = os.environ.get("FIREBASE_CLIENT_ID")
+FIREBASE_CLIENT_EMAIL = os.environ.get("FIREBASE_CLIENT_EMAIL")
+FIREBASE_CERT = os.environ.get("FIREBASE_CERT")

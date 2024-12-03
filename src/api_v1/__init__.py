@@ -8,6 +8,7 @@ from .cabinets.views import router as cabinets_router
 from .parser.views import router as parser_router
 from .manage.views import router as manage_router
 from .telegram.views import router as telegram_router
+from .notifications.views import router as notifications_router
 
 router = APIRouter()
 router.include_router(router=groups_router, prefix="/groups")
@@ -19,3 +20,4 @@ router.include_router(router=cabinets_router, prefix="/cabinets")
 router.include_router(router=parser_router, prefix="/parser")
 router.include_router(router=manage_router, prefix="/manage")
 router.include_router(router=telegram_router, prefix="/telegram")
+router.include_router(router=notifications_router, prefix="/notifications")

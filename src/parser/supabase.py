@@ -107,7 +107,7 @@ class SupaBaseWorker:
 
     @property
     def get_data_models_list(
-        self,
+            self,
     ) -> tuple[
         list[Group],
         list[Subscriber],
@@ -121,7 +121,7 @@ class SupaBaseWorker:
         """
         return (
             self._getGroups(),
-            self._getSubs(),
+            self.getSubs(),
             self._getTeachers(),
             self._getCabinets(),
             self._getCourses(),
@@ -247,7 +247,7 @@ class SupaBaseWorker:
         data, _ = client.table("Groups").select("id", "name").execute()
         return [Group(item["id"], item["name"]) for item in data[1]]
 
-    def _getSubs(self):
+    def getSubs(self):
         client = self.client
         data, _ = client.table("MessagingClients").select("*").execute()
         return [
@@ -354,7 +354,7 @@ class SupaBaseWorker:
         ]
 
     def get_course_from_synonyms(
-        self, search_text: str, courses: List[Course]
+            self, search_text: str, courses: List[Course]
     ) -> Course:
         for i in courses:
             for syn in i.synonyms:
@@ -368,7 +368,7 @@ class SupaBaseWorker:
         # return data[1][0]["name"]
 
     def get_teacher_from_synonyms(
-        self, search_text, teachers: List[Teacher]
+            self, search_text, teachers: List[Teacher]
     ) -> Teacher:
         for i in teachers:
             for syn in i.synonyms:
