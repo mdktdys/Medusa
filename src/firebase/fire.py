@@ -34,6 +34,10 @@ def send_single_message(title: str, body: str, token: str):
     print(token)
     print("____")
     message = messaging.Message(
+        notification=messaging.Notification(
+            title=title,
+            body=body,
+        ),
         data={'title': title, 'body': body},
         token=token
     )
