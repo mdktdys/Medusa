@@ -30,12 +30,17 @@ def send_single_message(title: str, body: str, token: str):
     print(FIREBASE_CLIENT_ID)
     print(FIREBASE_CERT)
     print("UPDATE")
-
+    print("____")
+    print(token)
+    print("____")
     message = messaging.Message(
         data={'title': title, 'body': body},
         token=token
     )
-    return messaging.send(message)
+    print(message)
+    response = messaging.send(message)
+    print(response)
+    return response
 
 
 def send_message_to_topic(title: str, body: str, sup: SupaBaseWorker):
