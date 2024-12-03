@@ -28,7 +28,7 @@ def send_single_message(title: str, body: str, token: str):
         data={'title': title, 'body': body},
         token=token
     )
-    messaging.send(message)
+    return messaging.send(message)
 
 
 def send_message_to_topic(title: str, body: str, sup: SupaBaseWorker):
