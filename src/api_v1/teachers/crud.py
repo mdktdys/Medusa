@@ -7,7 +7,7 @@ from src.api_v1.groups.schemas import Paras, DayScheduleFormatted
 from src.api_v1.telegram.crud import get_chat_subscribers
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
-from src.api_v1.teachers.schemas import ZamenasFull, DayScheduleTeacher
+from src.api_v1.teachers.schemas import ZamenasFull, DayScheduleTeacher, TeacherMonthStats, DayScheduleTeacherPydantic
 from src.api_v1.groups.schemas import Zamena as Zamenas
 import asyncio
 
@@ -19,7 +19,7 @@ async def get_teachers(session: AsyncSession) -> List[database.Teachers]:
 
 
 async def get_teacher_by_id(
-    session: AsyncSession, teacher_id: int
+        session: AsyncSession, teacher_id: int
 ) -> List[database.Teachers]:
     query = select(database.Teachers).where(database.Teachers.id == teacher_id)
     result: Result = await session.execute(query)
@@ -27,9 +27,8 @@ async def get_teacher_by_id(
 
 
 async def get_teacher_day_schedule_by_date(
-    session: AsyncSession, teacher_id: int, date: datetime
+        session: AsyncSession, teacher_id: int, date: datetime
 ) -> DayScheduleTeacher:
-
     async def get_search_teacher() -> database.Teachers:
         return list(
             (
@@ -58,7 +57,7 @@ async def get_teacher_day_schedule_by_date(
         return list(result.scalars().all())
 
     async def get_groups_zamenas_full_by_date(
-        zamenas_on_day: List[Zamenas],
+            zamenas_on_day: List[Zamenas],
     ) -> List[ZamenasFull]:
         query = select(database.ZamenasFull).where(
             and_(
@@ -104,7 +103,7 @@ async def get_teacher_day_schedule_by_date(
 
 
 async def get_teacher_day_schedule_by_date_formatted(
-    session: AsyncSession, teacher_id: int, date: datetime, chat_id: int
+        session: AsyncSession, teacher_id: int, date: datetime, chat_id: int
 ) -> DayScheduleFormatted:
     schedule: DayScheduleTeacher = await get_teacher_day_schedule_by_date(
         session=session, teacher_id=teacher_id, date=date
@@ -157,8 +156,8 @@ async def get_teacher_day_schedule_by_date_formatted(
 
 
 async def get_teacher_week_schedule_by_date(
-    session: AsyncSession, teacher_id: int, monday_date: datetime
-) -> List[DaySchedule]:
+        session: AsyncSession, teacher_id: int, monday_date: datetime
+) -> List[DayScheduleTeacherPydantic]:
     end_week = monday_date + timedelta(days=6)
     search_group: database.Groups = list(
         (
@@ -203,7 +202,11 @@ async def get_teacher_week_schedule_by_date(
                 day_lessons_list.append(
                     Para(origin=lesson_origin, zamena=lesson_zamena)
                 )
-        week_lessons.append(
-            DayScheduleTeacher(paras=day_lessons_list, search_name=search_group.name)
-        )
+        week_lessons.append(day_lessons_list)
     return week_lessons
+
+
+async def get_teacher_month_stats(date: datetime.date, teacher_id: int, session: AsyncSession) -> TeacherMonthStats:
+    return TeacherMonthStats(
+        teacher_id=teacher_id
+    )

@@ -45,3 +45,12 @@ class ZamenasFull(BaseModel):
     id: int
     group: int
     date: datetime.datetime
+
+
+class TeacherMonthStats(BaseModel):
+    teacher_id: int
+
+
+class TeacherMonthStatsRequest(BaseModel):
+    teacher_id: int
+    date: datetime.date

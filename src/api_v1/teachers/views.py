@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import List
+from typing import List, Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from fastapi_cache.decorator import cache
 
 from src.alchemy.db_helper import *
@@ -10,7 +10,7 @@ from .schemas import (
     DayScheduleFormatted,
     Teacher,
     DayScheduleTeacher,
-    DayScheduleTeacherPydantic,
+    DayScheduleTeacherPydantic, TeacherMonthStats, TeacherMonthStatsRequest,
 )
 
 router = APIRouter(tags=["Teachers"])
@@ -25,8 +25,8 @@ async def get_groups(session: AsyncSession = Depends(db_helper.session_dependenc
 @router.get("/id/{teacher_id}/", response_model=list[Teacher])
 @cache(expire=6000)
 async def get_teacher_by_id(
-    teacher_id: int = -1,
-    session: AsyncSession = Depends(db_helper.session_dependency),
+        teacher_id: int = -1,
+        session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.get_teacher_by_id(session=session, teacher_id=teacher_id)
 
@@ -37,10 +37,10 @@ async def get_teacher_by_id(
 )
 @cache(expire=6000)
 async def get_teacher_day_schedule_by_date(
-    teacher_id: int = -1,
-    chat_id: int = -1,
-    date: datetime = datetime.now(),
-    session: AsyncSession = Depends(db_helper.session_dependency),
+        teacher_id: int = -1,
+        chat_id: int = -1,
+        date: datetime = datetime.now(),
+        session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.get_teacher_day_schedule_by_date(
         session=session, teacher_id=teacher_id, date=date
@@ -52,10 +52,10 @@ async def get_teacher_day_schedule_by_date(
     response_model=DayScheduleFormatted,
 )
 async def get_teacher_day_schedule_by_date_formatted(
-    teacher_id: int = -1,
-    chat_id: int = -1,
-    date: datetime = datetime.now(),
-    session: AsyncSession = Depends(db_helper.session_dependency),
+        teacher_id: int = -1,
+        chat_id: int = -1,
+        date: datetime = datetime.now(),
+        session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.get_teacher_day_schedule_by_date_formatted(
         session=session, teacher_id=teacher_id, date=date, chat_id=chat_id
@@ -66,12 +66,17 @@ async def get_teacher_day_schedule_by_date_formatted(
     "/week_schedule/{teacher_id}/{monday_date}/",
     response_model=List[DayScheduleTeacherPydantic],
 )
-@cache(expire=6000)
 async def get_teacher_week_schedule_by_date(
-    teacher_id: int = -1,
-    monday_date: datetime = datetime.now(),
-    session: AsyncSession = Depends(db_helper.session_dependency),
+        teacher_id: int = -1,
+        monday_date: datetime = datetime.now(),
+        session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     return await crud.get_teacher_week_schedule_by_date(
         session=session, teacher_id=teacher_id, monday_date=monday_date
     )
+
+
+@router.post("/month_stats/", response_model=TeacherMonthStats)
+async def get_teacher_month_stats(request: TeacherMonthStatsRequest,
+                                  session: AsyncSession = Depends(db_helper.session_dependency)):
+    return await crud.get_teacher_month_stats(date=request.date, teacher_id=request.teacher_id, session=session)

@@ -24,15 +24,6 @@ firebase_admin.initialize_app(cred)
 
 
 def send_single_message(title: str, body: str, token: str):
-    print(FIREBASE_PROJECT_ID)
-    print(FIREBASE_PRIVATE_KEY_ID)
-    print(FIREBASE_CLIENT_EMAIL)
-    print(FIREBASE_CLIENT_ID)
-    print(FIREBASE_CERT)
-    print("UPDATE")
-    print("____")
-    print(token)
-    print("____")
     message = messaging.Message(
         notification=messaging.Notification(
             title=title,
@@ -41,9 +32,7 @@ def send_single_message(title: str, body: str, token: str):
         data={'title': title, 'body': body},
         token=token
     )
-    print(message)
     response = messaging.send(message)
-    print(response)
     return response
 
 

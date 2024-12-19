@@ -40,18 +40,17 @@ from src.parser.shared import (
 )
 from src.parser.supabase import SupaBaseWorker
 
-
 not_found_items: List[str] = []
 parse_result = None
 
 
 def parseZamenas(
-    stream: BytesIO,
-    date_: date,
-    data_model: Data,
-    link: str,
-    supabase_client: SupaBaseWorker,
-    force: bool,
+        stream: BytesIO,
+        date_: date,
+        data_model: Data,
+        link: str,
+        supabase_client: SupaBaseWorker,
+        force: bool,
 ) -> ZamenaParseResult:
     all_rows, header = _get_all_tables(stream)
     practice_groups = _extract_practice_groups(header, data_model)
@@ -121,7 +120,7 @@ def _filter_and_clean_rows(workRows: list[str]):
 
 
 def handle_special_cases(
-    workRows: list[str], data_model: Data
+        workRows: list[str], data_model: Data
 ) -> Tuple[list, list, List[Liquidation]]:
     """Handle specific cases such as liquidation and removing duplicate data."""
     iteration = 0
@@ -238,15 +237,15 @@ def process_multiple_entries(workRows: list[str]):
 
 
 def map_entities_to_ids(
-    workRows: list, data_model: Data, supabase_client: SupaBaseWorker
+        workRows: list, data_model: Data, supabase_client: SupaBaseWorker
 ):
     """
     Применяет функцию к Ids и записывает их в строки workRows
     """
     for row in workRows:
         group = get_group_from_string(groups=data_model.GROUPS, string=row[0])
-        if clean_dirty_string(row[0]) == clean_dirty_string("22пса-122пса-222пса-3"):
-            group = [group for group in data_model.GROUPS if group.name == "22ПСА-1"][0]
+        if clean_dirty_string(row[0]) == clean_dirty_string("24Ю-4- Ликвидация задолженностей"):
+            group = [group for group in data_model.GROUPS if group.name == "24Ю-4"][0]
         if group:
             row[0] = group.id
         else:
@@ -396,14 +395,14 @@ def download_file(link: str, filename: str):
 
 
 def prepare_and_send_supabase_entries(
-    workRows,
-    practice_groups: list,
-    liquidation: List[Liquidation],
-    fullzamenagroups: list,
-    date_: date,
-    link,
-    data_model: Data,
-    supabase_client: SupaBaseWorker,
+        workRows,
+        practice_groups: list,
+        liquidation: List[Liquidation],
+        fullzamenagroups: list,
+        date_: date,
+        link,
+        data_model: Data,
+        supabase_client: SupaBaseWorker,
 ):
     """
     Подготовить данные и отправить в БД
@@ -529,11 +528,11 @@ def add_and_get_entity(entity_type, add_func, entities, target_name, data_model,
 
 
 def get_group_by_id(
-    groups, target_name, data_model: Data, supabase_client: SupaBaseWorker
+        groups, target_name, data_model: Data, supabase_client: SupaBaseWorker
 ) -> Group:
     if (
-        target_name.replace("_", "-").replace("—", "-").lower()
-        == "22пса-1,22пса-2,22пса-3"
+            target_name.replace("_", "-").replace("—", "-").lower()
+            == "22пса-1,22пса-2,22пса-3"
     ):
         target_name = "22пса-1"
     return add_and_get_entity(
@@ -547,10 +546,10 @@ def get_group_by_id(
 
 
 def get_cabinet_by_id(
-    cabinets: list[Cabinet],
-    target_name: str,
-    data_model: Data,
-    supabase_client: SupaBaseWorker,
+        cabinets: list[Cabinet],
+        target_name: str,
+        data_model: Data,
+        supabase_client: SupaBaseWorker,
 ) -> Cabinet:
     return add_and_get_entity(
         entity_type="CABINETS",
@@ -563,11 +562,11 @@ def get_cabinet_by_id(
 
 
 def get_course_by_id(
-    courses,
-    target_name,
-    data_model: Data,
-    supabase_client: SupaBaseWorker,
-    args: List[str],
+        courses,
+        target_name,
+        data_model: Data,
+        supabase_client: SupaBaseWorker,
+        args: List[str],
 ) -> Course:
     return add_and_get_entity(
         entity_type="COURSES",
@@ -580,7 +579,7 @@ def get_course_by_id(
 
 
 def get_teacher_by_id(
-    teachers, target_name, data_model: Data, supabase_client: SupaBaseWorker
+        teachers, target_name, data_model: Data, supabase_client: SupaBaseWorker
 ) -> Teacher:
     teacher = find_entity_by_name(teachers, target_name)
     if teacher:
@@ -614,8 +613,8 @@ def get_teacher_from_short_name(teachers: list[Teacher], shortName: str):
         compare_result = f"{fio[0]}{fio[1][0]}{fio[2][0]}".lower().strip()
 
         if (
-            compare_result == shortcomparer
-            or count_different_characters(compare_result, shortcomparer) == 1
+                compare_result == shortcomparer
+                or count_different_characters(compare_result, shortcomparer) == 1
         ):
             print(f"taker {compare_result} and {shortcomparer}")
             print(f"set {teacher}")
