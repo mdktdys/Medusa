@@ -2,7 +2,7 @@ import datetime
 from io import BytesIO
 import os
 import traceback
-from typing import Any
+from typing import Any, List
 from urllib.request import urlopen
 
 from bs4 import BeautifulSoup
@@ -46,8 +46,10 @@ async def parse_zamena(url: str, date: datetime.datetime) -> dict:
     return (await parse_zamenas(url=url, date_=date, force=False)).model_dump()
 
 
-async def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date):
-    return (await parse_schedule_from_file(file, monday_date)).model_dump()
+async def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
+    paras: List = parse_schedule_from_file(file, monday_date)
+    json_paras = [paras.model_dump() for paras in paras]
+    return {"paras": json_paras}
 
 
 def get_latest_zamena_link():
@@ -252,11 +254,11 @@ async def check_new() -> dict[str, Any]:
                             error=Html.escape(str(e)),
                         ).model_dump()
             if any(
-                [
-                    True
-                    for check in result.checks
-                    if isinstance(check, CheckZamenaResultSuccess)
-                ]
+                    [
+                        True
+                        for check in result.checks
+                        if isinstance(check, CheckZamenaResultSuccess)
+                    ]
             ):
                 sup.client.table("checks").insert({"result": "new"}).execute()
             else:

@@ -36,6 +36,6 @@ def delete_zamena(date: datetime.date) -> dict[str, Any]:
 
 
 @parser_celery_app.task
-def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date):
+def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
     return asyncio.run(methods.parse_group_schedule_v3(file, monday_date))
     
