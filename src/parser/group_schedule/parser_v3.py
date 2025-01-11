@@ -84,10 +84,9 @@ def parse_page(sheet: pd.DataFrame, data_model: Data, monday_date: datetime.date
     return paras
 
 
-def parse_schedule(bytes_: BytesIO) -> List[Paras]:
+def parse_schedule(bytes_: BytesIO, monday_date: datetime.date) -> List[Paras]:
     supabase_client = SupaBaseWorker()
     data_model = init_date_model(supabase_client)
-    monday_date = datetime.date(2025, 1, 13)
     ex_data = pd.ExcelFile(bytes_)
     paras: List[Paras] = []
 
@@ -98,8 +97,8 @@ def parse_schedule(bytes_: BytesIO) -> List[Paras]:
     return paras
 
 
-def parse_schedule_from_file(file_path: BytesIO) -> List[Paras]:
-    return parse_schedule(file_path)
+def parse_schedule_from_file(file_path: BytesIO, monday_date: datetime.date) -> List[Paras]:
+    return parse_schedule(file_path, monday_date)
 
 
 # paras: List[Paras] = parse_schedule_from_file("sample.xlsx")

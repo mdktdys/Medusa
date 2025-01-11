@@ -13,6 +13,7 @@ from src.parser.core import (
     getAllMonthTables,
     get_all_tables_zamenas,
 )
+from src.parser.group_schedule.parser_v3 import parse_schedule_from_file
 from src.parser.parsers import (
     parse_zamenas,
     get_remote_file_bytes,
@@ -46,7 +47,7 @@ async def parse_zamena(url: str, date: datetime.datetime) -> dict:
 
 
 async def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date):
-    return (await parse_group_schedule_v3(file, monday_date)).model_dump()
+    return (await parse_schedule_from_file(file, monday_date)).model_dump()
 
 
 def get_latest_zamena_link():
