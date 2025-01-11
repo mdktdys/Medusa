@@ -62,4 +62,4 @@ def delete_zamena(request: RemoveZamenaRequest):
 
 @router.post("/parse_group_schedule_v3")
 async def parse_group_schedule_v3(file: UploadFile, monday_date: datetime.date):
-    return await crud.parse_group_schedule_v3(file=file, monday_date=monday_date)
+    return crud.parse_group_schedule_v3(file=file, monday_date=monday_date)
