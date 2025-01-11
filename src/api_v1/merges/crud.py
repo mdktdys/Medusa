@@ -19,7 +19,6 @@ async def merge_teachers(
     async with session.begin():
         logs = dict()
 
-        # merge paras
         query = (
             update(database.Paras)
             .returning(database.Paras.teacher)
@@ -29,7 +28,6 @@ async def merge_teachers(
         result = await session.execute(query)
         logs["paras"] = len(result.fetchall())
 
-        # merge zamenas
         query = (
             update(database.Zamenas)
             .returning(database.Zamenas.teacher)
@@ -39,17 +37,13 @@ async def merge_teachers(
         result = await session.execute(query)
         logs["zamenas"] = len(result.fetchall())
 
-        teacher_from: Teachers = (
-            await get_teacher_by_id(session=session, teacher_id=merge_from_id)
-        )[0]
-        teacher_to: Teachers = (
-            await get_teacher_by_id(session=session, teacher_id=merge_to_id)
-        )[0]
+        teacher_from: Teachers = (await get_teacher_by_id(session=session, teacher_id=merge_from_id))[0]
+        teacher_to: Teachers = (await get_teacher_by_id(session=session, teacher_id=merge_to_id))[0]
 
         teacher_from_synonyms = teacher_from.synonyms
         teacher_to_synonyms = teacher_to.synonyms
         merged_synonyms = teacher_from_synonyms + teacher_to_synonyms
-        # merge paras
+        
         query = (
             update(database.Teachers)
             .returning(database.Teachers.id)

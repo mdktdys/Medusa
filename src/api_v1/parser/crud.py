@@ -1,3 +1,4 @@
+import datetime
 from io import BytesIO
 from typing import Any
 
@@ -45,17 +46,21 @@ async def pdf2docx(docx: UploadFile) -> BytesIO:
     return convert_pdf_2_word(file=file_bytes)
 
 
+async def parse_group_schedule_v3(file: UploadFile, monday_date: datetime.date):
+    file_bytes = await file.read()
+    task: AsyncResult = tasks.parse_group_schedule_v3.delay(file_bytes, monday_date)
+    return task.get()
+
+
 def get_containers():
     client = docker.from_env()
-    containers = client.containers.list(all=True)  # Получаем список всех контейнеров
+    containers = client.containers.list(all=True)
     container_info = []
 
     for container in containers:
-        # Получаем атрибуты контейнера (включает информацию о состоянии)
         container_attrs = container.attrs
         state = container_attrs["State"]
 
-        # Время завершения контейнера (если остановлен)
         finished_at = (
             state["FinishedAt"]
             if state["FinishedAt"] != "0001-01-01T00:00:00Z"
@@ -67,8 +72,8 @@ def get_containers():
                 "name": container.name,
                 "status": container.status,
                 "image": container.image.tags,
-                "started_at": state["StartedAt"],  # Время запуска контейнера
-                "finished_at": finished_at,  # Время завершения работы (если остановлен)
+                "started_at": state["StartedAt"],
+                "finished_at": finished_at,
             }
         )
 

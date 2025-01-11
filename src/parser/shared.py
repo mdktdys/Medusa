@@ -35,14 +35,10 @@ def get_group_from_string(string: str, groups: List[Group]) -> Group | None:
 
 def get_course_from_string(string: str, courses: List[Course]) -> Course:
     string = clean_dirty_string(string)
-    founded_courses_by_name = [
-        course for course in courses if string == clean_dirty_string(course.name)
-    ]
+    founded_courses_by_name = [course for course in courses if string == clean_dirty_string(course.name)]
     if len(founded_courses_by_name) > 0:
         return founded_courses_by_name[0]
-    founded_courses_by_fullname = [
-        course for course in courses if string == clean_dirty_string(course.fullname)
-    ]
+    founded_courses_by_fullname = [course for course in courses if string == clean_dirty_string(course.fullname)]
     if len(founded_courses_by_fullname) > 0:
         return founded_courses_by_fullname[0]
     else:

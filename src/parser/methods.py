@@ -1,4 +1,5 @@
 import datetime
+from io import BytesIO
 import os
 import traceback
 from typing import Any
@@ -42,6 +43,10 @@ import html as Html
 
 async def parse_zamena(url: str, date: datetime.datetime) -> dict:
     return (await parse_zamenas(url=url, date_=date, force=False)).model_dump()
+
+
+async def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date):
+    return (await parse_group_schedule_v3(file, monday_date)).model_dump()
 
 
 def get_latest_zamena_link():

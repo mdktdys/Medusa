@@ -145,54 +145,15 @@ async def get_group_day_schedule_by_date_formatted(
     )
 
 
-async def get_group_week_schedule_by_date(
-    session: AsyncSession, group_id: int, monday_date: datetime
-) -> List[DaySchedule]:
-    end_week = monday_date + timedelta(days=6)
-    search_group: database.Groups = list(
-        (
-            await session.execute(
-                select(database.Groups).where(database.Groups.id == group_id)
-            )
-        )
-        .scalars()
-        .all()
-    )[0]
-    query = select(database.Zamenas).where(
-        and_(
-            database.Zamenas.group == group_id,
-            database.Zamenas.date.between(monday_date, end_week),
-        )
-    )
-    result: Result = await session.execute(query)
-    paras_on_week: List[Paras] = list(result.scalars().all())
-    query = select(database.Zamenas).where(
-        and_(
-            database.Zamenas.group == group_id,
-            database.Zamenas.date.between(monday_date, end_week),
-        )
-    )
-    result: Result = await session.execute(query)
-    zamenas_on_week: List[Zamena] = list(result.scalars().all())
+async def get_group_week_schedule_by_date(session: AsyncSession, group_id: int, monday_date: datetime) -> List[DaySchedule]:
+    week_schedule: List[DaySchedule] = []
 
-    week_lessons: List[DaySchedule] = []
     for day in range(0, 6):
         current_date = monday_date + timedelta(days=day)
-        day_paras = [
-            paras for paras in paras_on_week if paras.date.day == current_date.day
-        ]
-        day_zamenas = [
-            zamena for zamena in zamenas_on_week if zamena.date.day == current_date.day
-        ]
-        day_lessons_list = []
-        for i in range(1, 6):
-            lesson_origin = next((x for x in day_paras if x.number == i), None)
-            lesson_zamena = next((x for x in day_zamenas if x.number == i), None)
-            if lesson_zamena is not None or lesson_origin is not None:
-                day_lessons_list.append(
-                    Para(origin=lesson_origin, zamena=lesson_zamena)
-                )
-        week_lessons.append(
-            DaySchedule(paras=day_lessons_list, search_name=search_group.name)
+        day_schedule = await get_group_day_schedule_by_date(
+            group_id=group_id, date=current_date, session=session
         )
-    return week_lessons
+        week_schedule.append(day_schedule)
+
+    return week_schedule
+

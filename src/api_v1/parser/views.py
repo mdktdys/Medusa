@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Any
 
 from fastapi import APIRouter, Depends, UploadFile
@@ -40,7 +41,6 @@ async def parse_zamena(request: ParseZamenaRequest) -> dict:
 async def pdf2docx(docx: UploadFile):
     encoded_filename = f"attachment; filename=response.docx"
     output_stream = await crud.pdf2docx(docx)
-    print(output_stream)
     output_stream.seek(0)
 
     return StreamingResponse(
@@ -58,3 +58,8 @@ def get_containers():
 @router.delete("/zamena")
 def delete_zamena(request: RemoveZamenaRequest):
     return crud.delete_zamena(request)
+
+
+@router.post("/parse_group_schedule_v3")
+async def parse_group_schedule_v3(file: UploadFile, monday_date: datetime.date):
+    return await crud.parse_group_schedule_v3(file=file, monday_date=monday_date)

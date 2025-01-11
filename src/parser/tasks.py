@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+from io import BytesIO
 from typing import Any
 
 from celery import Celery
@@ -32,3 +33,9 @@ def check_new() -> dict[str, Any]:
 @parser_celery_app.task
 def delete_zamena(date: datetime.date) -> dict[str, Any]:
     return asyncio.run(methods.delete_zamena(date=date))
+
+
+@parser_celery_app.task
+def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date):
+    return asyncio.run(methods.parse_group_schedule_v3(file, monday_date))
+    
