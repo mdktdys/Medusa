@@ -1,4 +1,5 @@
 import datetime
+import requests
 
 from fastapi import APIRouter, Response, status, Depends
 from fastapi_cache.decorator import cache
@@ -50,3 +51,9 @@ async def get_day_schedule_by_date(
         date=date,
         chat_id=chat_id,
     )
+
+
+@router.post("/send_group_schedule_by_chat_id")
+async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: datetime.date, session: AsyncSession = Depends(db_helper.session_dependency)):
+    return await crud.send_group_schedule_by_chat_id(chat_id=chat_id, group_id=group_id, date=date, session=session)
+

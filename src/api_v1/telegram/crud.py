@@ -1,12 +1,14 @@
 import datetime
 from typing import List
-
+import httpx
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from fastapi import Response, status
+from fastapi import HTTPException, Response, status
 
+from my_secrets import TELEGRAM_API_URL
 from src.alchemy import database
+from src.api_v1.groups.crud import get_group_day_schedule_by_date_formatted
 from src.parser.supabase import SupaBaseWorker
 
 sup = SupaBaseWorker()
@@ -79,3 +81,22 @@ async def get_day_schedule_by_date(
     date: datetime.date,
 ):
     pass
+
+
+async def telegram_send_message(chat_id: int, message: str):
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(TELEGRAM_API_URL + "/sendMessage", json={"chat_id": chat_id, "text": message})
+            response.raise_for_status()
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка отправки сообщения: {str(e)}")
+
+
+async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: datetime.date, session: AsyncSession):
+    schedule_message_formatted = await get_group_day_schedule_by_date_formatted(
+        group_id=group_id,
+        chat_id=chat_id,
+        date=date,
+        session=session,
+    )
+    await telegram_send_message(chat_id, schedule_message_formatted)
