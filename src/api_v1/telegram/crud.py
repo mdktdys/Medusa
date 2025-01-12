@@ -117,7 +117,6 @@ async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: date
     for para in schedule_message_formatted.paras:
         message += f"{para}\n"
 
-    locale.setlocale(locale.LC_TIME, "ru_RU")
     message += f"\n📅 {date.strftime('%A').capitalize()}, {date.day} {date.strftime('%B')}"
 
     await telegram_send_message(chat_id, message)
