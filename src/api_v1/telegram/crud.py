@@ -1,4 +1,5 @@
 import datetime
+import locale
 from typing import List
 import httpx
 from sqlalchemy import select, Result
@@ -86,7 +87,15 @@ async def get_day_schedule_by_date(
 async def telegram_send_message(chat_id: int, message: str):
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.post(TELEGRAM_API_URL + "/sendMessage", json={"chat_id": chat_id, "text": message})
+            response = await client.post(
+                TELEGRAM_API_URL + "/sendMessage", 
+                json={
+                    "chat_id": chat_id, 
+                    "text": message,
+                    "parse_mode": "HTML"
+                },
+                headers={"Content-Type": "application/json; charset=utf-8"}
+            )
             response.raise_for_status()
     except httpx.HTTPError as e:
         raise HTTPException(status_code=500, detail=f"Ошибка отправки сообщения: {str(e)}")
@@ -100,4 +109,15 @@ async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: date
         date=date,
         session=session,
     )
-    await telegram_send_message(chat_id, schedule_message_formatted.paras)
+    message = f"🎓 Обнаружено изменение в расписании группы {schedule_message_formatted.search_name}\n"
+
+    if schedule_message_formatted.full_zamena:
+        message += "🔴 Полное изменение расписания\n"
+
+    for para in schedule_message_formatted.paras:
+        message += f"{para}\n"
+
+    locale.setlocale(locale.LC_TIME, "ru_RU")
+    message += f"\n📅 {date.strftime('%A').capitalize()}, {date.day} {date.strftime('%B')}"
+
+    await telegram_send_message(chat_id, message)
