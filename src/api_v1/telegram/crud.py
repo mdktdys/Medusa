@@ -112,7 +112,7 @@ async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: date
     message = f"🎓 Обнаружено изменение в расписании группы {schedule_message_formatted.search_name}\n"
 
     if len(schedule_message_formatted.paras) == 0:
-        message += "🎉 Нет пар\n"
+        message += "\n🎉 Нет пар\n"
 
     if schedule_message_formatted.full_zamena:
         message += "🔴 Полное изменение расписания\n"
