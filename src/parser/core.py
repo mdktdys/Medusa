@@ -574,7 +574,7 @@ def getMonthTable(soup: BeautifulSoup, monthIndex: int):
 def getAllMonthTables(soup: BeautifulSoup) -> List[ZamTable]:
     zam_tables: List[ZamTable] = []
     new_tables = soup.find_all(name="table")
-    for i in new_tables:
+    for i in new_tables[0:2]:
         class_type = "".join(i["class"]).strip()
         if class_type == "calendar-month":
             if len(i.find_all("td", {"class": "calendar-month-title"})) == 0:
@@ -608,7 +608,7 @@ def getAllMonthTables(soup: BeautifulSoup) -> List[ZamTable]:
             pass
         if class_type == "MsoNormalTable":
             header = i.find_next(name="strong").get_text().replace("\xa0", "")
-            year = 2025
+            year = int(datetime.datetime.now().year)
             index = convertMonthNameToIndex(header)
             zam_tables.append(ZamTable(raw=i, month_index=index + 1, year=year))
             pass

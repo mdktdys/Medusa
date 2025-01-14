@@ -266,6 +266,7 @@ async def check_new() -> dict[str, Any]:
             return result.model_dump()
     except Exception as e:
         print(e)
+        print(traceback.format_exc())
         return CheckResultError(
             result="Error",
             trace=Html.escape(str(traceback.format_exc())[0:100]),
