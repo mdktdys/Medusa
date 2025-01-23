@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Request, status
 
-from my_secrets import SECRET, API_KEY, IS_DEV
+from my_secrets import SECRET, API_KEY, IS_DEV, PUBLIC_API_KEY
 from src.auth.schemas import UserRead, UserCreate
 import uuid
 from typing import Optional, List
@@ -16,20 +16,20 @@ from src.alchemy.db_helper import local_db_helper
 from src.auth.schemas import User
 
 router = APIRouter()
-api_keys = [API_KEY]
+api_keys = [API_KEY, PUBLIC_API_KEY]
 
 
 # Функция для проверки API ключа
 async def api_key_auth(request: Request) -> bool:
     api_key = request.headers.get("X-API-KEY")
-    if api_key == API_KEY:
+    if api_keys.__contains__(api_key):
         return True
     return False
 
 
 # Получение базы данных пользователей
 async def get_user_db(
-    session: AsyncSession = Depends(local_db_helper.session_dependency),
+        session: AsyncSession = Depends(local_db_helper.session_dependency),
 ):
     yield SQLAlchemyUserDatabase(session, User)
 
@@ -43,12 +43,12 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         print(f"User {user.id} has registered.")
 
     async def on_after_forgot_password(
-        self, user: User, token: str, request: Optional[Request] = None
+            self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"User {user.id} has forgot their password. Reset token: {token}")
 
     async def on_after_request_verify(
-        self, user: User, token: str, request: Optional[Request] = None
+            self, user: User, token: str, request: Optional[Request] = None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
 
@@ -76,8 +76,8 @@ fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
 
 def any_auth_method(roles: List[str]):
     async def dependency(
-        api_key: Optional[str] = Depends(api_key_auth),
-        user_id: User = Depends(current_active_user),
+            api_key: Optional[str] = Depends(api_key_auth),
+            user_id: User = Depends(current_active_user),
     ):
         if api_key:
             return True
@@ -98,7 +98,6 @@ def any_auth_method(roles: List[str]):
 
 
 current_active_user = fastapi_users.current_user(active=True, optional=True)
-
 
 router.include_router(
     fastapi_users.get_auth_router(auth_backend),

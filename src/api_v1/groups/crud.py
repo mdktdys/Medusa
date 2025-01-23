@@ -21,7 +21,7 @@ async def get_groups(session: AsyncSession) -> List[database.Groups]:
 
 
 async def get_group_by_id(
-    session: AsyncSession, group_id: int
+        session: AsyncSession, group_id: int
 ) -> List[database.Groups]:
     query = select(database.Groups).where(database.Groups.id == group_id)
     result: Result = await session.execute(query)
@@ -29,9 +29,8 @@ async def get_group_by_id(
 
 
 async def get_group_day_schedule_by_date(
-    session: AsyncSession, group_id: int, date: datetime
+        session: AsyncSession, group_id: int, date: datetime
 ) -> DaySchedule:
-
     # Get Group
     search_group: database.Groups = list(
         (
@@ -83,17 +82,15 @@ async def get_group_day_schedule_by_date(
             if lesson_origin is not None:
                 lessons_list.append(Para(origin=lesson_origin, zamena=None))
 
-    res = DaySchedule(
-        paras=lessons_list, search_name=search_group.name, full_zamena=is_full_zamena
-    )
+    res = DaySchedule(paras=lessons_list, search_name=search_group.name, full_zamena=is_full_zamena)
     return res
 
 
 async def get_group_day_schedule_by_date_formatted(
-    session: AsyncSession,
-    group_id: int,
-    date: datetime,
-    chat_id: int,
+        session: AsyncSession,
+        group_id: int,
+        date: datetime,
+        chat_id: int,
 ) -> DayScheduleFormatted:
     schedule: DaySchedule = await get_group_day_schedule_by_date(
         session=session, group_id=group_id, date=date
@@ -145,7 +142,8 @@ async def get_group_day_schedule_by_date_formatted(
     )
 
 
-async def get_group_week_schedule_by_date(session: AsyncSession, group_id: int, monday_date: datetime) -> List[DaySchedule]:
+async def get_group_week_schedule_by_date(session: AsyncSession, group_id: int, monday_date: datetime) -> List[
+    DaySchedule]:
     week_schedule: List[DaySchedule] = []
 
     for day in range(0, 6):
@@ -156,4 +154,3 @@ async def get_group_week_schedule_by_date(session: AsyncSession, group_id: int, 
         week_schedule.append(day_schedule)
 
     return week_schedule
-
