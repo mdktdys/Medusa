@@ -603,7 +603,7 @@ def getAllMonthTables(soup: BeautifulSoup) -> List[ZamTable]:
                     .split(" ")
                 )
                 index = convertMonthNameToIndex(header[0])
-                year = int(header[1])
+                year = 2025
                 zam_tables.append(ZamTable(raw=i, month_index=index + 1, year=year))
             pass
         if class_type == "MsoNormalTable":
