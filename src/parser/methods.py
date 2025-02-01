@@ -116,9 +116,7 @@ async def check_new() -> dict[str, Any]:
                     filename = zamena_cell.link.split("/")[-1].replace(
                         f".{extension}", ""
                     )
-                    file_downloaded = download_file(
-                        link=zamena_cell.link, filename=f"{filename}.{extension}"
-                    )
+                    file_downloaded = download_file(link=zamena_cell.link, filename=f"{filename}.{extension}")
                     if not file_downloaded:
                         print("Fail to download")
                         print(extension)

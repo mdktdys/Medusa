@@ -522,7 +522,7 @@ def getLastZamenaLink(soup: BeautifulSoup):
 def getLastZamenaDate(soup: BeautifulSoup):
     days = getMonthAvalibleDays(soup=soup, monthIndex=0)
     month, year = str(getMonthsList(soup=soup)[0]).split(" ")
-    date = datetime.date(2024, convertMonthNameToIndex(month) + 1, days[-1])
+    date = datetime.date(2025, convertMonthNameToIndex(month) + 1, days[-1])
     return date
 
 
@@ -608,7 +608,7 @@ def getAllMonthTables(soup: BeautifulSoup) -> List[ZamTable]:
             pass
         if class_type == "MsoNormalTable":
             header = i.find_next(name="strong").get_text().replace("\xa0", "")
-            year = 2024
+            year = 2025
             index = convertMonthNameToIndex(header)
             zam_tables.append(ZamTable(raw=i, month_index=index + 1, year=year))
             pass
