@@ -5,24 +5,33 @@ import datetime
 from src.parser.parsers import parse_zamenas, convert_pdf2word, parse_zamenas_from_word
 from src.parser.supabase import SupaBaseWorker
 
-from src.parser.methods import get_latest_zamena_link
+from src.parser.methods import get_latest_zamena_link, check_new
 from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import get_remote_file_hash
 
-url = "https://www.uksivt.ru//storage/files/all/ZAMENY/2024/%D0%94%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C/20.12.docx.pdf"
-date = datetime.date(2024, 12, 20)
 
-
+# url = "https://www.uksivt.ru//storage/files/all/ZAMENY/2024/%D0%94%D0%B5%D0%BA%D0%B0%D0%B1%D1%80%D1%8C/20.12.docx.pdf"
+# date = datetime.date(2024, 12, 20)
 #
 #
-async def a():
-    res = await parse_zamenas(url=url, date_=date, force=True)
-    print(res)
+# #
+# #
+# async def a():
+#     res = await parse_zamenas(url=url, date_=date, force=True)
+#     print(res)
+#
+#
+# a()
+# asyncio.run(a())
+def b():
+    asyncio.run(check_new())
 
 
-a()
-asyncio.run(a())
+def c():
+    b()
 
+
+c()
 # sup = SupaBaseWorker()
 
 #

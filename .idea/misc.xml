@@ -3,7 +3,7 @@
   <component name="Black">
     <option name="executionMode" value="BINARY" />
     <option name="pathToExecutable" value="C:\Users\Danil\AppData\Local\Programs\Python\Python311\Scripts\black.exe" />
-    <option name="sdkUUID" value="55648948-49d0-438d-8165-ea5954a42296" />
+    <option name="sdkName" value="Python 3.11 (ScheduleApi)" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (ScheduleApi)" project-jdk-type="Python SDK" />
 </project>

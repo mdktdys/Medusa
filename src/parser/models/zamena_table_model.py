@@ -29,6 +29,7 @@ class ZamTable:
                     link = urllib.parse.urljoin(
                         "https://www.uksivt.ru/zameny/", tag.get("href")
                     )
+                    print(self.year, self.month_index, text)
                     zamenas.append(
                         Zamena(
                             link=link,

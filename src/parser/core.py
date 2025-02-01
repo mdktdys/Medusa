@@ -24,7 +24,7 @@ from src.parser.models.zamena_table_model import ZamTable
 
 
 def getParaNameAndTeacher(
-    para: str, data_model: Data, supabase_worker: supabase_worker.SupaBaseWorker
+        para: str, data_model: Data, supabase_worker: supabase_worker.SupaBaseWorker
 ) -> None | list[str]:
     if not para:
         return None
@@ -236,13 +236,13 @@ def clearDiscipline(table):
     for row in table:
         if len(row) >= 12:
             if (
-                row[0] == ""
-                and row[1] == ""
-                and row[2] == ""
-                and row[3] == ""
-                and row[4] == ""
-                and row[5] == ""
-                and row[6] == ""
+                    row[0] == ""
+                    and row[1] == ""
+                    and row[2] == ""
+                    and row[3] == ""
+                    and row[4] == ""
+                    and row[5] == ""
+                    and row[6] == ""
             ):
                 table.remove(row)
                 continue
@@ -258,7 +258,7 @@ def clearDiscipline(table):
 def get_cabinet_by_id(cabinets: List[Cabinet], target_name: str, sup, data) -> Cabinet:
     for cabinet in cabinets:
         if cabinet.name.lower().replace(" ", "").replace(".", "").replace(
-            "-", ""
+                "-", ""
         ).replace("\n", "") == target_name.lower().replace(" ", "").replace(
             ".", ""
         ).replace(
@@ -310,13 +310,13 @@ def get_teachers_from_string(teachers: List[Teacher], shortName: str) -> List[Te
     for teacher in teachers:
         fio: List[str] = teacher.name.split(" ")
         if (
-            len(fio) > 2
-            and fio[0].strip() != ""
-            and fio[1].strip() != ""
-            and fio[2].strip() != ""
+                len(fio) > 2
+                and fio[0].strip() != ""
+                and fio[1].strip() != ""
+                and fio[2].strip() != ""
         ):
             if short_comparer.__contains__(
-                teacher.name.replace(" ", "").lower().strip()
+                    teacher.name.replace(" ", "").lower().strip()
             ):
                 return [teacher]
             compare_result = f"{fio[0]}{fio[1][0]}{fio[2][0]}".lower().strip()
@@ -346,10 +346,10 @@ def get_teacher_from_short_name(teachers: List[Teacher], shortName: str):
     for i in teachers:
         fio: List[str] = i.name.split(" ")
         if (
-            len(fio) > 2
-            and fio[0].strip() != ""
-            and fio[1].strip() != ""
-            and fio[2].strip() != ""
+                len(fio) > 2
+                and fio[0].strip() != ""
+                and fio[1].strip() != ""
+                and fio[2].strip() != ""
         ):
             compare_result = f"{fio[0]}{fio[1][0]}{fio[2][0]}".lower().strip()
             shortcomparer = (
@@ -402,7 +402,7 @@ def get_group_by_id(groups, target_name, supabase_worker, data) -> Group:
 
 
 def get_course_by_id(
-    courses, target_name, sup: supabase_worker.SupaBaseWorker, data
+        courses, target_name, sup: supabase_worker.SupaBaseWorker, data
 ) -> Course:
     for course in courses:
         if course.name == target_name.lower():
@@ -449,20 +449,20 @@ def remove_duplicates(input_list):
 
 def check_family(i):
     if (
-        (len(i[1].split(" ")) > 2)
-        or (len(i[3].split(" ")) > 2)
-        or (len(i[5].split(" ")) > 2)
-        or (len(i[7].split(" ")) > 2)
-        or (len(i[9].split(" ")) > 2)
-        or (len(i[11].split(" ")) > 2)
+            (len(i[1].split(" ")) > 2)
+            or (len(i[3].split(" ")) > 2)
+            or (len(i[5].split(" ")) > 2)
+            or (len(i[7].split(" ")) > 2)
+            or (len(i[9].split(" ")) > 2)
+            or (len(i[11].split(" ")) > 2)
     ):
         if (
-            i[2] == ""
-            and i[4] == ""
-            and i[6] == ""
-            and i[8] == ""
-            and i[10] == ""
-            and i[12] == ""
+                i[2] == ""
+                and i[4] == ""
+                and i[6] == ""
+                and i[8] == ""
+                and i[10] == ""
+                and i[12] == ""
         ):
             return True
     return False
@@ -559,13 +559,13 @@ def getMonthTable(soup: BeautifulSoup, monthIndex: int):
     # oldtables = soup.find_all('table', {'class': 'calendar-month'})
     # newtables.extend(oldtables)
     month = (
-        convertMonthNameToIndex(
-            newtables[monthIndex]
-            .find_all("td", {"class": "calendar-month-title"})[0]
-            .get_text()
-            .split(" ")[0]
-        )
-        + 1
+            convertMonthNameToIndex(
+                newtables[monthIndex]
+                .find_all("td", {"class": "calendar-month-title"})[0]
+                .get_text()
+                .split(" ")[0]
+            )
+            + 1
     )
     tables = getAllMonthTables(soup)
     return newtables[monthIndex], month
@@ -574,7 +574,7 @@ def getMonthTable(soup: BeautifulSoup, monthIndex: int):
 def getAllMonthTables(soup: BeautifulSoup) -> List[ZamTable]:
     zam_tables: List[ZamTable] = []
     new_tables = soup.find_all(name="table")
-    for i in new_tables:
+    for i in new_tables[0:2]:
         class_type = "".join(i["class"]).strip()
         if class_type == "calendar-month":
             if len(i.find_all("td", {"class": "calendar-month-title"})) == 0:
@@ -603,7 +603,7 @@ def getAllMonthTables(soup: BeautifulSoup) -> List[ZamTable]:
                     .split(" ")
                 )
                 index = convertMonthNameToIndex(header[0])
-                year = int(header[1])
+                year = 2025
                 zam_tables.append(ZamTable(raw=i, month_index=index + 1, year=year))
             pass
         if class_type == "MsoNormalTable":
@@ -652,10 +652,10 @@ def getMonthsList(soup: BeautifulSoup):
     for par in paragraphs_with_class:
         paragraphText = par.get_text(strip=True)
         if (
-            paragraphText != ""
-            and paragraphText is not None
-            and not paragraphText.isdigit()
-            and paragraphText not in ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+                paragraphText != ""
+                and paragraphText is not None
+                and not paragraphText.isdigit()
+                and paragraphText not in ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
         ):
             list.append(par.get_text(strip=True))
     index = 0
@@ -704,7 +704,7 @@ def getLatestSchedleFile():
 
 
 def ParasGroupToSoup(
-    group, paras, startday, supabase_worker: supabase_worker.SupaBaseWorker, data
+        group, paras, startday, supabase_worker: supabase_worker.SupaBaseWorker, data
 ):
     date = startday
     supabasePARA = []
@@ -747,11 +747,11 @@ def ParasGroupToSoup(
                     data=data,
                 )
                 if (
-                    teacher is not None
-                    and course is not None
-                    and cabinet is not None
-                    and teacher.name != ""
-                    and course.name != ""
+                        teacher is not None
+                        and course is not None
+                        and cabinet is not None
+                        and teacher.name != ""
+                        and course.name != ""
                 ):
                     supabasePARA.append(
                         {
@@ -772,7 +772,7 @@ def ParasGroupToSoup(
 
 
 def parseParas(
-    date, supabase_worker: supabase_worker.SupaBaseWorker, data, stream: BytesIO
+        date, supabase_worker: supabase_worker.SupaBaseWorker, data, stream: BytesIO
 ):
     doc = Docx.Document(docx=stream)
     # doc = Docx.Document(docx=f"schedule {date}.docx")
@@ -868,7 +868,7 @@ def parseParas(
     for i in temp:
         if i[0] == "" and not is_all_empty(i):
             if para_count_in_row(
-                temp[iteraion - 2]
+                    temp[iteraion - 2]
             ) == get_row_text_count_without_number_para(temp[iteraion - 1]):
                 temp.remove(temp[iteraion - 1])
 
@@ -935,9 +935,9 @@ def parseParas(
 
                 for current_column in range(0, len(temp[iter])):
                     temp[iter - 1][current_column] = (
-                        temp[iter - 1][current_column]
-                        + " "
-                        + temp[iter][current_column]
+                            temp[iter - 1][current_column]
+                            + " "
+                            + temp[iter][current_column]
                     )
 
     for row in temp:
