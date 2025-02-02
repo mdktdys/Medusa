@@ -31,7 +31,6 @@ async def get_search_items(
 
     groups = groups_task
     teachers = teachers_task
-
     search_results = groups + teachers
 
     res = [
@@ -39,7 +38,7 @@ async def get_search_items(
             search_type="group" if isinstance(i, database.Groups) else "teacher",
             search_id=i.id,
             search_name=i.name,
-            search_image="https://abtechsolutions.ca/wp-content/uploads/2019/02/Test.png",
+            search_image="https://ojbsikxdqcbuvamygezd.supabase.co/storage/v1/object/sign/zamenas/python_(1).png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJ6YW1lbmFzL3B5dGhvbl8oMSkucG5nIiwiaWF0IjoxNzM4NTMzMDQ0LCJleHAiOjE3NzAwNjkwNDR9.C1p9_bssrMmsqQEd203gQLhBb1MLYC5CfaxMqbMIFCU",
         )
         for i in search_results
     ]
