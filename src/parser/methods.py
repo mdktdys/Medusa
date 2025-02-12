@@ -8,12 +8,12 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from docx2pdf import convert
 from my_secrets import SCHEDULE_URL
+from parser_v3 import parse_schedule_from_file
 from src.parser.core import (
     getLastZamenaLink,
     getAllMonthTables,
     get_all_tables_zamenas,
 )
-from src.parser.group_schedule.parser_v3 import parse_schedule_from_file
 from src.parser.parsers import (
     parse_zamenas,
     get_remote_file_bytes,

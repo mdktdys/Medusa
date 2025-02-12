@@ -45,7 +45,7 @@ def parse_page(sheet: pd.DataFrame, data_model: Data, monday_date: datetime.date
         group_name = rows[0][0 + (group_index * 3)]
 
         for day_index in range(6):
-            for para_index in range(6):
+            for para_index in range(7):
                 course_name = rows[1 + (day_index * 7) + para_index][0 + (group_index * 3)]
                 teacher_name = rows[1 + (day_index * 7) + para_index][1 + (group_index * 3)]
                 cabinet_name = rows[1 + (day_index * 7) + para_index][2 + (group_index * 3)]
@@ -76,7 +76,8 @@ def parse_page(sheet: pd.DataFrame, data_model: Data, monday_date: datetime.date
 
                 date: datetime.date = monday_date + datetime.timedelta(days=day_index)
 
-                paras.append(Paras(group=group.id, number=para_index + 1, course=course.id, teacher=teacher.id, cabinet=cabinet.id, date=date.strftime("%Y-%m-%d")))
+                paras.append(Paras(group=group.id, number=para_index + 1, course=course.id, teacher=teacher.id,
+                                   cabinet=cabinet.id, date=date.strftime("%Y-%m-%d")))
 
     if len(errors) > 0:
         raise Exception(errors)
@@ -101,23 +102,23 @@ def parse_schedule_from_file(file_path: BytesIO, monday_date: datetime.date) -> 
     return parse_schedule(file_path, monday_date)
 
 
-# paras: List[Paras] = parse_schedule_from_file("sample.xlsx")
-# print(paras)
-# supabase_client = SupaBaseWorker()
-# supabase_paras = []
+paras: List[Paras] = parse_schedule_from_file("sample2.xlsx", monday_date=datetime.date(2025, 2, 3))
+print(paras)
+supabase_client = SupaBaseWorker()
+supabase_paras = []
 
-# for para in paras:
-#     supabase_paras.append(
-#         {
-#             "group": para.group,
-#             "number": para.number,
-#             "course": para.course,
-#             "teacher": para.teacher,
-#             "cabinet": para.cabinet,
-#             "date": para.date,
-#         }
-#     )
+for para in paras:
+    print(para)
+    supabase_paras.append(
+        {
+            "group": para.group,
+            "number": para.number,
+            "course": para.course,
+            "teacher": para.teacher,
+            "cabinet": para.cabinet,
+            "date": para.date,
+        }
+    )
 
-# res = supabase_client.client.table("Paras").insert(supabase_paras).execute()
-# print(res)
-
+res = supabase_client.client.table("Paras").insert(supabase_paras).execute()
+print(res)
