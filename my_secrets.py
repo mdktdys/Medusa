@@ -12,7 +12,7 @@ BROKER_URL = os.environ.get("BROKER_URL")
 TELEGRAM_API_TOKEN = os.environ.get("TELEGRAM_API_TOKEN")
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_API_TOKEN}"
 
-SCHEDULE_URL = "https://www.uksivt.ru/zameny"
+SCHEDULE_URL = "https://www.uksivt.ru/замены"
 # # SCHEDULE_URL = 'http://127.0.0.1:3000/c:/Users/Danil/Desktop/Uksivt/sample.html'
 BASEURL = "https://www.uksivt.ru/"
 
