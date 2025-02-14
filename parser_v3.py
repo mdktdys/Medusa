@@ -101,24 +101,23 @@ def parse_schedule(bytes_: BytesIO, monday_date: datetime.date) -> List[Paras]:
 def parse_schedule_from_file(file_path: BytesIO, monday_date: datetime.date) -> List[Paras]:
     return parse_schedule(file_path, monday_date)
 
-
-paras: List[Paras] = parse_schedule_from_file("sample2.xlsx", monday_date=datetime.date(2025, 2, 3))
-print(paras)
-supabase_client = SupaBaseWorker()
-supabase_paras = []
-
-for para in paras:
-    print(para)
-    supabase_paras.append(
-        {
-            "group": para.group,
-            "number": para.number,
-            "course": para.course,
-            "teacher": para.teacher,
-            "cabinet": para.cabinet,
-            "date": para.date,
-        }
-    )
-
-res = supabase_client.client.table("Paras").insert(supabase_paras).execute()
-print(res)
+# paras: List[Paras] = parse_schedule_from_file("sample2.xlsx", monday_date=datetime.date(2025, 2, 3))
+# print(paras)
+# supabase_client = SupaBaseWorker()
+# supabase_paras = []
+#
+# for para in paras:
+#     print(para)
+#     supabase_paras.append(
+#         {
+#             "group": para.group,
+#             "number": para.number,
+#             "course": para.course,
+#             "teacher": para.teacher,
+#             "cabinet": para.cabinet,
+#             "date": para.date,
+#         }
+#     )
+#
+# res = supabase_client.client.table("Paras").insert(supabase_paras).execute()
+# print(res)
