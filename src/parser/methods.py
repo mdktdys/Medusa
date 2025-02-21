@@ -8,12 +8,13 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from docx2pdf import convert
 from my_secrets import SCHEDULE_URL
+from parser_v3 import parse_schedule_from_file
+from scripts.site_parser_v3 import get_zamena_tables
 from src.parser.core import (
     getLastZamenaLink,
     getAllMonthTables,
     get_all_tables_zamenas,
 )
-from src.parser.group_schedule.parser_v3 import parse_schedule_from_file
 from src.parser.parsers import (
     parse_zamenas,
     get_remote_file_bytes,
@@ -81,8 +82,9 @@ async def delete_zamena(date: datetime.date) -> dict[str, Any]:
 async def check_new() -> dict[str, Any]:
     try:
         sup = SupaBaseWorker()
-        soup = BeautifulSoup(urlopen(SCHEDULE_URL).read(), "html.parser")
-        tables = getAllMonthTables(soup=soup)
+        # soup = BeautifulSoup(urlopen(SCHEDULE_URL).read(), "html.parser")
+        # tables = getAllMonthTables(soup=soup)
+        tables = get_zamena_tables()
         site_links = get_all_tables_zamenas(tables)
         # database_links = sup.get_zamena_file_links()
         already_found_links = sup.get_already_found_links()

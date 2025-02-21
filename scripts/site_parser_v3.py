@@ -16,7 +16,6 @@ from bs4 import BeautifulSoup, PageElement
 from src.models.zamena_model import Zamena
 from src.parser.models.zamena_table_model import ZamTable
 
-
 def get_zamena_tables():
     def define_month(string_: str) -> int | None:
         string_ = string_.split(' ')[0].lower()
@@ -69,13 +68,13 @@ def get_zamena_tables():
     return zamena_tables
 
 
-def parse():
-    zamena_tables = get_zamena_tables()
-    print(zamena_tables)
-    # asyncio.run(get_zamena_tables())
-
-
-def main():
-    parse()
-
-main()
+# def parse():
+#     zamena_tables = get_zamena_tables()
+#     print(zamena_tables)
+#     # asyncio.run(get_zamena_tables())
+#
+#
+# def main():
+#     parse()
+#
+# main()
