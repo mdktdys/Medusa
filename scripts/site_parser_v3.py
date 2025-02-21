@@ -66,15 +66,3 @@ def get_zamena_tables():
                     zamenas.append(Zamena(link=zamena_link, date=date))
         zamena_tables.append(ZamTable(raw=table, month_index=month, year=year))
     return zamena_tables
-
-
-# def parse():
-#     zamena_tables = get_zamena_tables()
-#     print(zamena_tables)
-#     # asyncio.run(get_zamena_tables())
-#
-#
-# def main():
-#     parse()
-#
-# main()
