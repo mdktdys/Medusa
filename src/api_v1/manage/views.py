@@ -20,3 +20,8 @@ async def sync_local_database(
     local_session: AsyncSession = Depends(local_db_helper.session_dependency),
 ) -> dict:
     return await crud.sync_local_database(supabase_session, local_session)
+
+@router.get('/tasks', response_model=dict)
+async def get_all_tasks(
+
+) -> dict:
