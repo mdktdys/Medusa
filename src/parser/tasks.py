@@ -4,6 +4,7 @@ from io import BytesIO
 from typing import Any
 
 from celery import Celery
+from celery.app.control import Inspect
 
 from my_secrets import BACKEND_URL, BROKER_URL
 from src.parser import methods
@@ -42,6 +43,6 @@ def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
 
 @parser_celery_app.task
 def get_all_tasks() -> dict:
-    temp = parser_celery_app.control.inspect().scheduled()
-    print(temp)
+    temp: Inspect = parser_celery_app.control.inspect()
+    print(temp.scheduled())
     return temp
