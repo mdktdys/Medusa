@@ -44,5 +44,5 @@ def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
 @parser_celery_app.task
 def get_all_tasks() -> dict:
     temp: Inspect = parser_celery_app.control.inspect()
-    print(temp.scheduled())
+    print(temp.registered())
     return temp
