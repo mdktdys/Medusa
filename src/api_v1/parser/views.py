@@ -32,6 +32,11 @@ async def check_new() -> dict[str, Any]:
     return await crud.check_new()
 
 
+@router.get('/tasks', response_model=dict)
+async def get_all_tasks() -> dict:
+    return await crud.get_all_tasks()
+
+
 @router.post("/parse_zamena", response_model=dict)
 async def parse_zamena(request: ParseZamenaRequest) -> dict:
     return await crud.parse_zamena(request)

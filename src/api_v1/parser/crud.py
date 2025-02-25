@@ -31,6 +31,11 @@ async def check_new() -> dict[str, Any]:
     return task.get()
 
 
+async def get_all_tasks() -> dict[str, Any]:
+    task: AsyncResult = tasks.get_all_tasks.delay()
+    return task.get()
+
+
 async def delete_zamena(request: RemoveZamenaRequest) -> dict[str, Any]:
     task: AsyncResult = tasks.delete_zamena.delay(date=request.date)
     return task.get()
