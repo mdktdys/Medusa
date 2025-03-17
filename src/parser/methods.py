@@ -41,6 +41,7 @@ from src.parser.zamena_parser import (
     create_pdf_screenshots_bytes,
 )
 import html as Html
+from src.api_v1.notifications.views import send_message_to_all
 
 
 async def parse_zamena(url: str, date: datetime.datetime) -> dict:
