@@ -16,6 +16,7 @@ from bs4 import BeautifulSoup, PageElement
 from src.models.zamena_model import Zamena
 from src.parser.models.zamena_table_model import ZamTable
 
+
 def get_zamena_tables():
     def define_month(string_: str) -> int | None:
         string_ = string_.split(' ')[0].lower()
@@ -47,7 +48,7 @@ def get_zamena_tables():
     url = "https://uksivt.ru/"
     response = urlopen(url + quote('замены'), context=context)
     soup = BeautifulSoup(response.read(), "html.parser")
-    tables = soup.find_all(name="table", attrs={"class":"has-fixed-layout"})
+    tables = soup.find_all(name="table", attrs={"class": "has-fixed-layout"})
     zamena_tables = []
     for table in tables[0:2]:
         zamenas: List[Zamena] = []

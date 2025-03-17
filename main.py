@@ -30,17 +30,8 @@ app = FastAPI(
     swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
 )
 
-
-origins = [
-    # "http://telegram_bot",
-    # "http://localhost",
-    # "http://127.0.0.1:64038",
-    # "https://admin.uksivt.xyz",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=origins,
     allow_origins=["*"],
     allow_credentials=True,
     allow_headers=["*"],

@@ -11,8 +11,8 @@ from src.parser import methods
 
 parser_celery_app = Celery(
     "parser",
-    broker=BROKER_URL,
     backend=BACKEND_URL,
+    broker=BROKER_URL,
 )
 
 

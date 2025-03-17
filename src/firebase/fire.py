@@ -46,8 +46,11 @@ def send_message_to_topic(title: str, body: str, sup: SupaBaseWorker):
             data={'title': title, 'body': body},
             tokens=web_subs,
         )
-        response = messaging.send_each_for_multicast(message)
-        print('Successfully sent message web:', response)
+        try:
+            response = messaging.send_each_for_multicast(message)
+            print('Successfully sent message web:', response)
+        except Exception as e:
+            print(e)
     if len(android_subs) > 0:
         message = messaging.MulticastMessage(
             notification=messaging.Notification(
@@ -57,5 +60,8 @@ def send_message_to_topic(title: str, body: str, sup: SupaBaseWorker):
             data={'title': title, 'body': body},
             tokens=android_subs,
         )
-        response = messaging.send_each_for_multicast(message)
-        print('Successfully sent message android:', response)
+        try:
+            response = messaging.send_each_for_multicast(message)
+            print('Successfully sent message android:', response)
+        except Exception as e:
+            print(e)
