@@ -113,7 +113,7 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        send_message_to_all('Новые замены', f'Появились новые замены на {date}')
+                        await send_message_to_all('Новые замены', f'Появились новые замены на {date}')
                         sup.add_already_found_link(link=link, date=date, hash=None)
                         continue
                     extension = get_file_extension(zamena_cell.link)
@@ -132,7 +132,7 @@ async def check_new() -> dict[str, Any]:
                                 link=zamena_cell.link,
                             )
                         )
-                        send_message_to_all('Новые замены', f'Появились новые замены на {date}')
+                        await send_message_to_all('Новые замены', f'Появились новые замены на {date}')
                         sup.add_already_found_link(link=link, date=date, hash=None)
                         continue
 
@@ -152,7 +152,7 @@ async def check_new() -> dict[str, Any]:
                                     link=zamena_cell.link,
                                 )
                             )
-                            send_message_to_all('Новые замены', f'Появились новые замены на {date}')
+                            await send_message_to_all('Новые замены', f'Появились новые замены на {date}')
                             sup.add_already_found_link(
                                 link=link, date=date, hash=file_hash
                             )
@@ -164,7 +164,7 @@ async def check_new() -> dict[str, Any]:
                             link=zamena_cell.link,
                         )
                     )
-                    send_message_to_all('Новые замены', f'Появились новые замены на {date}')
+                    await send_message_to_all('Новые замены', f'Появились новые замены на {date}')
                     sup.add_already_found_link(link=link, date=date, hash=file_hash)
                     os.remove(f"{filename}.{extension}")
                 except Exception as e:
@@ -214,7 +214,7 @@ async def check_new() -> dict[str, Any]:
                                         link=zamena.link,
                                     )
                                 )
-                                send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {date}')
+                                await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {date}')
                                 sup.update_hash_already_found_link(
                                     link=zamena.link, new_hash=None
                                 )
@@ -237,7 +237,7 @@ async def check_new() -> dict[str, Any]:
                                             link=zamena.link,
                                         )
                                     )
-                                    send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {date}')
+                                    await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {date}')
                                     sup.update_hash_already_found_link(
                                         link=zamena.link, new_hash=file_hash
                                     )
@@ -250,7 +250,7 @@ async def check_new() -> dict[str, Any]:
                                 )
                             )
                             os.remove(f"{filename}.pdf")
-                            send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {date}')
+                            await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {date}')
                             sup.update_hash_already_found_link(link=zamena.link, new_hash=file_hash)
                     except Exception as e:
                         print(e)
