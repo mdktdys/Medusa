@@ -15,11 +15,11 @@ def clean_dirty_string(string: str):
         .replace(",", "")
         .replace("-", "")
         .replace("_", "")
-        .replace("\n", "")
+        .replace("\n", " ")
         .replace("\t", "")
         .replace("—", "")
         .replace("—", "")
-    ).lower()
+    ).lower().replace(' ','')
 
 
 def get_group_from_string(string: str, groups: List[Group]) -> Group | None:
