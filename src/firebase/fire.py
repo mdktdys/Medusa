@@ -39,8 +39,9 @@ def send_single_message(title: str, body: str, token: str):
 def send_message_to_topic(title: str, body: str, sup: SupaBaseWorker):
     registration_tokens = sup.getSubs()
 
-    web_subs = [sub.token for sub in registration_tokens if sub.clientID == 1]
-    android_subs = [sub.token for sub in registration_tokens if sub.clientID == 2]
+    web_subs = list(set(sub.token for sub in registration_tokens if sub.clientID == 1))
+    android_subs = list(set(sub.token for sub in registration_tokens if sub.clientID == 2))
+
     if len(web_subs) > 0:
         message = messaging.MulticastMessage(
             data={'title': title, 'body': body},
