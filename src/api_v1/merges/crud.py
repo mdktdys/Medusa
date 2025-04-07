@@ -4,7 +4,7 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
 from src.alchemy import database
-from src.alchemy.database import Teachers, Cabinets
+from src.alchemy.database import Teachers, Cabinets, Loadlinkers
 from src.api_v1.cabinets.crud import get_cabinet_by_id
 from src.api_v1.cabinets.schemas import Cabinet
 from src.api_v1.merges.schemas import MergeResult
@@ -27,6 +27,15 @@ async def merge_teachers(
         )
         result = await session.execute(query)
         logs["paras"] = len(result.fetchall())
+
+        query = (
+            update(database.Loadlinkers)
+            .returning(database.Loadlinkers.teacher)
+            .where(database.Loadlinkers.teacher == merge_from_id)
+            .values(teacher=merge_to_id)
+        )
+        result = await session.execute(query)
+        logs["loadlinkers"] = len(result.fetchall())
 
         query = (
             update(database.Zamenas)
