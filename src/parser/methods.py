@@ -214,7 +214,7 @@ async def check_new() -> dict[str, Any]:
                                         link=zamena.link,
                                     )
                                 )
-                                await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {date}')
+                                await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {zamena.date}')
                                 sup.update_hash_already_found_link(
                                     link=zamena.link, new_hash=None
                                 )
@@ -237,7 +237,7 @@ async def check_new() -> dict[str, Any]:
                                             link=zamena.link,
                                         )
                                     )
-                                    await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {date}')
+                                    await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {zamena.date}')
                                     sup.update_hash_already_found_link(
                                         link=zamena.link, new_hash=file_hash
                                     )
@@ -250,7 +250,7 @@ async def check_new() -> dict[str, Any]:
                                 )
                             )
                             os.remove(f"{filename}.pdf")
-                            await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {date}')
+                            await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {zamena.date}')
                             sup.update_hash_already_found_link(link=zamena.link, new_hash=file_hash)
                     except Exception as e:
                         print(e)
