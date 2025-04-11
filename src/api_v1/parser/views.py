@@ -61,8 +61,8 @@ def get_containers():
 
 
 @router.delete("/zamena")
-def delete_zamena(request: RemoveZamenaRequest):
-    return crud.delete_zamena(request)
+async def delete_zamena(request: RemoveZamenaRequest):
+    return await crud.delete_zamena(request)
 
 
 @router.post("/parse_group_schedule_v3")
