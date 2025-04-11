@@ -59,21 +59,34 @@ def get_latest_zamena_link():
         html = urlopen("https://www.uksivt.ru/zameny").read()
         soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
         link, date = getLastZamenaLink(soup=soup)
-        return {"date": date, "link": link}
+        return {
+            "date": date,
+            "link": link
+        }
     except Exception as e:
-        return {"message": "failed", "reason": str(e)}
+        return {
+            "message": "failed",
+            "reason": str(e)
+        }
 
 
 async def delete_zamena(date: datetime.date) -> dict[str, Any]:
     try:
         sup = SupaBaseWorker()
-        removed = []
-        removed.append(sup.client.table("Zamenas").delete().eq("date", date).execute())
-        removed.append(sup.client.table("ZamenasFull").delete().eq("date", date).execute())
-        removed.append(sup.client.table("ZamenaFileLinks").delete().eq("date", date).execute())
-        return {"res": "ok", "removed": str(len(removed))}
+        removed = [
+            sup.client.table("Zamenas").delete().eq("date", date).execute(),
+            sup.client.table("ZamenasFull").delete().eq("date", date).execute(),
+            sup.client.table("ZamenaFileLinks").delete().eq("date", date).execute()
+        ]
+        return {
+            "res": "ok",
+            "removed": str(len(removed))
+        }
     except Exception as e:
-        return {"message": "failed", "reason": str(e)}
+        return {
+            "message": "failed",
+            "reason": str(e)
+        }
 
 
 async def check_new() -> dict[str, Any]:

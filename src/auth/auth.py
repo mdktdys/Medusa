@@ -12,7 +12,7 @@ from fastapi_users.authentication import (
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.alchemy.db_helper import local_db_helper
+from src.alchemy.db_helper import db_helper
 from src.auth.schemas import User
 
 router = APIRouter()
@@ -29,7 +29,7 @@ async def api_key_auth(request: Request) -> bool:
 
 # Получение базы данных пользователей
 async def get_user_db(
-        session: AsyncSession = Depends(local_db_helper.session_dependency),
+        session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     yield SQLAlchemyUserDatabase(session, User)
 
