@@ -684,7 +684,7 @@ def getLatestSchedleFile():
 
     for par in paragraphs_with_class:
         if par.get_text(strip=True) != "" and par.get_text(strip=True) is not None:
-            print(par.get_text(strip=True).split()[0])
+            # print(par.get_text(strip=True).split()[0])
             break
     urls = []
     rows = table.find_all("tr")

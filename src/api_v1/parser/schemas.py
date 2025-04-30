@@ -7,6 +7,7 @@ from pydantic import BaseModel
 class ParseZamenaRequest(BaseModel):
     url: str
     date: datetime.datetime
+    notify: bool
 
 
 class RemoveZamenaRequest(BaseModel):

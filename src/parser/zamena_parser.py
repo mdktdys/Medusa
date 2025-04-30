@@ -73,6 +73,9 @@ def parseZamenas(
             trace=f"{link}",
         )
 
+    affected_teachers = get_affected_teachers(work_rows)
+    affected_groups = get_affected_groups(work_rows)
+
     prepare_and_send_supabase_entries(
         work_rows,
         practice_groups,
@@ -83,7 +86,10 @@ def parseZamenas(
         data_model,
         supabase_client,
     )
-    return ZamenaParseSucess()
+    return ZamenaParseSucess(
+        affected_teachers= affected_teachers,
+        affected_groups= affected_groups
+    )
 
 
 def _extract_practice_groups(header, data_model: Data):
@@ -234,6 +240,14 @@ def process_multiple_entries(workRows: list[str]):
             print(i)
             continue
     return editet
+
+
+def get_affected_groups(work_rows: list) -> List[int]:
+    return [i[0] for i in work_rows]
+
+
+def get_affected_teachers(work_rows: list) -> List[int]:
+    return [i[5] for i in work_rows]
 
 
 def map_entities_to_ids(

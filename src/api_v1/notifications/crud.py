@@ -9,7 +9,6 @@ async def send_single_message(token: str, session: AsyncSession):
         body='body',
         token=token
     )
-    print(response)
     return response
 
 
@@ -20,5 +19,4 @@ async def send_message_to_all(title: str, body:str):
         body=body,
         sup=sup
     )
-    print(response)
     return response

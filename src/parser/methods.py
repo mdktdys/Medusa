@@ -44,8 +44,8 @@ import html as Html
 from src.api_v1.notifications.views import send_message_to_all
 
 
-async def parse_zamena(url: str, date: datetime.datetime) -> dict:
-    return (await parse_zamenas(url=url, date_=date, force=False)).model_dump()
+async def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
+    return (await parse_zamenas(url=url, date_=date, force=False, notify = notify)).model_dump()
 
 
 async def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
@@ -162,9 +162,7 @@ async def check_new() -> dict[str, Any]:
                                 )
                             )
                             await send_message_to_all('Новые замены', f'Появились новые замены на {date}')
-                            sup.add_already_found_link(
-                                link=link, date=date, hash=file_hash
-                            )
+                            sup.add_already_found_link(link=link, date=date, hash=file_hash)
                             continue
                     result.checks.append(
                         CheckZamenaResultSuccess(
@@ -193,9 +191,7 @@ async def check_new() -> dict[str, Any]:
                     file_bytes = get_remote_file_bytes(link=zamena.link)
                     file_hash = get_bytes_hash(file_bytes)
                     try:
-                        old_hash = [
-                            x for x in already_found_links if x.link == zamena.link
-                        ]
+                        old_hash = [x for x in already_found_links if x.link == zamena.link]
                         if len(old_hash) == 0:
                             result.checks.append(
                                 CheckZamenaResultFailed(
@@ -209,9 +205,7 @@ async def check_new() -> dict[str, Any]:
                             print(f"hash changed {zamena.link}")
                             extension = get_file_extension(zamena.link)
                             filename = zamena.link.split("/")[-1].split(".")[0]
-                            file_downloaded = download_file(
-                                link=zamena.link, filename=f"{filename}.{extension}"
-                            )
+                            file_downloaded = download_file(link=zamena.link, filename=f"{filename}.{extension}")
                             if not file_downloaded:
                                 print("Fail to download")
                                 print(extension)
@@ -224,20 +218,14 @@ async def check_new() -> dict[str, Any]:
                                     )
                                 )
                                 await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {zamena.date}')
-                                sup.update_hash_already_found_link(
-                                    link=zamena.link, new_hash=None
-                                )
+                                sup.update_hash_already_found_link(link=zamena.link, new_hash=None)
                                 continue
                             match extension:
                                 case "pdf":
-                                    screenshot_paths = create_pdf_screenshots_bytes(
-                                        filename
-                                    )
+                                    screenshot_paths = create_pdf_screenshots_bytes(filename)
                                 case "docx":
                                     convert(f"{filename}.{extension}")
-                                    screenshot_paths = create_pdf_screenshots_bytes(
-                                        filename
-                                    )
+                                    screenshot_paths = create_pdf_screenshots_bytes(filename)
                                 case _:
                                     result.checks.append(
                                         CheckZamenaResultInvalidFormat(
@@ -247,9 +235,7 @@ async def check_new() -> dict[str, Any]:
                                         )
                                     )
                                     await send_message_to_all('Обнаружен перезалив', f'Перезалили замены на {zamena.date}')
-                                    sup.update_hash_already_found_link(
-                                        link=zamena.link, new_hash=file_hash
-                                    )
+                                    sup.update_hash_already_found_link(link=zamena.link, new_hash=file_hash)
                                     continue
                             result.checks.append(
                                 CheckZamenaResultSuccess(
@@ -268,13 +254,7 @@ async def check_new() -> dict[str, Any]:
                             trace=Html.escape(str(traceback.format_exc())[0:100]),
                             error=Html.escape(str(e)),
                         ).model_dump()
-            if any(
-                    [
-                        True
-                        for check in result.checks
-                        if isinstance(check, CheckZamenaResultSuccess)
-                    ]
-            ):
+            if any([True for check in result.checks if isinstance(check, CheckZamenaResultSuccess)]):
                 sup.client.table("checks").insert({"result": "new"}).execute()
             else:
                 sup.client.table("checks").insert({"result": "ok"}).execute()

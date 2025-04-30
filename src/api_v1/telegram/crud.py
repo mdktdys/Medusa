@@ -18,11 +18,19 @@ sup = SupaBaseWorker()
 async def get_chat_subscribers(
     session: AsyncSession, chat_id: int
 ) -> List[database.Subscribers]:
-    query = select(database.Subscribers).where(
-        database.Subscribers.chat_id == str(chat_id)
-    )
+    query = select(database.Subscribers).where(database.Subscribers.chat_id == str(chat_id))
     result: Result = await session.execute(query)
     return list(result.scalars().all())
+
+
+async def get_group_subscribers(id: int):
+    return (
+        sup.client.table('Subscribers')
+        .select('chat_id')
+        .eq('target_type', 0)
+        .eq('target_id', id)
+        .execute()
+    )
 
 
 async def subscribe_zamena_notifications(
@@ -38,7 +46,6 @@ async def subscribe_zamena_notifications(
         .execute()
     )
 
-    print(res.data)
     if len(res.data) > 0:
         response.status_code = status.HTTP_202_ACCEPTED
         return
@@ -50,8 +57,6 @@ async def subscribe_zamena_notifications(
         )
         .execute()
     )
-    print(result)
-    print(result.dict)
     response.status_code = status.HTTP_201_CREATED
     return
 
@@ -68,8 +73,6 @@ async def unsubscribe_zamena_notifications(
         .eq("target_id", target_id)
         .execute()
     )
-    print(result)
-    print(result)
     response.status_code = status.HTTP_201_CREATED
     return
 
@@ -123,3 +126,9 @@ async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: date
     message += f"\n📅 {date.strftime('%A').capitalize()}, {date.day} {date.strftime('%B')}"
 
     await telegram_send_message(chat_id, message)
+
+
+def notify_zamena(affected_groups: List[int], affected_teachers: List[int]):
+    subscribers = get_chat_subscribers()
+
+    return None

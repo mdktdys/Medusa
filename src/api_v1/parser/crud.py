@@ -15,9 +15,11 @@ from src.parser.parsers import convert_pdf_2_word
 
 
 async def parse_zamena(request: ParseZamenaRequest) -> dict:
-    url = request.url
-    date = request.date
-    task: AsyncResult = tasks.parse_zamena.delay(url=url, date=date)
+    task: AsyncResult = tasks.parse_zamena.delay(
+        url = request.url,
+        date = request.date,
+        notify = request.notify
+    )
     return task.get()
 
 

@@ -59,13 +59,11 @@ async def merge_teachers(
             .where(database.Teachers.id == merge_to_id)
             .values(synonyms=merged_synonyms)
         )
-        result = await session.execute(query)
-        print(result)
+        await session.execute(query)
         logs["synonyms"] = merged_synonyms
 
         query = delete(database.Teachers).where(database.Teachers.id == merge_from_id)
-        result = await session.execute(query)
-        print(result)
+        await session.execute(query)
 
         await session.commit()
     return MergeResult(
@@ -118,12 +116,10 @@ async def merge_cabinets(
             .values(synonyms=merged_synonyms)
         )
         result = await session.execute(query)
-        print(result)
         logs["synonyms"] = merged_synonyms
 
         query = delete(database.Cabinets).where(database.Cabinets.id == merge_from_id)
         result = await session.execute(query)
-        print(result)
 
         await session.commit()
     return MergeResult(
@@ -190,7 +186,6 @@ async def merge_groups(
 
         query = delete(database.Groups).where(database.Groups.id == merge_from_id)
         result = await session.execute(query)
-        print(result)
 
         await session.commit()
     return MergeResult(

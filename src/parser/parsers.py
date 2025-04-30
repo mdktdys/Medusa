@@ -10,8 +10,11 @@ from io import BytesIO
 from http import HTTPStatus
 from datetime import date
 from pdf2docx import Converter
+
+from src.api_v1.telegram.views import notify_zamena
 from src.parser.core import parseParas
 from src.parser.models.data_model import Data
+from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult, ZamenaParseSucess
 from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import parseZamenas
 
@@ -86,16 +89,15 @@ async def parse_zamenas_from_word(
 ):
     supabase_client = SupaBaseWorker()
     data_model = init_date_model(sup=supabase_client)
-    return parseZamenas(
-        file_bytes, date_, data_model, url, supabase_client, force=force
-    )
+    return parseZamenas(file_bytes, date_, data_model, url, supabase_client, force=force)
 
 
-async def parse_zamenas(url: str, date_: date, force: bool):
+async def parse_zamenas(url: str, date_: date, force: bool, notify: bool) -> ZamenaParseResult:
     supabase_client = SupaBaseWorker()
     data_model = init_date_model(sup=supabase_client)
     stream = get_file_stream(link=url)
     file_type = define_file_format(stream)
+    result: ZamenaParseResult
 
     match file_type:
         case "application/pdf":
@@ -104,13 +106,19 @@ async def parse_zamenas(url: str, date_: date, force: bool):
             cv.convert(stream_converted)
             cv.close()
 
-            return parseZamenas(
-                stream_converted, date_, data_model, url, supabase_client, force=force
-            )
+            result = parseZamenas(stream_converted, date_, data_model, url, supabase_client, force=force)
         case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            return parseZamenas(
-                stream, date_, data_model, url, supabase_client, force=force
-            )
+            result = parseZamenas(stream, date_, data_model, url, supabase_client, force=force)
+        case _:
+            raise Exception('Неизвестный формат')
+
+    if notify and result is ZamenaParseSucess:
+        await notify_zamena(
+            affected_groups = result.affected_groups,
+            affected_teachers = result.affected_teachers
+        )
+
+    return result
 
 
 def parse_schedule(url: str, date_: date):

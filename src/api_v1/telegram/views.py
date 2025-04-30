@@ -1,4 +1,6 @@
 import datetime
+from typing import List
+
 import requests
 
 from fastapi import APIRouter, Response, status, Depends
@@ -57,3 +59,7 @@ async def get_day_schedule_by_date(
 async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: datetime.date, session: AsyncSession = Depends(db_helper.session_dependency)):
     return await crud.send_group_schedule_by_chat_id(chat_id=chat_id, group_id=group_id, date=date, session=session)
 
+
+@router.post('/notify_zamena')
+async def notify_zamena(affected_groups: List[int], affected_teachers: List[int]):
+    return await crud.notify_zamena(affected_groups = affected_groups, affected_teachers = affected_teachers)

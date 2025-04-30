@@ -119,7 +119,6 @@ async def get_teacher_day_schedule_by_date_formatted(
     for paras in schedule.paras:
         if (len(paras)) != 0:
             for para in paras:
-                print(type(para))
                 if isinstance(para, Para):
                     if para.origin is None:
                         rows.append(
