@@ -11,12 +11,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 from src.api_v1.parser.schemas import ParseZamenaRequest, RemoveZamenaRequest
 from src.parser import tasks
-from src.parser.parsers import convert_pdf_2_word
 
 
 async def parse_zamena(request: ParseZamenaRequest) -> dict:
     task: AsyncResult = tasks.parse_zamena.delay(
-        url = request.url,
+        url = request.url.__str__(),
         date = request.date,
         notify = request.notify
     )
@@ -50,6 +49,7 @@ async def get_founded_links(session: AsyncSession):
 
 async def pdf2docx(docx: UploadFile) -> BytesIO:
     file_bytes = await docx.read()
+    from src.parser.parsers import convert_pdf_2_word 
     return convert_pdf_2_word(file=file_bytes)
 
 

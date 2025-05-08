@@ -2,8 +2,6 @@
 Модуль описывающий работу бота телеграм
 """
 
-from typing import List
-
 import magic
 import requests
 from io import BytesIO
@@ -20,17 +18,7 @@ from src.parser.zamena_parser import parseZamenas
 
 
 def init_date_model(sup: SupaBaseWorker) -> Data:
-    data_model = Data(sup=sup)
-
-    # (
-    #     data_model.GROUPS,
-    #     _,
-    #     data_model.TEACHERS,
-    #     data_model.CABINETS,
-    #     data_model.COURSES,
-    #     data_model.LINKERS,
-    # ) = supabase_client.get_data_models_list
-    return data_model
+    return Data(sup=sup)
 
 
 def get_file_stream(link: str) -> BytesIO:
@@ -69,7 +57,7 @@ def define_file_format(stream: BytesIO):
 
 
 def convert_pdf2word(url: str, file_name: str):
-    stream = get_file_stream(link=url)
+    stream: BytesIO = get_file_stream(link=url)
     cv = Converter(stream=stream, pdf_file="temp")
     cv.convert(docx_filename=file_name)
     cv.close()
@@ -94,9 +82,9 @@ async def parse_zamenas_from_word(
 
 async def parse_zamenas(url: str, date_: date, force: bool, notify: bool) -> ZamenaParseResult:
     supabase_client = SupaBaseWorker()
-    data_model = init_date_model(sup=supabase_client)
-    stream = get_file_stream(link=url)
-    file_type = define_file_format(stream)
+    data_model: Data = init_date_model(sup=supabase_client)
+    stream: BytesIO = get_file_stream(link=url)
+    file_type: str = define_file_format(stream)
     result: ZamenaParseResult
 
     match file_type:

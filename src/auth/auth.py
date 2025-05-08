@@ -117,7 +117,8 @@ router.include_router(
     "/protected-route",
     tags=["Users"],
     dependencies=[Depends(any_auth_method(roles=["Owner"]))],
-    include_in_schema=IS_DEV,
+    include_in_schema=False,
 )
+
 async def protected_route():
     return {"message": "Hello, you have access to the protected route!"}

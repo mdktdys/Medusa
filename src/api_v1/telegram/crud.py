@@ -23,14 +23,24 @@ async def get_chat_subscribers(
     return list(result.scalars().all())
 
 
-async def get_group_subscribers(id: int):
+def get_group_subscribers(id: int) -> list[int]:
     return (
         sup.client.table('Subscribers')
         .select('chat_id')
         .eq('target_type', 0)
         .eq('target_id', id)
         .execute()
-    )
+    ).data
+    
+    
+def get_teacher_subscribers(id: int)-> list[int]:
+    return (
+        sup.client.table('Subscribers')
+        .select('chat_id')
+        .eq('target_type', 1)
+        .eq('target_id', id)
+        .execute()
+    ).data
 
 
 async def subscribe_zamena_notifications(
@@ -129,6 +139,7 @@ async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: date
 
 
 def notify_zamena(affected_groups: List[int], affected_teachers: List[int]):
-    subscribers = get_chat_subscribers()
+    for group in affected_groups:
+        sub_chats: List[int] = get_group_subscribers(group)
 
     return None

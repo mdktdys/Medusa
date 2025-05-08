@@ -3,16 +3,11 @@ from io import BytesIO
 import os
 import traceback
 from typing import Any, List
-from urllib.request import urlopen
-
-from bs4 import BeautifulSoup
 from docx2pdf import convert
-from my_secrets import SCHEDULE_URL
 from parser_v3 import parse_schedule_from_file
 from scripts.site_parser_v3 import get_zamena_tables
 from src.parser.core import (
     getLastZamenaLink,
-    getAllMonthTables,
     get_all_tables_zamenas,
 )
 from src.parser.parsers import (
@@ -22,7 +17,6 @@ from src.parser.parsers import (
 
 import base64
 
-from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult
 from src.parser.site_schecker.schemas import (
     CheckResultFoundNew,
     CheckZamenaResultFailedDownload,
@@ -56,9 +50,7 @@ async def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> 
 
 def get_latest_zamena_link():
     try:
-        html = urlopen("https://www.uksivt.ru/zameny").read()
-        soup: BeautifulSoup = BeautifulSoup(html, "html.parser")
-        link, date = getLastZamenaLink(soup=soup)
+        link, date = getLastZamenaLink()
         return {
             "date": date,
             "link": link
@@ -66,7 +58,8 @@ def get_latest_zamena_link():
     except Exception as e:
         return {
             "message": "failed",
-            "reason": str(e)
+            "reason": str(e),
+            "trace": traceback.format_exc()
         }
 
 
@@ -92,11 +85,8 @@ async def delete_zamena(date: datetime.date) -> dict[str, Any]:
 async def check_new() -> dict[str, Any]:
     try:
         sup = SupaBaseWorker()
-        # soup = BeautifulSoup(urlopen(SCHEDULE_URL).read(), "html.parser")
-        # tables = getAllMonthTables(soup=soup)
         tables = get_zamena_tables()
         site_links = get_all_tables_zamenas(tables)
-        # database_links = sup.get_zamena_file_links()
         already_found_links = sup.get_already_found_links()
         new_links = list(
             set([x.link for x in site_links])
@@ -109,7 +99,7 @@ async def check_new() -> dict[str, Any]:
             for link in new_links:
                 zamena_table = [x for x in tables if x.links.__contains__(link)][0]
                 zamena_cell = [x for x in zamena_table.zamenas if x.link == link][0]
-                date = datetime.datetime(
+                date: str = datetime.datetime(
                     year=zamena_cell.date.year,
                     month=zamena_cell.date.month,
                     day=zamena_cell.date.day,
@@ -151,7 +141,7 @@ async def check_new() -> dict[str, Any]:
                             screenshot_paths = create_pdf_screenshots_bytes(filename)
                         case "jpeg":
                             with open(f"{filename}.{extension}", "rb") as image_file:
-                                data = base64.b64encode(image_file.read())
+                                data: bytes = base64.b64encode(image_file.read())
                                 screenshot_paths = [data]
                         case _:
                             result.checks.append(

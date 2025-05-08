@@ -1,0 +1,56 @@
+version: '3.7'
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - ./dev.env 
+    networks:
+      - medusa_network
+
+  flower:
+    image: mher/flower
+    container_name: flower
+    ports:
+      - "5555:5555"
+    env_file:
+      - ./dev.env 
+    depends_on:
+      - rabbitmq
+    networks:
+      - medusa_network
+        
+  postgres:
+    image: postgres:17
+    env_file:
+      - ./dev.env 
+    volumes:
+      - postgresss_datav6:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - medusa_network
+      
+  redis:
+    image: redis:7-alpine
+    command: redis-server --loglevel debug
+    volumes: 
+      - cache:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - medusa_network
+
+
+networks:
+  medusa_network:
+    driver: bridge
+
+volumes:
+  postgresss_datav6:
+  cache:
+    driver: local

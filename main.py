@@ -25,6 +25,11 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(
+    title = 'API 🐋 Замены уксивтика',
+    contact={
+        "name": "telegram: @mdktdys",
+        "url": "https://uksivt.xyz",
+    },
     lifespan=lifespan,
     docs_url="/",
     swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},

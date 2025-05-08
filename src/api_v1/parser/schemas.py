@@ -1,12 +1,12 @@
 import datetime
 
-from fastapi import UploadFile
 from pydantic import BaseModel
+from pydantic_core import Url
 
 
 class ParseZamenaRequest(BaseModel):
-    url: str
-    date: datetime.datetime
+    url: Url
+    date: datetime.date
     notify: bool
 
 

@@ -57,9 +57,7 @@ def parseZamenas(
     work_rows = _prepare_work_rows(all_rows)
     work_rows = _filter_and_clean_rows(work_rows)
 
-    work_rows, full_zamena_groups, liquidation = handle_special_cases(
-        work_rows, data_model
-    )
+    work_rows, full_zamena_groups, liquidation = handle_special_cases(work_rows, data_model)
     update_empty_group_column(work_rows)
     work_rows = process_multiple_entries(work_rows)
 

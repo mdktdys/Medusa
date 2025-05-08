@@ -1,4 +1,5 @@
 import datetime
+import os
 from typing import List, Any
 
 from fastapi import APIRouter, Depends, UploadFile
@@ -12,11 +13,11 @@ from .schemas import ParseZamenaRequest, RemoveZamenaRequest
 
 router = APIRouter(tags=["Parser"])
 
-pass_ = os.environ.get("API_SECRET")
+pass_: str = os.environ["API_SECRET"]
 
 
 @router.get("/get_latest_zamena_link", response_model=dict)
-@cache(300)
+# @cache(300)
 async def get_latest_zamena_link() -> dict:
     return await crud.get_latest_zamena_link()
 
@@ -44,7 +45,7 @@ async def parse_zamena(request: ParseZamenaRequest) -> dict:
 
 @router.post("/pdf2docx")
 async def pdf2docx(docx: UploadFile):
-    encoded_filename = f"attachment; filename=response.docx"
+    encoded_filename = "attachment; filename=response.docx"
     output_stream = await crud.pdf2docx(docx)
     output_stream.seek(0)
 

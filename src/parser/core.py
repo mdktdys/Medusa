@@ -7,6 +7,7 @@ import urllib
 from urllib.request import urlopen
 
 import requests
+from scripts.site_parser_v3 import get_zamena_tables
 from src.parser.models.zamena_model import Zamena
 from src.parser import supabase as supabase_worker
 import docx as Docx
@@ -510,13 +511,10 @@ def downloadFile(link: str, filename: str):
         print("Failed to download the file.")
 
 
-def getLastZamenaLink(soup: BeautifulSoup):
-    # days, month = getMonthAvalibleDays(soup=soup, monthIndex=0)
-    # day = days[-1]
-    # year = datetime.datetime.now().year.real
-    # date = datetime.date(year=year, month=month, day=day)
-    table = getAllMonthTables(soup)[0]
-    return table.zamenas[-1].link, table.zamenas[-1].date
+def getLastZamenaLink() -> tuple[str, datetime.date]:
+    table: ZamTable = get_zamena_tables()[0]
+    zamena: Zamena = table.zamenas[-1]
+    return zamena.link, zamena.date
 
 
 def getLastZamenaDate(soup: BeautifulSoup):

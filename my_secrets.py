@@ -4,8 +4,8 @@ PUBLIC_API_KEY = os.environ.get('PUBLIC_API_KEY')
 API_KEY = os.environ.get('API_KEY')
 SECRET = os.environ.get('SECRET')
 
-supabase_database_connection = os.environ.get('SUPABASE_DATABASE_CONNECTION')
-local_database_connection = os.environ.get('LOCAL_DATABASE_CONNECTION')
+supabase_database_connection: str = os.environ['SUPABASE_DATABASE_CONNECTION']
+local_database_connection: str = os.environ['LOCAL_DATABASE_CONNECTION']
 
 SUPABASE_ANON_KEY = os.environ.get('SCHEDULER_SUPABASE_ANON_KEY')
 SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')

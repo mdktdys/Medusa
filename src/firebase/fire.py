@@ -1,10 +1,7 @@
-from typing import List
-
 import firebase_admin
 from firebase_admin import messaging, credentials
 
-from my_secrets import FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY_ID, FIREBASE_PROJECT_ID, \
-    FIREBASE_CLIENT_ID, FIREBASE_CERT
+from my_secrets import FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY_ID, FIREBASE_PROJECT_ID, FIREBASE_CLIENT_ID, FIREBASE_CERT
 from src.parser.supabase import SupaBaseWorker
 
 cred = credentials.Certificate({
