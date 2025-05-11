@@ -35,7 +35,6 @@ from src.parser.zamena_parser import (
     create_pdf_screenshots_bytes,
 )
 import html as Html
-from src.api_v1.notifications.views import send_message_to_all
 
 
 async def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
@@ -83,6 +82,8 @@ async def delete_zamena(date: datetime.date) -> dict[str, Any]:
 
 
 async def check_new() -> dict[str, Any]:
+    from src.api_v1.notifications.views import send_message_to_all
+    
     try:
         sup = SupaBaseWorker()
         tables = get_zamena_tables()

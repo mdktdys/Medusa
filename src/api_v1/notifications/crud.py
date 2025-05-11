@@ -1,4 +1,6 @@
+from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
+from .schemas import FirebaseSubscriber, FirebaseMessage
 from src.firebase import fire
 from src.parser.supabase import SupaBaseWorker
 
@@ -20,3 +22,25 @@ async def send_message_to_all(title: str, body:str):
         sup=sup
     )
     return response
+
+
+async def send_multicast_message(message: FirebaseMessage, subscribers: List[FirebaseSubscriber]):
+    fire.send_multicats_message(
+        subscribers = subscribers,
+        message = message,
+    )
+
+
+def get_firebase_item_subscribers(item_id: int, item_type: int) -> List[FirebaseSubscriber]:
+    sup = SupaBaseWorker()
+    subscribers = (
+        sup.client.table('MessagingClients')
+        .select('token, clientID')
+        .eq('subType', item_type)
+        .eq('subID', item_id)
+        .execute()
+    ).data
+    print(subscribers)
+    print(type(subscribers))
+
+    return [FirebaseSubscriber(client_id = sub['clientID'], token = sub['token']) for sub in subscribers]

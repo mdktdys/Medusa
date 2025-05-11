@@ -7,6 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import HTTPException, Response, status
 
+from src.api_v1.notifications.schemas import FirebaseMessage, FirebaseSubscriber
+from src.api_v1.notifications.views import get_firebase_item_subscribers, send_multicast_message
 from my_secrets import TELEGRAM_API_URL
 from src.alchemy import database
 from src.api_v1.groups.schemas import DayScheduleFormatted
@@ -21,24 +23,14 @@ async def get_chat_subscribers(
     query = select(database.Subscribers).where(database.Subscribers.chat_id == str(chat_id))
     result: Result = await session.execute(query)
     return list(result.scalars().all())
-
-
-def get_group_subscribers(id: int) -> list[int]:
-    return (
-        sup.client.table('Subscribers')
-        .select('chat_id')
-        .eq('target_type', 0)
-        .eq('target_id', id)
-        .execute()
-    ).data
     
     
 def get_teacher_subscribers(id: int)-> list[int]:
     return (
-        sup.client.table('Subscribers')
-        .select('chat_id')
-        .eq('target_type', 1)
-        .eq('target_id', id)
+        sup.client.table('MessagingClients')
+        .select('token, clientID')
+        .eq('subType', 1)
+        .eq('subID', id)
         .execute()
     ).data
 
@@ -138,8 +130,30 @@ async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: date
     await telegram_send_message(chat_id, message)
 
 
-def notify_zamena(affected_groups: List[int], affected_teachers: List[int]):
+async def notify_zamena(affected_groups: List[int], affected_teachers: List[int]):
+    message = FirebaseMessage(
+        title = 'Появились замены для тебя',
+        body = 'В заменах есть изменения для тебя!' 
+    )
+    
+    print('1')
+    
     for group in affected_groups:
-        sub_chats: List[int] = get_group_subscribers(group)
-
+        sub_chats: List[FirebaseSubscriber] = await get_firebase_item_subscribers(
+            item_id = group,
+            item_type = 1
+        )
+        await send_multicast_message(
+            subscribers = sub_chats,
+            message = message,
+        )
+    for teacher in affected_teachers:
+        sub_chats: List[FirebaseSubscriber] = await get_firebase_item_subscribers(
+            item_id = teacher,
+            item_type = 2
+        )
+        await send_multicast_message(
+            subscribers = sub_chats,
+            message = message,
+        )
     return None

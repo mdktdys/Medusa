@@ -10,7 +10,7 @@ from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 
 from src.alchemy.db_helper import local_db_helper
-from router import router
+from router import router, tags_metadata, description
 
 
 @asynccontextmanager
@@ -26,6 +26,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(
     title = 'API 🐋 Замены уксивтика',
+    openapi_tags = tags_metadata,
+    description = description,
     contact={
         "name": "telegram: @mdktdys",
         "url": "https://uksivt.xyz",

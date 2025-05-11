@@ -241,11 +241,11 @@ def process_multiple_entries(workRows: list[str]):
 
 
 def get_affected_groups(work_rows: list) -> List[int]:
-    return [i[0] for i in work_rows]
+    return list(set([i[0] for i in work_rows]))
 
 
 def get_affected_teachers(work_rows: list) -> List[int]:
-    return [i[5] for i in work_rows]
+    return list(set([i[5] for i in work_rows]))
 
 
 def map_entities_to_ids(

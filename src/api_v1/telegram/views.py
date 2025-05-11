@@ -62,4 +62,4 @@ async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: date
 
 @router.post('/notify_zamena')
 async def notify_zamena(affected_groups: List[int], affected_teachers: List[int]):
-    return crud.notify_zamena(affected_groups = affected_groups, affected_teachers = affected_teachers)
+    return await crud.notify_zamena(affected_groups = affected_groups, affected_teachers = affected_teachers)

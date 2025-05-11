@@ -15,3 +15,19 @@ router.include_router(
     prefix="/api/v1",
     dependencies=[Depends(any_auth_method(roles=["Owner"]))],
 )
+
+tags_metadata: list[dict[str, str]] = []
+
+description = '''
+Публичный API для получения информации об расписании
+
+# Нотификации
+## ClientID
+1 - Web подписчики
+2 - Android подписчики
+
+## subType
+1 - Группы
+2 - Преподаватели
+3 - Кабинеты
+'''
