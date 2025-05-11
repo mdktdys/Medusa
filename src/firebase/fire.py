@@ -59,8 +59,10 @@ def send_multicats_message(message: FirebaseMessage, subscribers: List[FirebaseS
         },
     )
     
-    messaging.send_each_for_multicast(muticast_web_message)
-    messaging.send_each_for_multicast(multicast_android_message)
+    if len(web_subs) > 0:
+        messaging.send_each_for_multicast(muticast_web_message)
+    if len(android_subs) > 0:
+        messaging.send_each_for_multicast(multicast_android_message)
 
 
 def send_message_to_topic(title: str, body: str, sup: SupaBaseWorker):
