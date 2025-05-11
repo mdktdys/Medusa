@@ -103,8 +103,9 @@ async def parse_zamenas(url: str, date_: date, force: bool, notify: bool) -> Zam
     print(notify)
     print(type(result))
     print(result is ZamenaParseSucess)
+    print(type(result) is ZamenaParseSucess)
     
-    if notify and result is ZamenaParseSucess:
+    if notify and type(result) is ZamenaParseSucess:
         await notify_zamena(
             affected_groups = result.affected_groups,
             affected_teachers = result.affected_teachers
