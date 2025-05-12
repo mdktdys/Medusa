@@ -399,7 +399,7 @@ class Zamenas(Base):
     cabinet: Mapped[Optional[int]] = mapped_column(BigInteger)
 
     Cabinets_: Mapped['Cabinets'] = relationship('Cabinets', back_populates='Zamenas')
-    Courses_: Mapped['Courses'] = relationship('Courses', back_populates='Zamenas', lazy="selectin")
+    Courses_: Mapped['Courses'] = relationship('Courses', back_populates='Zamenas', sa_relationship_kwargs={'lazy': 'selectin'})
     Groups_: Mapped['Groups'] = relationship('Groups', back_populates='Zamenas')
     scheduleTimetable: Mapped['ScheduleTimetable'] = relationship('ScheduleTimetable', back_populates='Zamenas')
     Teachers_: Mapped['Teachers'] = relationship('Teachers', back_populates='Zamenas')
