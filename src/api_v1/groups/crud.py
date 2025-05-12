@@ -43,14 +43,20 @@ async def get_group_day_schedule_by_date(session: AsyncSession, group_id: int, d
     # Get Paras
     query = select(database.Paras).where(
         and_(database.Paras.group == group_id, database.Paras.date == date)
-    ).options(selectinload(database.Paras.Courses_))
+    ).options(
+        selectinload(database.Paras.Courses_),
+        selectinload(database.Paras.Teachers_)
+    )
     result: Result = await session.execute(query)
     paras_on_day: List[database.Paras] = list(result.scalars().all())
 
     # Get Zamenas
     query = select(database.Zamenas).where(
         and_(database.Zamenas.group == group_id, database.Zamenas.date == date)
-    ).options(selectinload(database.Zamenas.Courses_))
+    ).options(
+        selectinload(database.Zamenas.Courses_),
+        selectinload(database.Paras.Teachers_)
+    )
     result: Result = await session.execute(query)
     zamenas_on_day: List[database.Zamenas] = list(result.scalars().all())
 
