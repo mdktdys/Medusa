@@ -38,9 +38,6 @@ class Group(BaseModel):
     name: str
     department: int
     
-    class Config:
-        orm_mode = True
-
 
 class DaySchedule(BaseModel):
     model_config = ConfigDict(from_attributes=True)
