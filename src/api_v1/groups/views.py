@@ -70,3 +70,10 @@ async def get_group_week_schedule_by_date(
     return await crud.get_group_week_schedule_by_date(
         session=session, group_id=group_id, monday_date=monday_date
     )
+
+
+@router.get("/ping")
+@cache(expire=600)
+async def ping():
+    print("Called ping()")
+    return {"pong": True}
