@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from auth.auth import any_auth_method
+from src.auth.auth import any_auth_method
 from .groups.views import router as groups_router
 from .search.views import router as search_router
 from .teachers.views import router as teachers_router

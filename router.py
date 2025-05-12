@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from src.api_v1 import router as api_v1_router
-from src.auth.auth import router as auth_router, any_auth_method
+from src.auth.auth import router as auth_router
 
 router = APIRouter()
 
