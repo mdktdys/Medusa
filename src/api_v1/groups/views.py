@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
 from src.alchemy.db_helper import *
-from utils.key_builder import custom_key_builder
+from src.utils.key_builder import custom_key_builder
 from . import crud
 from .schemas import Group, DayScheduleFormatted
 from .schemas import DaySchedule
