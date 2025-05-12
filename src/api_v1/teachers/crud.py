@@ -103,7 +103,10 @@ async def get_teacher_day_schedule_by_date(
 
 
 async def get_teacher_day_schedule_by_date_formatted(
-        session: AsyncSession, teacher_id: int, date: datetime, chat_id: int
+    session: AsyncSession,
+    teacher_id: int,
+    date: datetime,
+    chat_id: int
 ) -> DayScheduleFormatted:
     schedule: DayScheduleTeacher = await get_teacher_day_schedule_by_date(
         session=session, teacher_id=teacher_id, date=date

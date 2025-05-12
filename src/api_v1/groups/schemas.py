@@ -37,6 +37,9 @@ class Group(BaseModel):
     id: int
     name: str
     department: int
+    
+    class Config:
+        orm_mode = True
 
 
 class DaySchedule(BaseModel):

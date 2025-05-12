@@ -1,20 +1,18 @@
 from datetime import datetime, timedelta
 from typing import List
 
-from fastapi.openapi.models import Response
-from sqlalchemy import *
+from sqlalchemy import select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
-from src.api_v1.groups.schemas import Zamena, Paras, DayScheduleFormatted
+from src.api_v1.groups.schemas import DayScheduleFormatted
 from src.api_v1.telegram.crud import (
     get_chat_subscribers,
-    subscribe_zamena_notifications,
 )
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
+from .schemas import Group
 
-
-async def get_groups(session: AsyncSession) -> List[database.Groups]:
+async def get_groups(session: AsyncSession) -> list[Group]:
     query = select(database.Groups)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
@@ -22,14 +20,13 @@ async def get_groups(session: AsyncSession) -> List[database.Groups]:
 
 async def get_group_by_id(
         session: AsyncSession, group_id: int
-) -> List[database.Groups]:
+) -> list[Group]:
     query = select(database.Groups).where(database.Groups.id == group_id)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
 
-async def get_group_day_schedule_by_date(
-        session: AsyncSession, group_id: int, date: datetime
+async def get_group_day_schedule_by_date(session: AsyncSession, group_id: int, date: datetime
 ) -> DaySchedule:
     # Get Group
     search_group: database.Groups = list(
@@ -87,14 +84,12 @@ async def get_group_day_schedule_by_date(
 
 
 async def get_group_day_schedule_by_date_formatted(
-        session: AsyncSession,
-        group_id: int,
-        date: datetime,
-        chat_id: int,
+    session: AsyncSession,
+    group_id: int,
+    date: datetime,
+    chat_id: int,
 ) -> DayScheduleFormatted:
-    schedule: DaySchedule = await get_group_day_schedule_by_date(
-        session=session, group_id=group_id, date=date
-    )
+    schedule: DaySchedule = await get_group_day_schedule_by_date(session = session, group_id=group_id, date=date)
     rows = []
     subscribed = any(
         [
@@ -114,7 +109,7 @@ async def get_group_day_schedule_by_date_formatted(
                     f"\n{para.zamena.scheduleTimetable.start}-{para.zamena.scheduleTimetable.end}   {para.zamena.Cabinets_.name}"
                 )
             else:
-                rows.append(f"\n<b>Замена🔄️</b>")
+                rows.append("\n<b>Замена🔄️</b>")
                 rows.append(
                     f"\n{get_number_para_emoji(para.zamena.number)} {para.zamena.Courses_.fullname}"
                 )
