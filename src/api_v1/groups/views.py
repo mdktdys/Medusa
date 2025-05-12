@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
 from src.alchemy.db_helper import *
-from src.utils.key_builder import custom_key_builder
+from src.utils.key_builder import default_key_builder
 from . import crud
 from .schemas import Group, DayScheduleFormatted
 from .schemas import DaySchedule
@@ -74,7 +74,7 @@ async def get_group_week_schedule_by_date(
 
 
 @router.get("/ping")
-@cache(expire=600, key_builder=custom_key_builder)
+@cache(expire=600, key_builder=default_key_builder)
 async def ping(session: AsyncSession = Depends(db_helper.session_dependency)):
     print("Called ping()")
     return {
