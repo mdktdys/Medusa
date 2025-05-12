@@ -46,7 +46,8 @@ async def get_group_day_schedule_by_date(session: AsyncSession, group_id: int, d
     ).options(
         selectinload(database.Paras.Courses_),
         selectinload(database.Paras.Teachers_),
-        selectinload(database.Paras.scheduleTimetable)
+        selectinload(database.Paras.scheduleTimetable),
+        selectinload(database.Paras.Cabinets_)
     )
     result: Result = await session.execute(query)
     paras_on_day: List[database.Paras] = list(result.scalars().all())
@@ -57,7 +58,8 @@ async def get_group_day_schedule_by_date(session: AsyncSession, group_id: int, d
     ).options(
         selectinload(database.Zamenas.Courses_),
         selectinload(database.Zamenas.Teachers_),
-        selectinload(database.Zamenas.scheduleTimetable)
+        selectinload(database.Zamenas.scheduleTimetable),
+        selectinload(database.Zamenas.Cabinets_)
     )
     result: Result = await session.execute(query)
     zamenas_on_day: List[database.Zamenas] = list(result.scalars().all())
