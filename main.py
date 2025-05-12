@@ -11,6 +11,7 @@ from redis import asyncio as aioredis
 
 from src.alchemy.db_helper import local_db_helper
 from router import router, tags_metadata, description
+from src.utils.key_builder import default_key_builder
 
 
 @asynccontextmanager
@@ -20,7 +21,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         await conn.run_sync(Base.metadata.create_all)
     async with local_db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache", key_builder=default_key_builder)
     yield
 
 

@@ -74,10 +74,10 @@ async def get_group_week_schedule_by_date(
 
 
 @router.get("/ping")
-@cache(expire=600, key_builder=default_key_builder)
+@cache(expire=600)
 async def ping(session: AsyncSession = Depends(db_helper.session_dependency)):
     print("Called ping()")
     return {
         "pong": False,
-        "gotcha": False
+        "gotcha": 'teasss'
     }
