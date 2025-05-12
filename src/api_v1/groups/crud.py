@@ -3,6 +3,7 @@ from typing import List
 
 from sqlalchemy import select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from src.alchemy import database
 from src.api_v1.groups.schemas import DayScheduleFormatted
 from src.api_v1.telegram.crud import (
@@ -42,14 +43,14 @@ async def get_group_day_schedule_by_date(session: AsyncSession, group_id: int, d
     # Get Paras
     query = select(database.Paras).where(
         and_(database.Paras.group == group_id, database.Paras.date == date)
-    )
+    ).options(selectinload(database.Paras.Courses_))
     result: Result = await session.execute(query)
     paras_on_day: List[database.Paras] = list(result.scalars().all())
 
     # Get Zamenas
     query = select(database.Zamenas).where(
         and_(database.Zamenas.group == group_id, database.Zamenas.date == date)
-    )
+    ).options(selectinload(database.Zamenas.Courses_))
     result: Result = await session.execute(query)
     zamenas_on_day: List[database.Zamenas] = list(result.scalars().all())
 
@@ -98,7 +99,7 @@ async def get_group_day_schedule_by_date_formatted(
             if sub.target_id == group_id and sub.target_type == 1
         ]
     )
-
+    
     for para in schedule.paras:
         if para.zamena is not None:
             if para.origin is None:
