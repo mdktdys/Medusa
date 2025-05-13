@@ -3,6 +3,7 @@ import os
 PUBLIC_API_KEY = os.environ.get('PUBLIC_API_KEY')
 API_KEY = os.environ.get('API_KEY')
 SECRET = os.environ.get('SECRET')
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
 
 supabase_database_connection: str = os.environ['SUPABASE_DATABASE_CONNECTION']
 local_database_connection: str = os.environ['LOCAL_DATABASE_CONNECTION']

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from starlette.middleware.cors import CORSMiddleware
 
+from my_secrets import REDIS_PASSWORD
 from src.alchemy import db_helper, Base
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
@@ -16,7 +17,10 @@ from src.utils.key_builder import default_key_builder
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    redis = aioredis.from_url("redis://redis", decode_responses=False)
+    redis = aioredis.from_url(
+        f"redis://:{REDIS_PASSWORD}@redis:6379/1",
+        decode_responses=False
+    )
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     async with local_db_helper.engine.begin() as conn:
