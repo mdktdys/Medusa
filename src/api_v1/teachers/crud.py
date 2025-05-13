@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
 from typing import List
-from sqlalchemy import *
+from sqlalchemy import select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
+from sqlalchemy.orm import selectinload
 from src.api_v1.groups.schemas import Paras, DayScheduleFormatted
 from src.api_v1.telegram.crud import get_chat_subscribers
-from src.models.day_schedule_model import DaySchedule, Para
+from src.models.day_schedule_model import Para
 from src.utils.tools import get_number_para_emoji
 from src.api_v1.teachers.schemas import ZamenasFull, DayScheduleTeacher, TeacherMonthStats, DayScheduleTeacherPydantic
 from src.api_v1.groups.schemas import Zamena as Zamenas
@@ -27,7 +28,9 @@ async def get_teacher_by_id(
 
 
 async def get_teacher_day_schedule_by_date(
-        session: AsyncSession, teacher_id: int, date: datetime
+    session: AsyncSession,
+    teacher_id: int,
+    date: datetime
 ) -> DayScheduleTeacher:
     async def get_search_teacher() -> database.Teachers:
         return list(
@@ -43,22 +46,26 @@ async def get_teacher_day_schedule_by_date(
         )[0]
 
     async def get_teachers_origin_paras_by_date() -> List[Paras]:
-        query = select(database.Paras).where(
-            and_(database.Paras.teacher == teacher_id, database.Paras.date == date)
+        query = select(database.Paras).where(and_(database.Paras.teacher == teacher_id, database.Paras.date == date)).options(
+            selectinload(database.Paras.Courses_),
+            selectinload(database.Paras.Teachers_),
+            selectinload(database.Paras.scheduleTimetable),
+            selectinload(database.Paras.Cabinets_)
         )
         result: Result = await session.execute(query)
         return list(result.scalars().all())
 
     async def get_teachers_zamenas_by_date() -> List[Zamenas]:
-        query = select(database.Zamenas).where(
-            and_(database.Zamenas.teacher == teacher_id, database.Zamenas.date == date)
+        query = select(database.Zamenas).where(and_(database.Zamenas.teacher == teacher_id, database.Zamenas.date == date)).options(
+            selectinload(database.Zamenas.Courses_),
+            selectinload(database.Zamenas.Teachers_),
+            selectinload(database.Zamenas.scheduleTimetable),
+            selectinload(database.Zamenas.Cabinets_)
         )
         result: Result = await session.execute(query)
         return list(result.scalars().all())
 
-    async def get_groups_zamenas_full_by_date(
-            zamenas_on_day: List[Zamenas],
-    ) -> List[ZamenasFull]:
+    async def get_groups_zamenas_full_by_date(zamenas_on_day: List[Zamenas]) -> List[ZamenasFull]:
         query = select(database.ZamenasFull).where(
             and_(
                 database.ZamenasFull.group.in_([x.group for x in zamenas_on_day]),
