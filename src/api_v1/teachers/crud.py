@@ -48,7 +48,8 @@ async def get_teacher_day_schedule_by_date(
             selectinload(database.Paras.Courses_),
             selectinload(database.Paras.Teachers_),
             selectinload(database.Paras.scheduleTimetable),
-            selectinload(database.Paras.Cabinets_)
+            selectinload(database.Paras.Cabinets_),
+            selectinload(database.Paras.Groups_)
         )
         result: Result = await session.execute(query)
         return list(result.scalars().all())
@@ -58,7 +59,8 @@ async def get_teacher_day_schedule_by_date(
             selectinload(database.Zamenas.Courses_),
             selectinload(database.Zamenas.Teachers_),
             selectinload(database.Zamenas.scheduleTimetable),
-            selectinload(database.Zamenas.Cabinets_)
+            selectinload(database.Zamenas.Cabinets_),
+            selectinload(database.Zamenas.Groups_)
         )
         result: Result = await session.execute(query)
         return list(result.scalars().all())
