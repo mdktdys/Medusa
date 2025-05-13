@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
-from alchemy.database import Teachers
+from src.alchemy.database import Teachers
 from src.alchemy.db_helper import db_helper, AsyncSession
 from . import crud
 from .schemas import (
