@@ -28,8 +28,8 @@ async def send_multicast_message(message: FirebaseMessage, subscribers: List[Fir
 
 
 @router.get('/get_firebase_item_subscribers', response_model = List[FirebaseSubscriber])
-async def get_firebase_item_subscribers(item_id: int, item_type: int) -> List[FirebaseSubscriber]:
+async def get_firebase_item_subscribers(item_ids: list[int], item_type: int) -> List[FirebaseSubscriber]:
     return crud.get_firebase_item_subscribers(
-        item_id = item_id,
+        item_ids = item_ids,
         item_type = item_type
     )

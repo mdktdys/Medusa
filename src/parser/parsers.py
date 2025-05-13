@@ -100,11 +100,6 @@ async def parse_zamenas(url: str, date_: date, force: bool, notify: bool) -> Zam
         case _:
             raise Exception('Неизвестный формат')
 
-    print(notify)
-    print(type(result))
-    print(result is ZamenaParseSucess)
-    print(type(result) is ZamenaParseSucess)
-    
     if notify and type(result) is ZamenaParseSucess:
         await notify_zamena(
             affected_groups = result.affected_groups,

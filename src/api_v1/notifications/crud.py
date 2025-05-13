@@ -31,16 +31,14 @@ async def send_multicast_message(message: FirebaseMessage, subscribers: List[Fir
     )
 
 
-def get_firebase_item_subscribers(item_id: int, item_type: int) -> List[FirebaseSubscriber]:
+def get_firebase_item_subscribers(item_ids: list[int], item_type: int) -> List[FirebaseSubscriber]:
     sup = SupaBaseWorker()
     subscribers = (
         sup.client.table('MessagingClients')
         .select('token, clientID')
         .eq('subType', item_type)
-        .eq('subID', item_id)
+        .in_('subID', item_ids)
         .execute()
     ).data
-    print(subscribers)
-    print(type(subscribers))
 
     return [FirebaseSubscriber(client_id = sub['clientID'], token = sub['token']) for sub in subscribers]

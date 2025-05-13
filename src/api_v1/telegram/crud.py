@@ -136,24 +136,12 @@ async def notify_zamena(affected_groups: List[int], affected_teachers: List[int]
         body = 'В заменах есть изменения для тебя!' 
     )
     
-    print('1')
+    groups_subscribers: list[FirebaseSubscriber] = await get_firebase_item_subscribers(item_type = 1, item_ids = affected_groups)
+    teachers_subscribers: list[FirebaseSubscriber] = await get_firebase_item_subscribers(item_type = 2, item_ids = affected_teachers)
     
-    for group in affected_groups:
-        sub_chats: List[FirebaseSubscriber] = await get_firebase_item_subscribers(
-            item_id = group,
-            item_type = 1
-        )
-        await send_multicast_message(
-            subscribers = sub_chats,
-            message = message,
-        )
-    for teacher in affected_teachers:
-        sub_chats: List[FirebaseSubscriber] = await get_firebase_item_subscribers(
-            item_id = teacher,
-            item_type = 2
-        )
-        await send_multicast_message(
-            subscribers = sub_chats,
-            message = message,
-        )
+    await send_multicast_message(
+        subscribers = groups_subscribers + teachers_subscribers,
+        message = message,
+    )
+
     return None
