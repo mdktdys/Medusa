@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from typing import List
-from sqlalchemy import select, Result, and_
+from typing import List, Tuple
+from sqlalchemy import Select, select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 from sqlalchemy.orm import selectinload
@@ -14,15 +14,13 @@ import asyncio
 
 
 async def get_teachers(session: AsyncSession) -> List[database.Teachers]:
-    query = select(database.Teachers)
+    query: Select[Tuple[database.Teachers]] = select(database.Teachers)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
 
-async def get_teacher_by_id(
-        session: AsyncSession, teacher_id: int
-) -> List[database.Teachers]:
-    query = select(database.Teachers).where(database.Teachers.id == teacher_id)
+async def get_teacher_by_id(session: AsyncSession, teacher_id: int) -> List[database.Teachers]:
+    query: Select[Tuple[database.Teachers]] = select(database.Teachers).where(database.Teachers.id == teacher_id)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
@@ -81,9 +79,7 @@ async def get_teacher_day_schedule_by_date(
         get_teachers_zamenas_by_date(),
     )
 
-    full_zamenas: List[ZamenasFull] = await get_groups_zamenas_full_by_date(
-        zamenas_on_day=zamenas_on_day
-    )
+    full_zamenas: List[ZamenasFull] = await get_groups_zamenas_full_by_date(zamenas_on_day = zamenas_on_day)
 
     lessons_list: List[List[Para | List]] = [[] for i in range(0, 7)]
     for i in range(1, 8):

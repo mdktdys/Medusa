@@ -13,9 +13,13 @@ from .telegram.views import router as telegram_router
 from .notifications.views import router as notifications_router
 
 router = APIRouter()
+
+# Public
 router.include_router(router=groups_router, prefix="/groups")
+router.include_router(router=teachers_router, prefix="/teachers")
+
+# Private
 router.include_router(router=search_router, prefix="/search", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
-router.include_router(router=teachers_router, prefix="/teachers", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router=merges_router, prefix="/merge", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router=bench_router, prefix="/bench", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router=cabinets_router, prefix="/cabinets", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
