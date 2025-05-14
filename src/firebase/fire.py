@@ -39,30 +39,26 @@ def send_multicats_message(message: FirebaseMessage, subscribers: List[FirebaseS
     web_subs = list(set(sub.token for sub in subscribers if sub.client_id == 1))
     android_subs = list(set(sub.token for sub in subscribers if sub.client_id == 2))
 
-    muticast_web_message = messaging.MulticastMessage(
-        tokens = web_subs,
+    messages_web  = [messaging.Message(
+        token = sub,
         data = {
             'title': message.title,
             'body': message.body
         }
-    )
-    
-    multicast_android_message = messaging.MulticastMessage(
-        tokens=android_subs,
-        notification=messaging.Notification(
-            title=message.title,
-            body=message.body,
-        ),
+    ) for sub in web_subs]
+    mssages_android = [messaging.Message(
+        token=sub,
         data = {
             'title': message.title,
             'body': message.body
         },
-    )
+        notification=messaging.Notification(
+            title=message.title,
+            body=message.body,
+        ),            
+    ) for sub in android_subs]
     
-    messaging.send_each(messages = [
-        multicast_android_message,
-        muticast_web_message,
-    ])
+    messaging.send_each(messages = messages_web + mssages_android)
 
 
 def send_message_to_topic(title: str, body: str, sup: SupaBaseWorker):
