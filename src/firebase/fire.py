@@ -35,6 +35,10 @@ def send_single_message(title: str, body: str, token: str):
     return response
 
 
+def send_all(message: list[FirebaseMessage]): 
+    messages = message)
+
+
 def send_multicats_message(message: FirebaseMessage, subscribers: List[FirebaseSubscriber]):
     web_subs = list(set(sub.token for sub in subscribers if sub.client_id == 1))
     android_subs = list(set(sub.token for sub in subscribers if sub.client_id == 2))
@@ -59,10 +63,15 @@ def send_multicats_message(message: FirebaseMessage, subscribers: List[FirebaseS
         },
     )
     
-    if len(web_subs) > 0:
-        messaging.send_each_for_multicast(muticast_web_message)
-    if len(android_subs) > 0:
-        messaging.send_each_for_multicast(multicast_android_message)
+    messaging.send_each(messages = [
+        multicast_android_message,
+        muticast_web_message,
+    ])
+    
+    # if len(web_subs) > 0:
+    #     messaging.send_each_for_multicast(muticast_web_message)
+    # if len(android_subs) > 0:
+    #     messaging.send_each_for_multicast(multicast_android_message)
 
 
 def send_message_to_topic(title: str, body: str, sup: SupaBaseWorker):
