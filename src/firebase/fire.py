@@ -35,10 +35,6 @@ def send_single_message(title: str, body: str, token: str):
     return response
 
 
-def send_all(message: list[FirebaseMessage]): 
-    messages = message)
-
-
 def send_multicats_message(message: FirebaseMessage, subscribers: List[FirebaseSubscriber]):
     web_subs = list(set(sub.token for sub in subscribers if sub.client_id == 1))
     android_subs = list(set(sub.token for sub in subscribers if sub.client_id == 2))
