@@ -28,7 +28,7 @@ async def get_teacher_by_id(teacher_id: int = -1, session: AsyncSession = Depend
     return await crud.get_teacher_by_id(session=session, teacher_id=teacher_id)
 
 
-@router.get("/day_schedule/{teacher_id}/{date}/{chat_id}/", response_model=DayScheduleTeacherPydantic)
+@router.get("/day_schedule/{teacher_id}/{date}/{chat_id}/", response_model = DayScheduleTeacherPydantic)
 @cache(expire=6000)
 async def get_teacher_day_schedule_by_date(
     teacher_id: int = -1,
@@ -39,6 +39,7 @@ async def get_teacher_day_schedule_by_date(
 
 
 @router.get("/day_schedule_formatted/{teacher_id}/{date}/{chat_id}/", response_model=DayScheduleFormatted)
+@cache(expire=6000)
 async def get_teacher_day_schedule_by_date_formatted(
     teacher_id: int = -1,
     chat_id: int = -1,
