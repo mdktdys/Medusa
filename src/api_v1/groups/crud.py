@@ -102,13 +102,7 @@ async def get_group_day_schedule_by_date_formatted(
 ) -> DayScheduleFormatted:
     schedule: DaySchedule = await get_group_day_schedule_by_date(session = session, group_id=group_id, date=date)
     rows = []
-    subscribed = any(
-        [
-            True
-            for sub in (await get_chat_subscribers(chat_id=chat_id, session=session))
-            if sub.target_id == group_id and sub.target_type == 1
-        ]
-    )
+    subscribed = any([True for sub in (await get_chat_subscribers(chat_id=chat_id, session=session)) if sub.target_id == group_id and sub.target_type == 1])
     
     for para in schedule.paras:
         if para.zamena is not None:
@@ -144,7 +138,7 @@ async def get_group_day_schedule_by_date_formatted(
         paras=rows,
         search_name=schedule.search_name,
         full_zamena=schedule.full_zamena,
-        subscribed=subscribed,
+        subscribed = subscribed,
     )
 
 

@@ -17,9 +17,7 @@ from src.parser.supabase import SupaBaseWorker
 sup = SupaBaseWorker()
 
 
-async def get_chat_subscribers(
-    session: AsyncSession, chat_id: int
-) -> List[database.Subscribers]:
+async def get_chat_subscribers(session: AsyncSession, chat_id: int) -> List[database.Subscribers]:
     query = select(database.Subscribers).where(database.Subscribers.chat_id == str(chat_id))
     result: Result = await session.execute(query)
     return list(result.scalars().all())
