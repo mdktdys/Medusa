@@ -61,6 +61,7 @@ async def get_group_week_schedule_by_date(
     
 
 @router.post('/schedule', response_model = GroupScheduleResponse)
+@cache(expire = 60000)
 async def get_group_schedule(
     request: GroupScheduleRequest,
     datasource: DataSource = Depends(get_supabase_data_source)

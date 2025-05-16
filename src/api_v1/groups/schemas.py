@@ -63,10 +63,6 @@ class GroupScheduleRequest(BaseModel):
     group_id: int
     date_from: date
     date_to: date
-    
-class GroupScheduleResponse(BaseModel):
-    schedule: list
-    
 
 class ScheduleLesson(BaseModel):
     model_config = ConfigDict(from_attributes = True)
@@ -84,4 +80,7 @@ class ScheduleDaySchedule(BaseModel):
     zamena_full: ZamenaFull | None
     telegram_link: ZamenaFileLink | None
     zamena_links: list[ZamenaFileLink]
+
+class GroupScheduleResponse(BaseModel):
+    schedule: list[ScheduleDaySchedule]
     

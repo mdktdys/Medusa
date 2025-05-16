@@ -1,15 +1,9 @@
-import os
-from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi_cache.decorator import cache
+from fastapi import APIRouter, Depends
+from fastapi_cache import FastAPICache
 
-from src.alchemy.db_helper import *
+from src.alchemy.db_helper import AsyncSession, db_helper, local_db_helper
 from . import crud
-import docker
-
-from ...auth.auth import fastapi_users
-from ...auth.schemas import User
 
 router = APIRouter(tags=["Manage"])
 
@@ -20,3 +14,12 @@ async def sync_local_database(
         local_session: AsyncSession = Depends(local_db_helper.session_dependency),
 ) -> dict:
     return await crud.sync_local_database(supabase_session, local_session)
+
+
+@router.delete('purge_cache', response_model = dict)
+def purge_cache():
+        FastAPICache.reset()
+        return {
+                'result': 'ok'
+        }
+        
