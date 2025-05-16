@@ -1,26 +1,16 @@
 import datetime
 
+from pydantic import BaseModel, ConfigDict
 
-class ZamenaFileLink:
+
+class ZamenaFileLink(BaseModel):
+    model_config = ConfigDict(from_attributes = True)
+    
     id: int
     link: str
     date: datetime.date
     created_at: datetime.datetime
     hash: str
-
-    def __init__(
-        self,
-        id: int,
-        link: str,
-        date: datetime.date,
-        created_at: datetime.datetime,
-        hash: str
-    ):
-        self.id = id
-        self.link = link
-        self.date = date
-        self.created_at = created_at
-        self.hash = hash
         
     @staticmethod
     def fromMap(map: dict) -> "ZamenaFileLink":

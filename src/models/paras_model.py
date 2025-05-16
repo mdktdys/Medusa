@@ -14,24 +14,6 @@ class Paras(BaseModel):
     cabinet: int
     date: datetime.date
 
-    def __init__(
-        self,
-        id: int,
-        group: int,
-        number: int,
-        course: int,
-        teacher: int,
-        cabinet: int,
-        date: datetime.date,
-    ):
-        self.id = id
-        self.group = group
-        self.number = number
-        self.course = course
-        self.teacher = teacher
-        self.cabinet = cabinet
-        self.date = date
-
     def toDict(self) -> dict:
         return {
             "id": self.id,

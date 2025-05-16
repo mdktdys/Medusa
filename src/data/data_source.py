@@ -11,9 +11,6 @@ class DataSource:
     async def load_timings(self) -> list[LessonTimings]:
         raise NotImplementedError
 
-    async def __init__(self) -> None:
-        self.timings: list[LessonTimings] = await self.load_timings()
-    
     async def get_lessons(
         self,
         group_id: int | None = None,

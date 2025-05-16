@@ -1,20 +1,14 @@
 import datetime
 
+from pydantic import BaseModel, ConfigDict
 
-class Holiday:
+
+class Holiday(BaseModel):
+    model_config = ConfigDict(from_attributes = True)
+    
     id: int
     name: str
     date: datetime.date
-
-    def __init__(
-        self,
-        id: int,
-        name: str,
-        date: datetime.date,
-    ):
-        self.id = id
-        self.name = name
-        self.date = date
         
     @staticmethod
     def fromMap(map: dict) -> "Holiday":

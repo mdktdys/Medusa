@@ -5,12 +5,12 @@ class LessonTimings(BaseModel):
     model_config = ConfigDict(from_attributes = True)
     
     number: int
-    start: datetime.datetime
-    end: datetime.datetime
-    saturday_start: datetime.datetime
-    saturday_end: datetime.datetime
-    obed_start: datetime.datetime
-    obed_end: datetime.datetime
+    start: datetime.time
+    end: datetime.time
+    saturday_start: datetime.time
+    saturday_end: datetime.time
+    obed_start: datetime.time
+    obed_end: datetime.time
     
     @staticmethod
     def fromMap(data: dict) -> "LessonTimings":

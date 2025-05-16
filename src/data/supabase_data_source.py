@@ -10,17 +10,21 @@ from src.models.paras_model import Paras
 from supabase import AsyncClient, acreate_client
 
 class SupabaseDataSource(DataSource):
-    async def __init__(self):
-        self.supabase: AsyncClient = await acreate_client(
-            supabase_key = SUPABASE_ANON_KEY,
-            supabase_url = SUPABASE_URL,
+    def __init__(self, supabase: AsyncClient, timings: list[LessonTimings]) -> None:
+        self.supabase: AsyncClient = supabase
+        self.timings: list[LessonTimings] = timings
+
+
+    @classmethod
+    async def create(cls) -> 'SupabaseDataSource':
+        supabase: AsyncClient = await acreate_client(
+            supabase_key=SUPABASE_ANON_KEY,
+            supabase_url=SUPABASE_URL,
         )
-        await super().__init__()
-        
-        
-    async def load_timings(self) -> list[LessonTimings]:
-        result = await self.supabase.from_('timings').select('*').execute()
-        return [LessonTimings.fromMap(data) for data in result.data]
+        result = await supabase.from_('timings').select('*').execute()
+        timings: list[LessonTimings] = [LessonTimings.fromMap(data) for data in result.data]
+        return cls(supabase, timings)
+
 
     async def get_lessons(
         self,
