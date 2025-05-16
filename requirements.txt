@@ -4,7 +4,7 @@ pydantic~=2.7.0
 pydantic_settings==2.4.0
 redis~=4.6.0
 SQLAlchemy~=2.0.32
-supabase~=2.4.1
+supabase~=2.15.1
 asyncpg==0.29.0
 fastapi-users[sqlalchemy]
 passlib==1.7.4

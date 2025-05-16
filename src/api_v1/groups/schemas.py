@@ -3,16 +3,22 @@ from typing import List
 
 from pydantic import BaseModel, ConfigDict
 
+from src.models.holiday_model import Holiday
+from src.models.paras_model import Paras
+from src.models.zamena_file_link_model import ZamenaFileLink
+from src.models.zamena_full import ZamenaFull
+from src.models.zamenas import Zamenas
 
-class Paras(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: int
-    group: int
-    number: int
-    course: int
-    teacher: int
-    cabinet: int
-    date: datetime
+
+# class Paras(BaseModel):
+#     model_config = ConfigDict(from_attributes=True)
+#     id: int
+#     group: int
+#     number: int
+#     course: int
+#     teacher: int
+#     cabinet: int
+#     date: datetime
 
 
 class Zamena(BaseModel):
@@ -60,3 +66,22 @@ class GroupScheduleRequest(BaseModel):
     
 class GroupScheduleResponse(BaseModel):
     schedule: list
+    
+
+class ScheduleLesson(BaseModel):
+    model_config = ConfigDict(from_attributes = True)
+    
+    number: int    
+    lessons: list[Paras]
+    zamenas: list[Zamenas]
+
+class ScheduleDaySchedule(BaseModel):
+    model_config = ConfigDict(from_attributes = True)
+    
+    date: date
+    paras: list[ScheduleLesson]
+    holidays: list[Holiday]
+    zamena_full: ZamenaFull | None
+    telegram_link: ZamenaFileLink | None
+    zamena_links: list[ZamenaFileLink]
+    

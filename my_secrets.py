@@ -8,9 +8,9 @@ REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
 supabase_database_connection: str = os.environ['SUPABASE_DATABASE_CONNECTION']
 local_database_connection: str = os.environ['LOCAL_DATABASE_CONNECTION']
 
-SUPABASE_ANON_KEY = os.environ.get('SCHEDULER_SUPABASE_ANON_KEY')
-SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
-SUPABASE_URL = os.environ.get('SCHEDULER_SUPABASE_URL')
+SUPABASE_ANON_KEY: str = os.environ['SCHEDULER_SUPABASE_ANON_KEY']
+SUPABASE_SECRET_KEY: str = os.environ['SUPABASE_SECRET_KEY']
+SUPABASE_URL: str = os.environ['SCHEDULER_SUPABASE_URL']
 
 BACKEND_URL = os.environ.get('BACKEND_URL')
 BROKER_URL = os.environ.get('BROKER_URL')

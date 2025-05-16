@@ -4,6 +4,12 @@ from typing import List
 from sqlalchemy import select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from src.models.holiday_model import Holiday
+from src.models.paras_model import Paras
+from src.models.zamena_file_link_model import ZamenaFileLink
+from src.models.zamena_full import ZamenaFull
+from src.models.zamenas import Zamenas
+from src.data.data_source import DataSource
 from src.alchemy import database
 from src.api_v1.groups.schemas import DayScheduleFormatted
 from src.api_v1.telegram.crud import (
@@ -11,7 +17,8 @@ from src.api_v1.telegram.crud import (
 )
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
-from .schemas import Group, GroupScheduleRequest, GroupScheduleResponse
+from .schemas import Group, GroupScheduleRequest, GroupScheduleResponse, ScheduleDaySchedule, ScheduleLesson
+import asyncio
 
 async def get_groups(session: AsyncSession) -> list[Group]:
     query = select(database.Groups)
@@ -156,5 +163,80 @@ async def get_group_week_schedule_by_date(session: AsyncSession, group_id: int, 
     return week_schedule
 
 
-async def get_group_schedule(request: GroupScheduleRequest) -> GroupScheduleResponse:
-    return GroupScheduleResponse(schedule = ['asd'])
+async def get_group_schedule(
+    request: GroupScheduleRequest,
+    datasource: DataSource
+) -> GroupScheduleResponse:
+    lessons_task = datasource.get_lessons(
+        group_id = request.group_id,
+        date_from = request.date_from,
+        date_to = request.date_to,
+    )
+    zamenas_task = datasource.get_zamenas(
+        group_id = request.group_id,
+        date_from = request.date_from,
+        date_to = request.date_to,
+    )
+    zamena_file_links_task = datasource.get_zamena_file_links(
+        date_from = request.date_from,
+        date_to = request.date_to,
+    )
+    zamena_full_task = datasource.get_zamena_full(
+        group_ids = [request.group_id],
+        date_from = request.date_from,
+        date_to = request.date_to,
+    )
+    holidays_task = datasource.get_holidays(
+        date_from = request.date_from,
+        date_to = request.date_to,
+    )
+    
+    lessons, zamenas, zamena_file_links, zamena_full, holidays = await asyncio.gather(
+        lessons_task,
+        zamenas_task,
+        zamena_file_links_task,
+        zamena_full_task,
+        holidays_task
+    )
+    
+    day_count: int = max((request.date_to - request.date_from).days, 1)
+    schedule = []
+        
+    for i in range(day_count):
+        current_date = request.date_from + timedelta(days=i)
+
+        day_lessons: List[Paras] = [lesson for lesson in lessons if lesson.date == current_date]
+        day_zamenas: List[Zamenas] = [z for z in zamenas if z.date == current_date]
+        day_zamena_full: ZamenaFull | None = next((z for z in zamena_full if z.date == current_date), None)
+        # see
+        day_telegram_link: ZamenaFileLink | None = next((t for t in zamena_file_links if t.date == current_date), None)
+        day_zamena_links: List[ZamenaFileLink] = [z for z in zamena_file_links if z.date == current_date]
+        day_holidays: List[Holiday] = [h for h in holidays if h.date == current_date]
+
+        day_paras: list[ScheduleLesson] = []
+        for timing in datasource.timings:
+            lesson_matches: List[Paras] = [lesson for lesson in day_lessons if lesson.number == timing.number]
+            zamena_matches: List[Zamenas] = [zamena for zamena in day_zamenas if zamena.number == timing.number and zamena.group == request.group_id]
+
+            if not lesson_matches and not zamena_matches:
+                continue
+
+            paras = ScheduleLesson(
+                number = timing.number,
+                lessons = lesson_matches,
+                zamenas = zamena_matches
+            )
+            day_paras.append(paras)
+
+        day_schedule = ScheduleDaySchedule(
+            date = current_date,
+            paras = day_paras,
+            holidays = day_holidays,
+            zamena_full = day_zamena_full,
+            telegram_link = day_telegram_link,
+            zamena_links = day_zamena_links
+        )
+
+        schedule.append(day_schedule)
+
+    return GroupScheduleResponse(schedule=schedule)

@@ -4,6 +4,8 @@ from typing import List
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
+from src.dependencies.data_source_dependency import get_supabase_data_source
+from src.data.data_source import DataSource
 from src.alchemy.db_helper import AsyncSession, db_helper
 from . import crud
 from .schemas import DaySchedule, GroupScheduleRequest, Group, DayScheduleFormatted, GroupScheduleResponse
@@ -58,6 +60,12 @@ async def get_group_week_schedule_by_date(
     )
     
 
-@router.get('/schedule', response_model = GroupScheduleResponse)
-async def get_group_schedule(request: GroupScheduleRequest):
-    return await crud.get_group_schedule(request = request)
+@router.post('/schedule', response_model = GroupScheduleResponse)
+async def get_group_schedule(
+    request: GroupScheduleRequest,
+    datasource: DataSource = Depends(get_supabase_data_source)
+) -> GroupScheduleResponse:
+    return await crud.get_group_schedule(
+        request = request,
+        datasource = datasource,
+    )

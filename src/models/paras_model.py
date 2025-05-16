@@ -8,7 +8,7 @@ class Paras:
     course: int
     teacher: int
     cabinet: int
-    date: datetime
+    date: datetime.date
 
     def __init__(
         self,
@@ -38,3 +38,16 @@ class Paras:
             "cabinet": self.cabinet,
             "date": self.date.strftime("%Y-%m-%d"),
         }
+        
+    @staticmethod
+    def fromMap(map: dict) -> "Paras":
+        return Paras(
+            id=map["id"],
+            group=map["group"],
+            number=map["number"],
+            course=map["course"],
+            teacher=map["teacher"],
+            cabinet=map["cabinet"],
+            date=datetime.datetime.strptime(map["date"], "%Y-%m-%d").date()
+        )
+        
