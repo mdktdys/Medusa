@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import List
 
 from pydantic import BaseModel, ConfigDict
@@ -49,3 +49,14 @@ class DayScheduleFormatted(BaseModel):
     search_name: str
     full_zamena: bool
     paras: List[str] = []
+    
+
+class GroupScheduleRequest(BaseModel):
+    model_config = ConfigDict(from_attributes = True)
+    
+    group_id: int
+    date_from: date
+    date_to: date
+    
+class GroupScheduleResponse(BaseModel):
+    schedule: list

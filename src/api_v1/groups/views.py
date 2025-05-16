@@ -6,8 +6,7 @@ from fastapi_cache.decorator import cache
 
 from src.alchemy.db_helper import AsyncSession, db_helper
 from . import crud
-from .schemas import Group, DayScheduleFormatted
-from .schemas import DaySchedule
+from .schemas import DaySchedule, GroupScheduleRequest, Group, DayScheduleFormatted, GroupScheduleResponse
 
 router = APIRouter(tags=["Groups"])
 
@@ -57,3 +56,8 @@ async def get_group_week_schedule_by_date(
         group_id=group_id,
         session=session,
     )
+    
+
+@router.get('/schedule', response_model = GroupScheduleResponse)
+async def get_group_schedule(request: GroupScheduleRequest):
+    return await crud.get_group_schedule(request = request)

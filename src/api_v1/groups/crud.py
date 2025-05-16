@@ -11,7 +11,7 @@ from src.api_v1.telegram.crud import (
 )
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
-from .schemas import Group
+from .schemas import Group, GroupScheduleRequest, GroupScheduleResponse
 
 async def get_groups(session: AsyncSession) -> list[Group]:
     query = select(database.Groups)
@@ -154,3 +154,7 @@ async def get_group_week_schedule_by_date(session: AsyncSession, group_id: int, 
         week_schedule.append(day_schedule)
 
     return week_schedule
+
+
+async def get_group_schedule(request: GroupScheduleRequest) -> GroupScheduleResponse:
+    return GroupScheduleResponse(schedule = ['asd'])
