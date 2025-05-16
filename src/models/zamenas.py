@@ -1,7 +1,11 @@
 import datetime
 
+from pydantic import BaseModel, ConfigDict
 
-class Zamenas:
+
+class Zamenas(BaseModel):
+    model_config = ConfigDict(from_attributes = True)
+    
     id: int
     group: int
     number: int
