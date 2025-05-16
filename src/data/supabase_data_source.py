@@ -1,7 +1,7 @@
 import datetime
 from src.models.lesson_timings_model import LessonTimings
 from src.models.holiday_model import Holiday
-from my_secrets import SUPABASE_SECRET_KEY, SUPABASE_URL
+from my_secrets import SUPABASE_ANON_KEY, SUPABASE_URL
 from src.models.zamena_file_link_model import ZamenaFileLink
 from src.models.zamenas import Zamenas
 from src.models.zamena_full import ZamenaFull
@@ -12,7 +12,7 @@ from supabase import AsyncClient, acreate_client
 class SupabaseDataSource(DataSource):
     async def __init__(self):
         self.supabase: AsyncClient = await acreate_client(
-            supabase_key = SUPABASE_SECRET_KEY,
+            supabase_key = SUPABASE_ANON_KEY,
             supabase_url = SUPABASE_URL,
         )
         await super().__init__()
