@@ -92,7 +92,18 @@ async def parse_zamenas_json(url: str | UploadFile, date: date) -> dict:
     file_type: str = define_file_format(stream)
     match file_type:
         case "application/pdf":
-            raise Exception('Пока не поддерживается')
+            cv = Converter(stream=stream, pdf_file="temp")
+            stream_converted = BytesIO()
+            cv.convert(stream_converted)
+            cv.close()
+
+            result: ZamenaParseResult = parse_zamena_v2(
+                supabase_client = supabase_client,
+                data_model = data_model,
+                stream = stream_converted,
+                date = date,
+                link = url,
+            )
         case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
             result: ZamenaParseResult = parse_zamena_v2(
                 supabase_client = supabase_client,
