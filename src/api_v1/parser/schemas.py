@@ -12,7 +12,7 @@ class ParseZamenaRequest(BaseModel):
 
 
 class ParseZamenaJsonRequest(BaseModel):
-    file: Url | UploadFile
+    file: str | UploadFile
     date: datetime.date
 
 

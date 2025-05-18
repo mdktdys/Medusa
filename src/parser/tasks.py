@@ -23,7 +23,7 @@ def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
     return asyncio.run(methods.parse_zamena(url, date, notify))
 
 @parser_celery_app.task
-def parse_zamena_json(url: Url | UploadFile, date: datetime.date) -> dict:
+def parse_zamena_json(url: str | UploadFile, date: datetime.date) -> dict:
     return asyncio.run(methods.parse_zamenas_json(url = url, date = date))
 
 @parser_celery_app.task

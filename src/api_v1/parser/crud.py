@@ -25,7 +25,7 @@ async def parse_zamena(request: ParseZamenaRequest) -> dict:
 
 def parse_zamena_json(request: ParseZamenaJsonRequest) -> dict:
     task: AsyncResult = tasks.parse_zamena_json.delay(
-        url = request.url,
+        url = request.file,
         date = request.date,
     )
     return {'task_id': task.id.__str__()}
