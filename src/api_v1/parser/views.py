@@ -1,11 +1,10 @@
 import datetime
 import os
 from typing import List, Any
-
 from fastapi import APIRouter, Depends, UploadFile
 from fastapi_cache.decorator import cache
 from fastapi.responses import StreamingResponse
-
+from celery.result import AsyncResult
 from src.parser.schemas.parse_zamena_schemas import ZamenaParseResultJson
 from src.alchemy.db_helper import *
 from . import crud
@@ -51,8 +50,12 @@ async def parse_zamena_json(request: ParseZamenaRequest) -> dict:
 
 @router.get("/status")
 def status(task_id: str) -> dict:
-    r = crud.tasks.parser_celery_app.AsyncResult(task_id)
-    return r
+    r: AsyncResult = crud.tasks.parser_celery_app.AsyncResult(task_id)
+    return {
+        'status': r.status,
+        'result': r.result,
+        'info': r.info
+    }
 
 
 @router.post("/pdf2docx")
