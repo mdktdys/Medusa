@@ -1,8 +1,3 @@
-"""
-Модуль описывающий работу бота телеграм
-"""
-
-from asyncio import sleep
 import magic
 import requests
 from io import BytesIO
@@ -10,12 +5,13 @@ from http import HTTPStatus
 from datetime import date
 from pdf2docx import Converter
 
+from data.data_source import DataSource
 from src.api_v1.telegram.views import notify_zamena
 from src.parser.core import parseParas
 from src.parser.models.data_model import Data
-from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult, ZamenaParseResultJson, ZamenaParseSucess
+from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult, ZamenaParseSucess
 from src.parser.supabase import SupaBaseWorker
-from src.parser.zamena_parser import parseZamenas
+from src.parser.zamena_parser import parseZamenas, parse_zamena_v2
 
 
 def init_date_model(sup: SupaBaseWorker) -> Data:
@@ -73,18 +69,34 @@ def convert_pdf_2_word(file: bytes) -> BytesIO:
     return stream_converted
 
 
-async def parse_zamenas_from_word(
-        file_bytes: BytesIO, date_: date, force: bool, url: str
-):
+async def parse_zamenas_from_word(file_bytes: BytesIO, date_: date, force: bool, url: str):
     supabase_client = SupaBaseWorker()
     data_model = init_date_model(sup=supabase_client)
     return parseZamenas(file_bytes, date_, data_model, url, supabase_client, force=force)
 
 
-async def  parse_zamenas_json(url: str, date: date) -> dict:
-    await sleep(100)
+def parse_zamenas_json(url: str, date: date, datasource: DataSource) -> dict:
+    # remove me
+    supabase_client = SupaBaseWorker()
+    data_model = init_date_model(sup=supabase_client)
+    
+    stream = get_file_stream(link=url)
+    file_type: str = define_file_format(stream)
+    
+    match file_type:
+        case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            result: ZamenaParseResult = parse_zamena_v2(
+                supabase_client = supabase_client,
+                data_model = data_model,
+                stream = stream,
+                date = date,
+                link = url,
+            )
+        case _:
+            raise Exception('Неизвестный формат')
+
     return {
-        'result': 'ok',
+        'result': result.model_dump(),
         'test': 'test'
     }
 

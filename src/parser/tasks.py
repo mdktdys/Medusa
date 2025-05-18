@@ -6,8 +6,8 @@ from typing import Any
 from celery import Celery
 from celery.app.control import Inspect
 
+from src.data.data_source import DataSource
 from my_secrets import BACKEND_URL, BROKER_URL
-from src.parser.schemas.parse_zamena_schemas import ZamenaParseResultJson
 from src.parser import methods
 
 parser_celery_app = Celery(
@@ -22,11 +22,8 @@ def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
     return asyncio.run(methods.parse_zamena(url, date, notify))
 
 @parser_celery_app.task
-def parse_zamena_json(url: str, date: datetime.date) -> dict:
-    
-    return {
-        'result': 'gotcha'
-    }
+def parse_zamena_json(url: str, date: datetime.date, datasource: DataSource) -> dict:
+    return methods.parse_zamenas_json(url = url, date = date, datasource = datasource)
 
 @parser_celery_app.task
 def get_latest_zamena_link() -> dict:

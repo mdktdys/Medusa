@@ -5,8 +5,9 @@ from fastapi import APIRouter, Depends, UploadFile
 from fastapi_cache.decorator import cache
 from fastapi.responses import StreamingResponse
 from celery.result import AsyncResult
-from src.parser.schemas.parse_zamena_schemas import ZamenaParseResultJson
-from src.alchemy.db_helper import *
+from src.dependencies.data_source_dependency import get_supabase_data_source
+from src. data.data_source import DataSource
+from src.alchemy.db_helper import db_helper, AsyncSession
 from . import crud
 
 from .schemas import ParseZamenaRequest, RemoveZamenaRequest
@@ -44,17 +45,23 @@ async def parse_zamena(request: ParseZamenaRequest) -> dict:
 
 
 @router.post('/parse_zamena_json', response_model = dict)
-async def parse_zamena_json(request: ParseZamenaRequest) -> dict:
-    return await crud.parse_zamena_json(request = request)
+def parse_zamena_json(
+    request: ParseZamenaRequest,
+    datasource: DataSource = Depends(get_supabase_data_source),
+) -> dict:
+    return crud.parse_zamena_json(
+        request = request,
+        datasource = datasource,
+    )
 
 
 @router.get("/status")
 def status(task_id: str) -> dict:
     r: AsyncResult = crud.tasks.parser_celery_app.AsyncResult(task_id)
     return {
+        'id': r.id,
         'status': r.status,
-        'result': r.result,
-        'info': r.info
+        'result': r.traceback if r.failed() else r.result,
     }
 
 

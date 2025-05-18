@@ -8,7 +8,7 @@ from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.parser.schemas.parse_zamena_schemas import ZamenaParseResultJson
+from src.data.data_source import DataSource
 from src.alchemy import database
 from src.api_v1.parser.schemas import ParseZamenaRequest, RemoveZamenaRequest
 from src.parser import tasks
@@ -23,12 +23,16 @@ async def parse_zamena(request: ParseZamenaRequest) -> dict:
     return task.get()
 
 
-async def parse_zamena_json(request: ParseZamenaRequest) -> dict:
-    task: AsyncResult = tasks.parse_zamena_json.delay(url = request.url.__str__(), date = request.date)
-    
-    return {
-        'task_id': task.id.__str__(),
-    }
+def parse_zamena_json(
+    request: ParseZamenaRequest,
+    datasource: DataSource
+) -> dict:
+    task: AsyncResult = tasks.parse_zamena_json.delay(
+        url = request.url.__str__(),
+        date = request.date,
+        datasource = datasource,
+    )
+    return {'task_id': task.id.__str__()}
 
 
 async def get_latest_zamena_link():

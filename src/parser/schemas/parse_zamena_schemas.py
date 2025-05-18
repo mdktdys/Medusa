@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 from pydantic import BaseModel, ConfigDict
@@ -23,4 +24,9 @@ class ZamenaParseSucess(ZamenaParseResult):
     affected_groups: List[int]
 
 class ZamenaParseResultJson(ZamenaParseResult):
-    test: str
+    liquidation_groups: list[int]
+    full_zamena_groups: list[int]
+    practice_groups: list[int]
+    zamenas: list[dict]
+    file_hash: str | None
+    date: datetime.date

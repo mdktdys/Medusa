@@ -17,7 +17,6 @@ from docx.table import Table
 from datetime import date
 import aspose.words as aw
 
-from src.alchemy.database import Liquidation
 from src.parser.models.cabinet_model import Cabinet
 from src.parser.models.course_model import Course
 from src.parser.models.data_model import Data
@@ -26,13 +25,13 @@ from src.parser.models.teacher_model import Teacher
 from src.parser.schemas.parse_zamena_schemas import (
     ZamenaParseFailedNotFoundItems,
     ZamenaParseResult,
+    ZamenaParseResultJson,
     ZamenaParseSucess,
 )
 from src.parser.shared import (
     get_align_course_by_group,
     get_teacher_from_string,
     clean_dirty_string,
-    get_course_from_string,
     get_empty_course,
     is_empty_course,
     get_cabinet_from_string,
@@ -42,6 +41,42 @@ from src.parser.supabase import SupaBaseWorker
 
 not_found_items: List[str] = []
 parse_result = None
+
+
+def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> ZamenaParseResult:
+    all_rows, header = _get_all_tables(stream)
+    practice_groups = _extract_practice_groups(header, data_model)
+    work_rows = _prepare_work_rows(all_rows)
+    work_rows = _filter_and_clean_rows(work_rows)
+
+    work_rows, full_zamena_groups, liquidation = handle_special_cases(work_rows, data_model)
+    update_empty_group_column(work_rows)
+    work_rows = process_multiple_entries(work_rows)
+
+    map_entities_to_ids(work_rows, data_model)
+
+    if len(not_found_items) > 0:
+        return ZamenaParseFailedNotFoundItems(
+            error="Not found items",
+            items=list(set(not_found_items)),
+            result="error",
+            trace=f"{link}",
+        )
+
+    practice_groups_ = [i.id for i in practice_groups]
+    zamenas = [{"group": i[0], "number": int(i[1]), "course": i[4], "teacher": i[5], "cabinet": i[6]} for i in work_rows]
+    full_zamenas_groups: list[int] = [get_group_by_id(target_name=i,data_model=data_model,groups=data_model.GROUPS,supabase_client=supabase_client).id for i in full_zamena_groups]
+    hash = get_remote_file_hash(link)
+    
+    return ZamenaParseResultJson(
+        result = 'ok',
+        zamenas = zamenas,
+        liquidation_groups = liquidation,
+        full_zamena_groups = full_zamenas_groups,
+        practice_groups = practice_groups_,
+        file_hash = hash,
+        date = date,
+    )
 
 
 def parseZamenas(
@@ -61,7 +96,7 @@ def parseZamenas(
     update_empty_group_column(work_rows)
     work_rows = process_multiple_entries(work_rows)
 
-    map_entities_to_ids(work_rows, data_model, supabase_client)
+    map_entities_to_ids(work_rows, data_model)
 
     if len(not_found_items) > 0:
         return ZamenaParseFailedNotFoundItems(
@@ -84,6 +119,7 @@ def parseZamenas(
         data_model,
         supabase_client,
     )
+
     return ZamenaParseSucess(
         affected_teachers= affected_teachers,
         affected_groups= affected_groups
@@ -94,9 +130,7 @@ def _extract_practice_groups(header, data_model: Data):
     """Extract practice groups from the header."""
     practice_groups = []
     for i in header:
-        practice_groups.extend(
-            SupaBaseWorker.get_groups_from_string(i.text, data_model=data_model)
-        )
+        practice_groups.extend(SupaBaseWorker.get_groups_from_string(i.text, data_model=data_model))
     return practice_groups
 
 
@@ -125,7 +159,7 @@ def _filter_and_clean_rows(workRows: list[str]):
 
 def handle_special_cases(
         workRows: list[str], data_model: Data
-) -> Tuple[list, list, List[Liquidation]]:
+) -> Tuple[list, list, list[int]]:
     """Handle specific cases such as liquidation and removing duplicate data."""
     iteration = 0
     liquidation = list()
@@ -248,9 +282,7 @@ def get_affected_teachers(work_rows: list) -> List[int]:
     return list(set([i[5] for i in work_rows]))
 
 
-def map_entities_to_ids(
-        workRows: list, data_model: Data, supabase_client: SupaBaseWorker
-):
+def map_entities_to_ids(workRows: list, data_model: Data):
     """
     Применяет функцию к Ids и записывает их в строки workRows
     """
@@ -409,7 +441,7 @@ def download_file(link: str, filename: str):
 def prepare_and_send_supabase_entries(
         workRows,
         practice_groups: list,
-        liquidation: List[Liquidation],
+        liquidation: list[int],
         fullzamenagroups: list,
         date_: date,
         link,
@@ -539,12 +571,10 @@ def add_and_get_entity(entity_type, add_func, entities, target_name, data_model,
         return None
 
 
-def get_group_by_id(
-        groups, target_name, data_model: Data, supabase_client: SupaBaseWorker
-) -> Group:
+def get_group_by_id(groups, target_name, data_model: Data, supabase_client: SupaBaseWorker) -> Group:
     if (
-            target_name.replace("_", "-").replace("—", "-").lower()
-            == "22пса-1,22пса-2,22пса-3"
+        target_name.replace("_", "-").replace("—", "-").lower()
+        == "22пса-1,22пса-2,22пса-3"
     ):
         target_name = "22пса-1"
     return add_and_get_entity(
