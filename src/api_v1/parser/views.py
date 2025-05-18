@@ -49,6 +49,11 @@ async def parse_zamena_json(request: ParseZamenaRequest) -> dict:
     return await crud.parse_zamena_json(request = request)
 
 
+@router.get("/status")
+def status(task_id: str) -> dict:
+    r = crud.tasks.parser_celery_app.AsyncResult(task_id)
+    return r
+
 
 @router.post("/pdf2docx")
 async def pdf2docx(docx: UploadFile):
