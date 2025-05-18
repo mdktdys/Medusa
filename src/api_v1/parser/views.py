@@ -5,12 +5,10 @@ from fastapi import APIRouter, Depends, UploadFile
 from fastapi_cache.decorator import cache
 from fastapi.responses import StreamingResponse
 from celery.result import AsyncResult
-from src.dependencies.data_source_dependency import get_supabase_data_source
-from src. data.data_source import DataSource
 from src.alchemy.db_helper import db_helper, AsyncSession
 from . import crud
 
-from .schemas import ParseZamenaRequest, RemoveZamenaRequest
+from .schemas import ParseZamenaJsonRequest, ParseZamenaRequest, RemoveZamenaRequest
 
 router = APIRouter(tags=["Parser"])
 
@@ -45,7 +43,7 @@ async def parse_zamena(request: ParseZamenaRequest) -> dict:
 
 
 @router.post('/parse_zamena_json', response_model = dict)
-def parse_zamena_json(request: ParseZamenaRequest) -> dict:
+def parse_zamena_json(request: ParseZamenaJsonRequest) -> dict:
     return crud.parse_zamena_json(request = request)
 
 
