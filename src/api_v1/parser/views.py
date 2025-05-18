@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, UploadFile
 from fastapi_cache.decorator import cache
 from fastapi.responses import StreamingResponse
 
+from src.parser.schemas.parse_zamena_schemas import ZamenaParseResultJson
 from src.alchemy.db_helper import *
 from . import crud
 
@@ -41,6 +42,12 @@ async def get_all_tasks() -> dict:
 @router.post("/parse_zamena", response_model=dict)
 async def parse_zamena(request: ParseZamenaRequest) -> dict:
     return await crud.parse_zamena(request)
+
+
+@router.post('/parse_zamena_json', response_model = dict)
+async def parse_zamena_json(request: ParseZamenaRequest) -> dict:
+    return await crud.parse_zamena_json(request = request)
+
 
 
 @router.post("/pdf2docx")

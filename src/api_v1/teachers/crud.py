@@ -2,9 +2,10 @@ from datetime import datetime, timedelta
 from typing import List, Tuple
 from sqlalchemy import Select, select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.data.data_source import DataSource
 from src.alchemy import database
 from sqlalchemy.orm import selectinload
-from src.api_v1.groups.schemas import Paras, DayScheduleFormatted
+from src.api_v1.groups.schemas import GroupScheduleRequest, GroupScheduleResponse, Paras, DayScheduleFormatted
 from src.api_v1.telegram.crud import get_chat_subscribers
 from src.models.day_schedule_model import Para
 from src.utils.tools import get_number_para_emoji
@@ -213,7 +214,89 @@ async def get_teacher_week_schedule_by_date(
     return week_lessons
 
 
-async def get_teacher_month_stats(date: datetime.date, teacher_id: int, session: AsyncSession) -> TeacherMonthStats:
-    return TeacherMonthStats(
-        teacher_id=teacher_id
-    )
+async def get_teacher_month_stats(date: datetime, teacher_id: int, session: AsyncSession) -> TeacherMonthStats:
+    return TeacherMonthStats(teacher_id = teacher_id)
+    
+
+async def get_teacher_schedule(
+    request: GroupScheduleRequest,
+    datasource: DataSource
+) -> GroupScheduleResponse:
+
+    return GroupScheduleResponse(schedule=[])
+
+
+# Future<List<DaySchedule>> teacherSchedule({
+#     required final List<LessonTimings> timings,
+#     required final DateTime startdate,
+#     required final Teacher searchItem,
+#     required final DateTime endDate,
+#   }) async {
+
+#     final List<Lesson> lessons = (await Api.loadWeekTeacherSchedule(
+#       teacherID: searchItem.id,
+#       start: startdate,
+#       end: endDate,
+#     ))..sort((final a, final b) => a.date.compareTo(b.date));
+
+#     final List<int> groups = List<int>.from(lessons.map((final Lesson e) => e.group));
+    
+#     final result = await Future.wait([
+#       Api.getZamenasFull(groups, startdate, endDate),
+#       Api.getLiquidation(groups, startdate, endDate),
+#       Api.loadZamenas(groupsID: groups, start: startdate, end: endDate),
+#       Api.getZamenaFileLinks(start: startdate, end: endDate),
+#       Api.getAlreadyFoundLinks(start: startdate, end: endDate),
+#       Api.getHolidays(startdate, endDate)
+#     ].toList());
+
+#     final List<ZamenaFull> zamenasFull = result[0] as List<ZamenaFull>;
+#     // final List<Liquidation> liquidations = result[1] as List<Liquidation>;
+#     final List<Zamena> groupsLessons = result[2] as List<Zamena>;
+#     final List<ZamenaFileLink> links = result[3] as List<ZamenaFileLink>;
+#     final List<TelegramZamenaLinks> telegramLinks = result[4] as List<TelegramZamenaLinks>;
+#     final List<Holiday> holidays = result[5] as List<Holiday>;
+
+#     List<DaySchedule> schedule = [];
+#     for (DateTime date in List.generate(math.max(endDate.difference(startdate).inDays, 1), (final int index) => startdate.add(Duration(days: index)))) {
+#       List<Paras> dayParas = [];
+
+#       final List<Lesson> teacherDayLessons = lessons.where((final lesson) => lesson.date.sameDate(date)).toList();
+#       final List<Zamena> dayGroupsLessons = groupsLessons.where((final lesson) => lesson.date.sameDate(date)).toList();
+
+#       for (LessonTimings timing in timings) {
+#         final Paras paras = Paras();
+
+#         final List<Lesson> teacherLesson = teacherDayLessons.where((final Lesson lesson) => lesson.number == timing.number).toList();
+#         final List<Zamena> groupLessonZamena = dayGroupsLessons.where((final Zamena lesson) => lesson.lessonTimingsID == timing.number).toList();
+#         final List<ZamenaFull> paraZamenaFull = zamenasFull.where((final zamena) => zamena.date.sameDate(date)).toList();
+
+#         paras.lesson = teacherLesson;
+#         paras.zamena = groupLessonZamena;
+#         paras.zamenaFull = paraZamenaFull;
+
+#         if (
+#           paras.lesson!.isEmpty
+#           && paras.zamena!.isEmpty
+#         ) {
+#           continue;
+#         }
+
+#         paras.number = timing.number;
+#         dayParas.add(paras);
+#       }
+
+#       final DaySchedule daySchedule = DaySchedule(
+#         zamenaFull: null,
+#         holidays: holidays.where((final holiday) => holiday.date.sameDate(date)).toList(),
+#         telegramLink: telegramLinks.where((final link) => link.date.sameDate(date)).firstOrNull,
+#         zamenaLinks: links.where((final link) => link.date.sameDate(date)).toList(),
+#         paras: dayParas,
+#         date: date,
+#       );
+
+#       schedule.add(daySchedule);
+#     }
+
+#     return schedule;
+#   }

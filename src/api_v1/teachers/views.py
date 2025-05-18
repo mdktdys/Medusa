@@ -4,6 +4,9 @@ from typing import List
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
+from src.api_v1.groups.schemas import GroupScheduleRequest, GroupScheduleResponse
+from src.data.data_source import DataSource
+from src.dependencies.data_source_dependency import get_supabase_data_source
 from src.alchemy.database import Teachers
 from src.alchemy.db_helper import db_helper, AsyncSession
 from . import crud
@@ -56,6 +59,17 @@ async def get_teacher_week_schedule_by_date(
 ) -> List[DayScheduleTeacherPydantic]:
     return await crud.get_teacher_week_schedule_by_date(session=session, teacher_id=teacher_id, monday_date=monday_date)
 
+
+@router.post('/schedule', response_model = GroupScheduleResponse)
+@cache(expire = 60000)
+async def get_teacher_schedule(
+    request: GroupScheduleRequest,
+    datasource: DataSource = Depends(get_supabase_data_source)
+) -> GroupScheduleResponse:
+    return await crud.get_teacher_schedule(
+        request = request,
+        datasource = datasource,
+    )
 
 # @router.post("/month_stats/", response_model=TeacherMonthStats)
 # async def get_teacher_month_stats(request: TeacherMonthStatsRequest,

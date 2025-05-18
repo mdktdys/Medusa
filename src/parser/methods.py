@@ -4,6 +4,7 @@ import os
 import traceback
 from typing import Any, List
 from docx2pdf import convert
+from src.parser.schemas.parse_zamena_schemas import ZamenaParseResultJson
 from parser_v3 import parse_schedule_from_file
 from scripts.site_parser_v3 import get_zamena_tables
 from src.parser.core import (
@@ -12,6 +13,7 @@ from src.parser.core import (
 )
 from src.parser.parsers import (
     parse_zamenas,
+    parse_zamenas_json,
     get_remote_file_bytes,
 )
 
@@ -39,6 +41,10 @@ import html as Html
 
 async def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
     return (await parse_zamenas(url=url, date_=date, force=False, notify = notify)).model_dump()
+
+
+async def parse_zamena_json(url: str, date: datetime.datetime) -> ZamenaParseResultJson:
+    return await parse_zamenas_json(url=url, date = date)
 
 
 async def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:

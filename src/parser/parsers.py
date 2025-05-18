@@ -2,6 +2,8 @@
 Модуль описывающий работу бота телеграм
 """
 
+from asyncio import sleep
+from concurrent.futures import thread
 import magic
 import requests
 from io import BytesIO
@@ -12,7 +14,7 @@ from pdf2docx import Converter
 from src.api_v1.telegram.views import notify_zamena
 from src.parser.core import parseParas
 from src.parser.models.data_model import Data
-from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult, ZamenaParseSucess
+from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult, ZamenaParseResultJson, ZamenaParseSucess
 from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import parseZamenas
 
@@ -78,6 +80,12 @@ async def parse_zamenas_from_word(
     supabase_client = SupaBaseWorker()
     data_model = init_date_model(sup=supabase_client)
     return parseZamenas(file_bytes, date_, data_model, url, supabase_client, force=force)
+
+
+async def   parse_zamenas_json(url: str, date: date) -> ZamenaParseResultJson:
+    await sleep(100)
+    return ZamenaParseResultJson(result = 'ok', test = 'test')
+
 
 
 async def parse_zamenas(url: str, date_: date, force: bool, notify: bool) -> ZamenaParseResult:

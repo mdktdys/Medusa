@@ -7,6 +7,7 @@ from celery import Celery
 from celery.app.control import Inspect
 
 from my_secrets import BACKEND_URL, BROKER_URL
+from src.parser.schemas.parse_zamena_schemas import ZamenaParseResultJson
 from src.parser import methods
 
 parser_celery_app = Celery(
@@ -20,6 +21,9 @@ parser_celery_app = Celery(
 def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
     return asyncio.run(methods.parse_zamena(url, date, notify))
 
+@parser_celery_app.task
+def parse_zamena_json(url: str, date: datetime.date) -> ZamenaParseResultJson:
+    return asyncio.run(methods.parse_zamenas_json(url, date))
 
 @parser_celery_app.task
 def get_latest_zamena_link() -> dict:
