@@ -5,6 +5,7 @@ from http import HTTPStatus
 from datetime import date
 from pdf2docx import Converter
 
+from dependencies.data_source_dependency import get_supabase_data_source
 from src.data.data_source import DataSource
 from src.api_v1.telegram.views import notify_zamena
 from src.parser.core import parseParas
@@ -75,7 +76,8 @@ async def parse_zamenas_from_word(file_bytes: BytesIO, date_: date, force: bool,
     return parseZamenas(file_bytes, date_, data_model, url, supabase_client, force=force)
 
 
-def parse_zamenas_json(url: str, date: date, datasource: DataSource) -> dict:
+async def parse_zamenas_json(url: str, date: date) -> dict:
+    datasource: DataSource = await get_supabase_data_source()
     # remove me
     supabase_client = SupaBaseWorker()
     data_model = init_date_model(sup=supabase_client)

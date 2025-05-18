@@ -6,6 +6,7 @@ from typing import Any
 from celery import Celery
 from celery.app.control import Inspect
 
+from dependencies.data_source_dependency import get_supabase_data_source
 from src.data.data_source import DataSource
 from my_secrets import BACKEND_URL, BROKER_URL
 from src.parser import methods
@@ -22,8 +23,8 @@ def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
     return asyncio.run(methods.parse_zamena(url, date, notify))
 
 @parser_celery_app.task
-def parse_zamena_json(url: str, date: datetime.date, datasource: DataSource) -> dict:
-    return methods.parse_zamenas_json(url = url, date = date, datasource = datasource)
+def parse_zamena_json(url: str, date: datetime.date) -> dict:
+    return asyncio.run(methods.parse_zamenas_json(url = url, date = date))
 
 @parser_celery_app.task
 def get_latest_zamena_link() -> dict:

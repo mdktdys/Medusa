@@ -30,7 +30,6 @@ def parse_zamena_json(
     task: AsyncResult = tasks.parse_zamena_json.delay(
         url = request.url.__str__(),
         date = request.date,
-        datasource = datasource,
     )
     return {'task_id': task.id.__str__()}
 
