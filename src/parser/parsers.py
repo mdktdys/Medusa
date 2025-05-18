@@ -2,6 +2,7 @@
 Модуль описывающий работу бота телеграм
 """
 
+from asyncio import sleep
 import magic
 import requests
 from io import BytesIO
@@ -81,8 +82,7 @@ async def parse_zamenas_from_word(
 
 
 async def  parse_zamenas_json(url: str, date: date) -> dict:
-    import time
-    time.sleep(100)
+    await sleep(100)
     return {
         'result': 'ok',
         'test': 'test'
