@@ -83,9 +83,9 @@ async def parse_zamenas_json(url: str | UploadFile, date: date) -> dict:
     data_model = init_date_model(sup=supabase_client)
     
     stream = None
-    if type(url) is Url:
+    if type(url) is str:
         stream = get_file_stream(link=url.__str__())
-    if type(url is UploadFile):
+    if type(url) is UploadFile:
         stream = url.file.read()
         
         
