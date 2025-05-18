@@ -2,8 +2,6 @@
 Модуль описывающий работу бота телеграм
 """
 
-from asyncio import sleep
-from concurrent.futures import thread
 import magic
 import requests
 from io import BytesIO
@@ -82,8 +80,7 @@ async def parse_zamenas_from_word(
     return parseZamenas(file_bytes, date_, data_model, url, supabase_client, force=force)
 
 
-async def   parse_zamenas_json(url: str, date: date) -> ZamenaParseResultJson:
-    await sleep(100)
+async def  parse_zamenas_json(url: str, date: date) -> ZamenaParseResultJson:
     return ZamenaParseResultJson(result = 'ok', test = 'test')
 
 
