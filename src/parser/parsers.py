@@ -80,9 +80,11 @@ async def parse_zamenas_from_word(
     return parseZamenas(file_bytes, date_, data_model, url, supabase_client, force=force)
 
 
-async def  parse_zamenas_json(url: str, date: date) -> ZamenaParseResultJson:
-    return ZamenaParseResultJson(result = 'ok', test = 'test')
-
+async def  parse_zamenas_json(url: str, date: date) -> dict:
+    return {
+        'result': 'ok',
+        'test': 'test'
+    }
 
 
 async def parse_zamenas(url: str, date_: date, force: bool, notify: bool) -> ZamenaParseResult:
