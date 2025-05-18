@@ -6,8 +6,6 @@ from typing import Any
 from celery import Celery
 from celery.app.control import Inspect
 
-from dependencies.data_source_dependency import get_supabase_data_source
-from src.data.data_source import DataSource
 from my_secrets import BACKEND_URL, BROKER_URL
 from src.parser import methods
 

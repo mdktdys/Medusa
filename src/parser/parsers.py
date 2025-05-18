@@ -5,7 +5,7 @@ from http import HTTPStatus
 from datetime import date
 from pdf2docx import Converter
 
-from dependencies.data_source_dependency import get_supabase_data_source
+from src.dependencies.data_source_dependency import get_supabase_data_source
 from src.data.data_source import DataSource
 from src.api_v1.telegram.views import notify_zamena
 from src.parser.core import parseParas
