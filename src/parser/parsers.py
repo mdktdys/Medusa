@@ -5,7 +5,7 @@ from http import HTTPStatus
 from datetime import date
 from pdf2docx import Converter
 
-from data.data_source import DataSource
+from src.data.data_source import DataSource
 from src.api_v1.telegram.views import notify_zamena
 from src.parser.core import parseParas
 from src.parser.models.data_model import Data
