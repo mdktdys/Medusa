@@ -1,4 +1,6 @@
+from fastapi import UploadFile
 import magic
+from pydantic_core import Url
 import requests
 from io import BytesIO
 from http import HTTPStatus
@@ -76,16 +78,21 @@ async def parse_zamenas_from_word(file_bytes: BytesIO, date_: date, force: bool,
     return parseZamenas(file_bytes, date_, data_model, url, supabase_client, force=force)
 
 
-async def parse_zamenas_json(url: str, date: date) -> dict:
-    datasource: DataSource = await get_supabase_data_source()
-    # remove me
+async def parse_zamenas_json(url: Url | UploadFile, date: date) -> dict:
     supabase_client = SupaBaseWorker()
     data_model = init_date_model(sup=supabase_client)
     
-    stream = get_file_stream(link=url)
+    stream = None
+    if type(url) is Url:
+        stream = get_file_stream(link=url.__str__())
+    if type(url is UploadFile):
+        stream = url.file.read()
+        
+        
     file_type: str = define_file_format(stream)
-    
     match file_type:
+        case "application/pdf":
+            raise Exception('Пока не поддерживается')
         case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
             result: ZamenaParseResult = parse_zamena_v2(
                 supabase_client = supabase_client,

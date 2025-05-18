@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.data.data_source import DataSource
 from src.alchemy import database
-from src.api_v1.parser.schemas import ParseZamenaRequest, RemoveZamenaRequest
+from src.api_v1.parser.schemas import ParseZamenaJsonRequest, ParseZamenaRequest, RemoveZamenaRequest
 from src.parser import tasks
 
 
@@ -23,12 +23,9 @@ async def parse_zamena(request: ParseZamenaRequest) -> dict:
     return task.get()
 
 
-def parse_zamena_json(
-    request: ParseZamenaRequest,
-    datasource: DataSource
-) -> dict:
+def parse_zamena_json(request: ParseZamenaJsonRequest) -> dict:
     task: AsyncResult = tasks.parse_zamena_json.delay(
-        url = request.url.__str__(),
+        url = request.url,
         date = request.date,
     )
     return {'task_id': task.id.__str__()}

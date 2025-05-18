@@ -45,14 +45,8 @@ async def parse_zamena(request: ParseZamenaRequest) -> dict:
 
 
 @router.post('/parse_zamena_json', response_model = dict)
-def parse_zamena_json(
-    request: ParseZamenaRequest,
-    datasource: DataSource = Depends(get_supabase_data_source),
-) -> dict:
-    return crud.parse_zamena_json(
-        request = request,
-        datasource = datasource,
-    )
+def parse_zamena_json(request: ParseZamenaRequest) -> dict:
+    return crud.parse_zamena_json(request = request)
 
 
 @router.get("/status")
