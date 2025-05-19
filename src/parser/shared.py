@@ -92,11 +92,11 @@ def get_teacher_from_string(string: str, teachers: List[Teacher]) -> Teacher | N
 
 def get_cabinet_from_string(string: str, cabinets: List[Cabinet]) -> Cabinet | None:
     string = clean_dirty_string(string)
-    founded_cabinets_by_name = [cabinet for cabinet in cabinets if string == clean_dirty_string(cabinet.name)]
+    founded_cabinets_by_name: List[Cabinet] = [cabinet for cabinet in cabinets if string == clean_dirty_string(cabinet.name)]
     if len(founded_cabinets_by_name) > 0:
         return founded_cabinets_by_name[0]
     else:
-        founded_cabinets_by_synonyms = []
+        founded_cabinets_by_synonyms: list[Cabinet] = []
         for cabinet in cabinets:
             for syn in cabinet.synonyms:
                 if string == clean_dirty_string(syn):

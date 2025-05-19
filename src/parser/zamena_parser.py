@@ -145,7 +145,7 @@ def extract_teacher_cabinets_switchers(text: str, data_model: Data) -> List[Tupl
             continue
         
         teacher: Teacher | None = get_teacher_from_string(separated[0], teachers = data_model.TEACHERS)
-        cabinet: Cabinet | None = get_cabinet_from_string(separated[1], cabinets = data_model.CABINETS),
+        cabinet: Cabinet | None = get_cabinet_from_string(separated[1], cabinets = data_model.CABINETS)
         
         if teacher is None:
             raise Exception(f'Не найден преподаватель {separated[0]}')
