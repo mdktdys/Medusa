@@ -9,14 +9,13 @@ import os
 import re
 from io import BytesIO
 from typing import List, Tuple
-
+from docx.text.paragraph import Paragraph
 import fitz
 import requests
 from docx import Document
 from docx.table import Table
 from datetime import date
 import aspose.words as aw
-
 from src.parser.models.cabinet_model import Cabinet
 from src.parser.models.course_model import Course
 from src.parser.models.data_model import Data
@@ -45,6 +44,9 @@ parse_result = None
 
 def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> ZamenaParseResult:
     all_rows, header = _get_all_tables(stream)
+    print(header)
+    for head in header:
+        print(head.text)
     practice_groups = _extract_practice_groups(header, data_model)
     work_rows = _prepare_work_rows(all_rows)
     work_rows = _filter_and_clean_rows(work_rows)
@@ -63,7 +65,7 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
             trace=f"{link}",
         )
 
-    practice_groups_ = [i.id for i in practice_groups]
+    practice_groups_: list[int] = [i.id for i in practice_groups]
     zamenas = [{"group": i[0], "number": int(i[1]), "course": i[4], "teacher": i[5], "cabinet": i[6]} for i in work_rows]
     full_zamenas_groups: list[int] = [get_group_by_id(target_name=i,data_model=data_model,groups=data_model.GROUPS,supabase_client=supabase_client).id for i in full_zamena_groups]
     hash = get_remote_file_hash(link)
@@ -126,9 +128,8 @@ def parseZamenas(
     )
 
 
-def _extract_practice_groups(header, data_model: Data):
-    """Extract practice groups from the header."""
-    practice_groups = []
+def _extract_practice_groups(header: List[Paragraph], data_model: Data):
+    practice_groups: list[Group] = []
     for i in header:
         practice_groups.extend(SupaBaseWorker.get_groups_from_string(i.text, data_model=data_model))
     return practice_groups

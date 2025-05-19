@@ -32,7 +32,7 @@ def send_ai_request():
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
     },
     data = json.dumps({
-        "model": "meta-llama/llama-3.3-8b-instruct:free", # Optional
+        "model": "meta-llama/llama-3.3-8b-instruct:free",
         "messages": [
         {
             "role": "user",
