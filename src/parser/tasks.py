@@ -6,7 +6,6 @@ from typing import Any
 from celery import Celery
 from celery.app.control import Inspect
 from fastapi import UploadFile
-from pydantic_core import Url
 
 from my_secrets import BACKEND_URL, BROKER_URL
 from src.parser import methods
