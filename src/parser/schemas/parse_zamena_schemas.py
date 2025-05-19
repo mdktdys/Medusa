@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Tuple
 
 from pydantic import BaseModel, ConfigDict
 
@@ -28,6 +28,6 @@ class ZamenaParseResultJson(ZamenaParseResult):
     full_zamena_groups: list[int]
     practice_groups: list[int]
     zamenas: list[dict]
-    teacher_cabinet_switches: str
+    teacher_cabinet_switches: list[Tuple[int, int]]
     file_hash: str | None
     date: datetime.date

@@ -49,7 +49,7 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
     practice_groups: List[Group] = _extract_practice_groups(header, data_model)
     practice_groups_: list[int] = [i.id for i in practice_groups]
     
-    teacher_cabinets_switches = extract_teacher_cabinets_switchers(header, data_model)
+    teacher_cabinets_switches: list[Tuple[int, int]] = [(pair[0].id, pair[1].id) for pair in extract_teacher_cabinets_switchers(header, data_model)]
 
     work_rows = _prepare_work_rows(all_rows)
     work_rows = _filter_and_clean_rows(work_rows)
@@ -133,9 +133,29 @@ def parseZamenas(
     )
     
     
-def extract_teacher_cabinets_switchers(text: str, data_model: Data):
-    groups_text = send_ai_request(request = f'{teacher_cabinets_switches_promt}\n{text}')
-    return groups_text
+def extract_teacher_cabinets_switchers(text: str, data_model: Data) -> List[Tuple[Teacher, Cabinet]]:
+    groups_text: str = send_ai_request(request = f'{teacher_cabinets_switches_promt}\n{text}')
+    pairs: list[str] = groups_text.split('#')
+    extracted: List[Tuple[Teacher, Cabinet]] = []
+    
+    for pair in pairs:
+        separated: list[str] = pair.split('|')
+        
+        if len(separated) != 2:
+            continue
+        
+        teacher: Teacher | None = get_teacher_from_string(separated[0], teachers = data_model.TEACHERS)
+        cabinet: Cabinet | None = get_cabinet_from_string(separated[1], cabinets = data_model.CABINETS),
+        
+        if teacher is None:
+            raise Exception(f'Не найден преподаватель {separated[0]}')
+        
+        if cabinet is None:
+            raise Exception(f'Не найден кабинет {separated[1]}')
+        
+        extracted.append((teacher, cabinet))
+    
+    return extracted
 
 
 def _extract_practice_groups(text: str, data_model: Data):
