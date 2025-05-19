@@ -46,7 +46,9 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
     all_rows, header_paragraphs = _get_all_tables(stream)
     header: str = ' '.join(head.text for head in header_paragraphs)
 
-    practice_groups = _extract_practice_groups(header, data_model)
+    practice_groups: List[Group] = _extract_practice_groups(header, data_model)
+    practice_groups_: list[int] = [i.id for i in practice_groups]
+
     work_rows = _prepare_work_rows(all_rows)
     work_rows = _filter_and_clean_rows(work_rows)
 
@@ -64,7 +66,6 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
             trace=f"{link}",
         )
 
-    practice_groups_: list[int] = [i.id for i in practice_groups]
     zamenas = [{"group": i[0], "number": int(i[1]), "course": i[4], "teacher": i[5], "cabinet": i[6]} for i in work_rows]
     full_zamenas_groups: list[int] = [get_group_by_id(target_name=i,data_model=data_model,groups=data_model.GROUPS,supabase_client=supabase_client).id for i in full_zamena_groups]
     hash = get_remote_file_hash(link)
@@ -88,7 +89,9 @@ def parseZamenas(
         supabase_client: SupaBaseWorker,
         force: bool,
 ) -> ZamenaParseResult:
-    all_rows, header = _get_all_tables(stream)
+    all_rows, header_paragraphs = _get_all_tables(stream)
+    header: str = ' '.join(head.text for head in header_paragraphs)
+
     practice_groups = _extract_practice_groups(header, data_model)
     work_rows = _prepare_work_rows(all_rows)
     work_rows = _filter_and_clean_rows(work_rows)
