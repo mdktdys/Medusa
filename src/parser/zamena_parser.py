@@ -44,7 +44,7 @@ parse_result = None
 
 def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> ZamenaParseResult:
     all_rows, header_paragraphs = _get_all_tables(stream)
-    header: str = ' '.join(head.text for head in header_paragraphs)
+    header: str = ' '.join(head.text for head in header_paragraphs if 'Исп.' not in head.text)
 
     practice_groups: List[Group] = _extract_practice_groups(header, data_model)
     practice_groups_: list[int] = [i.id for i in practice_groups]
