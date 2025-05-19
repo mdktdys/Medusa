@@ -7,7 +7,7 @@ import time
 import asyncio
 
 from my_secrets import IS_DEV
-from src.alchemy.db_helper import *
+from src.alchemy.db_helper import db_helper, AsyncSession
 from . import crud
 from .schemas import Teacher
 
@@ -29,7 +29,6 @@ async def bench_alchemy(
 async def bench_supabase(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> List[Teacher]:
-    import os
     from supabase import create_client, Client
 
     url: str = "https://ojbsikxdqcbuvamygezd.supabase.co"
@@ -45,6 +44,5 @@ async def bench_supabase(
 
 
 @router.get("/test/")
-@cache(expire=6000)
-async def index():
-    return dict(hello="world")
+def index():
+    return crud.send_ai_request()

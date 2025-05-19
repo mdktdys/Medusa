@@ -1,5 +1,6 @@
 import os
 
+OPENROUTER_API_KEY: str = os.environ['OPENROUTER_API_KEY']
 PUBLIC_API_KEY = os.environ.get('PUBLIC_API_KEY')
 API_KEY = os.environ.get('API_KEY')
 SECRET = os.environ.get('SECRET')
