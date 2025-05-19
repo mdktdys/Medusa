@@ -11,4 +11,4 @@ RUN pip install celery
 
 COPY . .
 
-CMD ["celery", "-A", "src.parser.tasks", "worker", "--loglevel=INFO", "--pool=solo"]
+CMD ["celery", "-A", "src.parser.tasks", "worker", "--loglevel=INFO", "--pool=prefork"]
