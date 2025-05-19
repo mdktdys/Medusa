@@ -28,5 +28,6 @@ class ZamenaParseResultJson(ZamenaParseResult):
     full_zamena_groups: list[int]
     practice_groups: list[int]
     zamenas: list[dict]
+    teacher_cabinet_switches: str
     file_hash: str | None
     date: datetime.date

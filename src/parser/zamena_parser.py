@@ -12,7 +12,7 @@ from typing import List, Tuple
 import fitz
 import requests
 from docx import Document
-from src.utils.ai_requests import send_ai_request, extract_groups_promt
+from src.utils.ai_requests import send_ai_request, extract_groups_promt, teacher_cabinets_switches_promt
 from docx.table import Table
 from datetime import date
 import aspose.words as aw
@@ -48,6 +48,8 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
 
     practice_groups: List[Group] = _extract_practice_groups(header, data_model)
     practice_groups_: list[int] = [i.id for i in practice_groups]
+    
+    teacher_cabinets_switches = extract_teacher_cabinets_switchers(header, data_model)
 
     work_rows = _prepare_work_rows(all_rows)
     work_rows = _filter_and_clean_rows(work_rows)
@@ -73,6 +75,7 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
     return ZamenaParseResultJson(
         result = 'ok',
         zamenas = zamenas,
+        teacher_cabinet_switches = teacher_cabinets_switches,
         liquidation_groups = liquidation,
         full_zamena_groups = full_zamenas_groups,
         practice_groups = practice_groups_,
@@ -128,6 +131,11 @@ def parseZamenas(
         affected_teachers= affected_teachers,
         affected_groups= affected_groups
     )
+    
+    
+def extract_teacher_cabinets_switchers(text: str, data_model: Data):
+    groups_text = send_ai_request(request = f'{teacher_cabinets_switches_promt}\n{text}')
+    return groups_text
 
 
 def _extract_practice_groups(text: str, data_model: Data):
