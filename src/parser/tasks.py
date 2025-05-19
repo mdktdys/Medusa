@@ -17,6 +17,11 @@ parser_celery_app = Celery(
     broker=BROKER_URL,
 )
 
+def get_tasks():
+    smth = parser_celery_app.control.inspect()
+    print(smth)
+    print(type(smth)) 
+    return smth
 
 @parser_celery_app.task
 def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
