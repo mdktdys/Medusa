@@ -21,6 +21,7 @@ def get_tasks():
     return {
         'registered': inspect.registered(),
         'scheduled': inspect.scheduled(),
+        'reserved': inspect.reserved(),
         'active': inspect.active(),
     }
 
