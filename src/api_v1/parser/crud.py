@@ -8,7 +8,6 @@ from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.data.data_source import DataSource
 from src.alchemy import database
 from src.api_v1.parser.schemas import ParseZamenaJsonRequest, ParseZamenaRequest, RemoveZamenaRequest
 from src.parser import tasks

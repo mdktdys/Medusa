@@ -9,10 +9,10 @@ import os
 import re
 from io import BytesIO
 from typing import List, Tuple
-from docx.text.paragraph import Paragraph
 import fitz
 import requests
 from docx import Document
+from src.utils.ai_requests import send_ai_request, extract_groups_promt
 from docx.table import Table
 from datetime import date
 import aspose.words as aw
@@ -43,10 +43,9 @@ parse_result = None
 
 
 def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> ZamenaParseResult:
-    all_rows, header = _get_all_tables(stream)
-    print(header)
-    for head in header:
-        print(head.text)
+    all_rows, header_paragraphs = _get_all_tables(stream)
+    header: str = ' '.join(head.text for head in header_paragraphs)
+
     practice_groups = _extract_practice_groups(header, data_model)
     work_rows = _prepare_work_rows(all_rows)
     work_rows = _filter_and_clean_rows(work_rows)
@@ -128,10 +127,9 @@ def parseZamenas(
     )
 
 
-def _extract_practice_groups(header: List[Paragraph], data_model: Data):
-    practice_groups: list[Group] = []
-    for i in header:
-        practice_groups.extend(SupaBaseWorker.get_groups_from_string(i.text, data_model=data_model))
+def _extract_practice_groups(text: str, data_model: Data):
+    groups_text = send_ai_request(request = f'{extract_groups_promt}\n{text}')
+    practice_groups: list[Group] = SupaBaseWorker.get_groups_from_string(groups_text, data_model=data_model)
     return practice_groups
 
 
