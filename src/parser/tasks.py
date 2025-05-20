@@ -51,14 +51,3 @@ def delete_zamena(date: datetime.date) -> dict[str, Any]:
 @parser_celery_app.task
 def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
     return asyncio.run(methods.parse_group_schedule_v3(file, monday_date))
-
-
-@parser_celery_app.task
-def get_all_tasks() -> dict:
-    temp: Inspect = parser_celery_app.control.inspect()
-    tasks = temp.registered_tasks
-    
-    if tasks is dict:
-        return tasks # type: ignore
-    else:
-        return {'result': f'no ok {type(tasks())} {tasks}'}

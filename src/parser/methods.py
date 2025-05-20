@@ -43,8 +43,8 @@ async def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
     return (await parse_zamenas(url=url, date_=date, force=False, notify = notify)).model_dump()
 
 
-def parse_zamena_json(url: str, date: datetime.datetime, datasource: DataSource) -> dict:
-    return parse_zamenas_json(url=url, date = date, datasource = datasource)
+# def parse_zamena_json(url: str, date: datetime.datetime, datasource: DataSource) -> dict:
+#     return parse_zamenas_json(url=url, date = date, datasource = datasource)
 
 
 async def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:

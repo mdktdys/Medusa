@@ -11,6 +11,7 @@ from .parser.views import router as parser_router
 from .manage.views import router as manage_router
 from .telegram.views import router as telegram_router
 from .notifications.views import router as notifications_router
+from .departments.views import router as departments_router
 
 router = APIRouter()
 
@@ -18,6 +19,7 @@ router = APIRouter()
 router.include_router(router = groups_router, prefix="/groups")
 router.include_router(router = teachers_router, prefix="/teachers")
 router.include_router(router = cabinets_router, prefix="/cabinets")
+router.include_router(router = departments_router, prefix='/departments')
 
 # Private
 router.include_router(router=search_router, prefix="/search", dependencies=[Depends(any_auth_method(roles=["Owner"]))])

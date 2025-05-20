@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import *
+from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 

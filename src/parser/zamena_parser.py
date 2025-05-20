@@ -158,7 +158,7 @@ def extract_teacher_cabinets_switchers(text: str, data_model: Data) -> List[Tupl
     return extracted
 
 
-def _extract_practice_groups(text: str, data_model: Data):
+def _extract_practice_groups(text: str, data_model: Data) -> List[Group]:
     groups_text = send_ai_request(request = f'{extract_groups_promt}\n{text}')
     practice_groups: list[Group] = SupaBaseWorker.get_groups_from_string(groups_text, data_model=data_model)
     return practice_groups
