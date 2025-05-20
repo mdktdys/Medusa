@@ -1,4 +1,3 @@
-import hashlib
 from typing import Callable, Optional
 from fastapi import Request, Response
 from fastapi_cache import FastAPICache
