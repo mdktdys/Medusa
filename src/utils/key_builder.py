@@ -15,7 +15,7 @@ def default_key_builder(
         if not isinstance(v, AsyncSession)
     }
 
-    prefix = f"fastapi-cache:{namespace}:"
+    prefix = f"{namespace}:"
     args_repr = ",".join(map(str, args or ()))
     kwargs_repr = ",".join(f"{k}={v}" for k, v in safe_kwargs.items())
     
