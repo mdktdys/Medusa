@@ -3,7 +3,6 @@ from typing import List
 
 from pydantic import BaseModel, ConfigDict
 
-from alchemy.base import Base
 from src.models.holiday_model import Holiday
 from src.models.paras_model import Paras
 from src.models.zamena_file_link_model import ZamenaFileLink
