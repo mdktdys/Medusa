@@ -12,23 +12,14 @@ def default_key_builder(
     args: Optional[tuple] = None,
     kwargs: Optional[dict] = None,
 ) -> str:
-    print('ARGS')
-    print(args)
-    print('KWARGS')
-    print(kwargs)
-
-    # Фильтруем из kwargs значения, которые не сериализуются (например, AsyncSession)
     safe_kwargs = {
         k: v for k, v in (kwargs or {}).items()
         if not isinstance(v, AsyncSession)
     }
 
     prefix = f"{FastAPICache.get_prefix()}:{namespace}:"
-    cache_key = (
-        prefix
-        + hashlib.md5(
-            f"{func.__module__}:{func.__name__}:{args}:{safe_kwargs}".encode()
-        ).hexdigest()
-    )
-    return cache_key
+    args_repr = ",".join(map(str, args or ()))
+    kwargs_repr = ",".join(f"{k}={v}" for k, v in safe_kwargs.items())
+
+    return f"{prefix}{func.__module__}.{func.__name__}?args={args_repr}&kwargs={kwargs_repr}"
 
