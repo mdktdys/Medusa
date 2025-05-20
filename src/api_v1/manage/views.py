@@ -17,8 +17,8 @@ async def sync_local_database(
 
 
 @router.delete('purge_cache', response_model = dict)
-def purge_cache():
-        FastAPICache.reset()
+async def purge_cache():
+        await FastAPICache.clear()
         return {
                 'result': 'ok'
         }

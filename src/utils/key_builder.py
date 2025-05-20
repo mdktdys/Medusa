@@ -19,6 +19,9 @@ def default_key_builder(
     prefix = f"{FastAPICache.get_prefix()}:{namespace}:"
     args_repr = ",".join(map(str, args or ()))
     kwargs_repr = ",".join(f"{k}={v}" for k, v in safe_kwargs.items())
+    
+    key = f"{prefix}{func.__module__}.{func.__name__}?args={args_repr}&kwargs={kwargs_repr}"
+    print(f"saved as {key}")
 
-    return f"{prefix}{func.__module__}.{func.__name__}?args={args_repr}&kwargs={kwargs_repr}"
+    return key
 
