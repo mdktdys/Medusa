@@ -33,7 +33,10 @@ async def update_department(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> Department:
     result: Department = await crud.update_department(session, department_id, data)
-    await FastAPICache.clear(namespace = namespace)
+    try:
+        await FastAPICache.clear(namespace = namespace)
+    except:
+        pass
     return result
 
 
@@ -43,7 +46,10 @@ async def delete_department(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> dict[str, str]:
     result: dict[str, str] = await crud.delete_department(session, department_id)
-    await FastAPICache.clear(namespace = namespace)
+    try:
+        await FastAPICache.clear(namespace = namespace)
+    except:
+        pass
     return result
 
 
@@ -53,5 +59,8 @@ async def create_department(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> Department:
     result: Department = await crud.create_department(session=session, data = data)
-    await FastAPICache.clear(namespace = namespace)
+    try:
+        await FastAPICache.clear(namespace = namespace)
+    except:
+        pass
     return result
