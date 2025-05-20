@@ -25,7 +25,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         await conn.run_sync(Base.metadata.create_all)
     async with local_db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache", key_builder=default_key_builder)
+    FastAPICache.init(RedisBackend(redis), key_builder=default_key_builder)
     yield
 
 
