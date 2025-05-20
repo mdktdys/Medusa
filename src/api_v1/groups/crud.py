@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Tuple
 
-from sqlalchemy import select, Result, and_
+from fastapi import HTTPException
+from sqlalchemy import Select, select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from src.models.holiday_model import Holiday
@@ -17,8 +18,9 @@ from src.api_v1.telegram.crud import (
 )
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
-from .schemas import Group, GroupScheduleRequest, GroupScheduleResponse, ScheduleDaySchedule, ScheduleLesson
+from .schemas import Group, GroupScheduleRequest, GroupScheduleResponse, ScheduleDaySchedule, ScheduleLesson, GroupCreate
 import asyncio
+
 
 async def get_groups(session: AsyncSession) -> list[Group]:
     query = select(database.Groups)
@@ -26,14 +28,54 @@ async def get_groups(session: AsyncSession) -> list[Group]:
     return list(result.scalars().all())
 
 
-async def get_group_by_id(
-        session: AsyncSession, group_id: int
-) -> list[Group]:
-    query = select(database.Groups).where(database.Groups.id == group_id)
+async def get_group_by_id(session: AsyncSession, group_id: int) -> list[Group]:
+    query: Select[Tuple[database.Groups]] = select(database.Groups).where(database.Groups.id == group_id)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
 
+async def update_group(
+    session: AsyncSession,
+    group_id: int,
+    data: Group
+) -> Group:
+    query: Select[Tuple[database.Groups]] = select(database.Groups).where(database.Groups.id == group_id)
+    result: Result[Tuple[database.Groups]] = await session.execute(query)
+    group: database.Groups | None = result.scalar_one_or_none()
+
+    if group is None:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    for key, value in data.model_dump(exclude_unset=True).items():
+        setattr(group, key, value)
+
+    await session.commit()
+    await session.refresh(group)
+    return group # type: ignore
+
+
+async def delete_group(session: AsyncSession, group_id: int) -> dict[str, str]:
+    query: Select[Tuple[database.Groups]] = select(database.Groups).where(database.Groups.id == group_id)
+    result: Result[Tuple[database.Groups]] = await session.execute(query)
+    group: database.Groups | None = result.scalar_one_or_none()
+
+    if group is None:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    await session.delete(group)
+    await session.commit()
+    return {"result": "ok"}
+
+
+async def create_group(session: AsyncSession, data: GroupCreate) -> Group:
+    new_group = database.Groups(**data.model_dump(exclude={"id"}))
+    session.add(new_group)
+    await session.commit()
+    await session.refresh(new_group)
+    return new_group # type: ignore
+
+
+# Schedule
 async def get_group_day_schedule_by_date(session: AsyncSession, group_id: int, date: datetime
 ) -> DaySchedule:
     # Get Group

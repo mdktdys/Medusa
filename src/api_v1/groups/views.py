@@ -2,29 +2,64 @@ from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends
+from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
 
+from src.auth.auth import any_auth_method
 from src.dependencies.data_source_dependency import get_supabase_data_source
 from src.data.data_source import DataSource
 from src.alchemy.db_helper import AsyncSession, db_helper
 from . import crud
-from .schemas import DaySchedule, GroupScheduleRequest, Group, DayScheduleFormatted, GroupScheduleResponse
+from .schemas import DaySchedule, GroupScheduleRequest, Group, DayScheduleFormatted, GroupScheduleResponse, GroupCreate
 
-router = APIRouter(tags=["Groups"])
+namespace: str = 'Groups'
+router = APIRouter(tags=[namespace])
 
 
 @router.get("/", response_model = list[Group])
-@cache(expire=6000)
+@cache(expire = 6000, namespace = namespace)
 async def get_groups(session: AsyncSession = Depends(db_helper.session_dependency)) -> List[Group]:
     return await crud.get_groups(session=session)
 
 
 @router.get("/id/{group_id}/", response_model=list[Group])
-@cache(expire=6000)
+@cache(expire = 6000, namespace = namespace)
 async def get_group_by_id(group_id: int = -1, session: AsyncSession = Depends(db_helper.session_dependency)) -> List[Group]:
     return await crud.get_group_by_id(session=session, group_id=group_id)
 
 
+@router.put("/{group_id}", response_model = Group, dependencies = [Depends(any_auth_method(roles=["Owner"]))])
+async def update_group(
+    group_id: int,
+    data: Group,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+) -> Group:
+    result: Group = await crud.update_group(session, group_id, data)
+    await FastAPICache.clear(namespace = namespace)
+    return result
+
+
+@router.delete("/{group_id}", dependencies = [Depends(any_auth_method(roles=["Owner"]))])
+async def delete_group(
+    group_id: int,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+) -> dict[str, str]:
+    result: dict[str, str] = await crud.delete_group(session, group_id)
+    await FastAPICache.clear(namespace = namespace)
+    return result
+
+
+@router.post("/", response_model = Group, status_code=201, dependencies = [Depends(any_auth_method(roles=["Owner"]))])
+async def create_group(
+    data: GroupCreate,
+    session: AsyncSession = Depends(db_helper.session_dependency),
+) -> Group:
+    result: Group = await crud.create_group(session=session, data=data)
+    await FastAPICache.clear(namespace = namespace)
+    return result
+
+
+# Schedule
 @router.get("/day_schedule/{group_id}/{date}/{chat_id}/", response_model=DaySchedule)
 @cache(expire=6000)
 async def get_group_day_schedule_by_date(
