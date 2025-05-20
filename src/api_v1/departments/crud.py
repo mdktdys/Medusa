@@ -57,7 +57,7 @@ async def delete_department(session: AsyncSession, department_id: int) -> dict[s
 
 
 async def create_department(session: AsyncSession, data: DepartmentCreate) -> Department:
-    new_department = database.Departments(**data.model_dump())
+    new_department = database.Departments(**data.model_dump(exclude={"id"}))
     session.add(new_department)
     await session.commit()
     await session.refresh(new_department)

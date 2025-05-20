@@ -52,6 +52,6 @@ async def create_department(
     data: DepartmentCreate,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> Department:
-    result: Department = await crud.create_department(session=session, data=data)
+    result: Department = await crud.create_department(session=session, data = data)
     await FastAPICache.clear(namespace = namespace)
     return result
