@@ -146,6 +146,7 @@ class Teachers(Base):
     id: Mapped[int] = mapped_column(Integer, Identity(start=1, increment=1, minvalue=1, maxvalue=2147483647, cycle=False, cache=1), primary_key=True)
     name: Mapped[str] = mapped_column(String)
     synonyms: Mapped[list] = mapped_column(ARRAY(String()), server_default=text("'{}'::character varying[]"))
+    image: Mapped[Optional[str]] = mapped_column(String)
 
     Paras: Mapped[List['Paras']] = relationship('Paras', back_populates='Teachers_')
     Zamenas: Mapped[List['Zamenas']] = relationship('Zamenas', back_populates='Teachers_')
@@ -315,6 +316,7 @@ class Groups(Base):
     name: Mapped[str] = mapped_column(Text)
     department: Mapped[Optional[int]] = mapped_column(BigInteger)
     type: Mapped[Optional[str]] = mapped_column(String)
+    image: Mapped[Optional[str]] = mapped_column(String)
 
     Departments_: Mapped['Departments'] = relationship('Departments', back_populates='Groups')
     Liquidation: Mapped[List['Liquidation']] = relationship('Liquidation', back_populates='Groups_')
