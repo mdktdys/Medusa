@@ -126,18 +126,21 @@ async def parse_zamenas(url: str, date_: date, notify: bool) -> ZamenaParseResul
             zamena['date'] = str(date_)
         supabase_client.addZamenas(zamenas = result_json.zamenas)
 
+        if len(result_json.full_zamena_groups) > 0:
+            full_zamena_groups: list[dict[str, Any]] = [{'group':group,'date': str(date_)} for group in result_json.full_zamena_groups]
+            supabase_client.addFullZamenaGroups(groups = full_zamena_groups)
 
-        full_zamena_groups: list[dict[str, Any]] = [{'group':group,'date': str(date_)} for group in result_json.full_zamena_groups]
-        supabase_client.addFullZamenaGroups(groups = full_zamena_groups)
-
-        practice_groups: list[dict[str, Any]] = [{'group':group,'date': str(date_)} for group in result_json.practice_groups]
-        supabase_client.add_practices(practices = practice_groups)
+        if len(result_json.practice_groups) > 0:
+            practice_groups: list[dict[str, Any]] = [{'group':group,'date': str(date_)} for group in result_json.practice_groups]
+            supabase_client.add_practices(practices = practice_groups)
         
-        liquidation_groups: list[dict[str, Any]] = [{'group':group,'date': str(date_)} for group in result_json.liquidation_groups]
-        supabase_client.addLiquidations(liquidations = liquidation_groups)
+        if len(result_json.liquidation_groups) > 0:
+            liquidation_groups: list[dict[str, Any]] = [{'group':group,'date': str(date_)} for group in result_json.liquidation_groups]
+            supabase_client.addLiquidations(liquidations = liquidation_groups)
         
-        cabinet_switches: list[dict[str, Any]] = [{'teacher': pair[0], 'cabinet': pair[1], 'date': str(date_)} for pair in result_json.teacher_cabinet_switches]
-        supabase_client.client.from_('teacher_cabinet_swaps').insert(cabinet_switches).execute()
+        if len(result_json.teacher_cabinet_switches) > 0:
+            cabinet_switches: list[dict[str, Any]] = [{'teacher': pair[0], 'cabinet': pair[1], 'date': str(date_)} for pair in result_json.teacher_cabinet_switches]
+            supabase_client.client.from_('teacher_cabinet_swaps').insert(cabinet_switches).execute()
         
         supabase_client.addNewZamenaFileLink(link = url, date = date_, hash = result_json.file_hash)
 
