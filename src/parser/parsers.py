@@ -9,7 +9,7 @@ from pdf2docx import Converter
 from src.api_v1.telegram.views import notify_zamena
 from src.parser.core import parseParas
 from src.parser.models.data_model import Data
-from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult, ZamenaParseResultJson
+from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult, ZamenaParseResultJson, ZamenaParseSucess
 from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import parseZamenas, parse_zamena_v2
 
@@ -140,16 +140,21 @@ async def parse_zamenas(url: str, date_: date, notify: bool) -> ZamenaParseResul
         supabase_client.client.from_('teacher_cabinet_swaps').insert(cabinet_switches).execute()
         
         supabase_client.addNewZamenaFileLink(link = url, date = date_, hash = result_json.file_hash)
+
+        affected_groups: list[int] = list(set([pair['group'] for pair in result_json.zamenas]))
+        affected_teachers: list[int] = list(set([pair['teacher'] for pair in result_json.zamenas]))
         
         if (notify):
-            affected_groups: list[int] = list(set([pair['group'] for pair in result_json.zamenas]))
-            affected_teachers: list[int] = list(set([pair['teacher'] for pair in result_json.zamenas]))
-
             await notify_zamena(
                 affected_groups = affected_groups,
                 affected_teachers = affected_teachers
             )
             
+        return ZamenaParseSucess(
+            affected_teachers = affected_teachers, 
+            affected_groups = affected_groups,
+        )
+        
     return result
 
 
