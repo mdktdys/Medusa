@@ -40,7 +40,7 @@ import html as Html
 
 
 async def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
-    return (await parse_zamenas(url=url, date_=date, force=False, notify = notify)).model_dump()
+    return (await parse_zamenas(url=url, date_=date, notify = notify)).model_dump()
 
 
 # def parse_zamena_json(url: str, date: datetime.datetime, datasource: DataSource) -> dict:
@@ -74,7 +74,10 @@ async def delete_zamena(date: datetime.date) -> dict[str, Any]:
         removed = [
             sup.client.table("Zamenas").delete().eq("date", date).execute(),
             sup.client.table("ZamenasFull").delete().eq("date", date).execute(),
-            sup.client.table("ZamenaFileLinks").delete().eq("date", date).execute()
+            sup.client.table("ZamenaFileLinks").delete().eq("date", date).execute(),
+            sup.client.table("Liquidation").delete().eq("date", date).execute(),
+            sup.client.table("Practices").delete().eq("date", date).execute(),
+            sup.client.table("teacher_cabinet_swaps").delete().eq("date", date).execute()
         ]
         return {
             "res": "ok",

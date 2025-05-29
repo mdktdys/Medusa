@@ -70,7 +70,7 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
 
     zamenas = [{"group": i[0], "number": int(i[1]), "course": i[4], "teacher": i[5], "cabinet": i[6]} for i in work_rows]
     full_zamenas_groups: list[int] = [get_group_by_id(target_name=i,data_model=data_model,groups=data_model.GROUPS,supabase_client=supabase_client).id for i in full_zamena_groups]
-    hash = get_remote_file_hash(link)
+    hash: str = get_remote_file_hash(link)
     
     return ZamenaParseResultJson(
         result = 'ok',
@@ -395,7 +395,7 @@ def get_remote_file_hash(url):
                 hasher.update(chunk)
         return hasher.hexdigest()
     else:
-        return None
+        raise Exception('Не удалось получить хеш')
 
 
 def get_file_extension(url):

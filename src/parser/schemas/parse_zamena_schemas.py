@@ -29,5 +29,5 @@ class ZamenaParseResultJson(ZamenaParseResult):
     practice_groups: list[int]
     zamenas: list[dict]
     teacher_cabinet_switches: list[Tuple[int, int]]
-    file_hash: str | None
+    file_hash: str
     date: datetime.date

@@ -5,7 +5,7 @@ from typing import List
 import requests
 import supabase
 from pdf2docx import *
-from datetime import datetime
+from datetime import date, datetime
 from supabase import create_client, Client
 
 from my_secrets import SUPABASE_URL, SUPABASE_ANON_KEY
@@ -76,7 +76,7 @@ class SupaBaseWorker:
         ).execute()
         pass
 
-    def addNewZamenaFileLink(self, link: str, date: datetime, hash: str):
+    def addNewZamenaFileLink(self, link: str, date: date, hash: str):
         """
         Добавляет ссылку на новый файл с заменами
 
