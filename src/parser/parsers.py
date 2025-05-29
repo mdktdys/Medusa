@@ -122,8 +122,10 @@ async def parse_zamenas(url: str, date_: date, notify: bool) -> ZamenaParseResul
         result_json: ZamenaParseResultJson = cast(ZamenaParseResultJson, result)
         supabase_client = SupaBaseWorker()
         
+        for zamena in result_json.zamenas:
+            zamena['date'] = str(date_)
         supabase_client.addZamenas(zamenas = result_json.zamenas)
-        supabase_client.addNewZamenaFileLink(link = url, date = date_, hash = result_json.file_hash)
+
 
         full_zamena_groups: list[dict[str, Any]] = [{'group':group,'date': str(date_)} for group in result_json.full_zamena_groups]
         supabase_client.addFullZamenaGroups(groups = full_zamena_groups)
@@ -136,6 +138,8 @@ async def parse_zamenas(url: str, date_: date, notify: bool) -> ZamenaParseResul
         
         cabinet_switches: list[dict[str, Any]] = [{'teacher': pair[0], 'cabinet': pair[1], 'date': str(date_)} for pair in result_json.teacher_cabinet_switches]
         supabase_client.client.from_('teacher_cabinet_swaps').insert(cabinet_switches).execute()
+        
+        supabase_client.addNewZamenaFileLink(link = url, date = date_, hash = result_json.file_hash)
         
         if (notify):
             affected_groups: list[int] = list(set([pair['group'] for pair in result_json.zamenas]))
