@@ -8,6 +8,7 @@ from celery.app.control import Inspect
 from fastapi import UploadFile
 
 from my_secrets import BACKEND_URL, BROKER_URL
+from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult
 from src.parser import methods
 
 parser_celery_app = Celery(
@@ -30,7 +31,7 @@ def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
     return asyncio.run(methods.parse_zamena(url, date, notify))
 
 @parser_celery_app.task
-def parse_zamena_json(url: str | UploadFile, date: datetime.date) -> dict:
+def parse_zamena_json(url: str | UploadFile, date: datetime.date) -> ZamenaParseResult:
     return asyncio.run(methods.parse_zamenas_json(url = url, date = date))
 
 @parser_celery_app.task

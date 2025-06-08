@@ -13,11 +13,11 @@ from redis import asyncio as aioredis
 from src.alchemy.db_helper import local_db_helper
 from router import router, tags_metadata, description
 from src.utils.key_builder import default_key_builder
-
+from redis.asyncio.client import Redis
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    redis = aioredis.from_url(
+    redis: Redis = aioredis.from_url(
         f"redis://:{REDIS_PASSWORD}@redis:6379/1",
         decode_responses=False
     )
