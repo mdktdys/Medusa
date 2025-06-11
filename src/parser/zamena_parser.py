@@ -42,6 +42,41 @@ not_found_items: List[str] = []
 parse_result = None
 
 
+#     practice_supabase = [{"group": i.id, "date": str(date_)} for i in practice_groups]
+#     zamenas_supabase = [
+#         {
+#             "group": i[0],
+#             "number": int(i[1]),
+#             "course": i[4],
+#             "teacher": i[5],
+#             "cabinet": i[6],
+#             "date": str(date_),
+#         }
+#         for i in workRows
+#     ]
+#     full_zamenas_groups = [
+#         {
+#             "group": get_group_by_id(
+#                 target_name=i,
+#                 data_model=data_model,
+#                 groups=data_model.GROUPS,
+#                 supabase_client=supabase_client,
+#             ).id,
+#             "date": str(date_),
+#         }
+#         for i in fullzamenagroups
+#     ]
+#     liquidations = [{"group": i, "date": str(date_)} for i in liquidation]
+
+
+# def upload_parse_result(result: ZamenaParseResultJson,  supabase_client: SupaBaseWorker):
+#     supabase_client.addZamenas(zamenas = result.zamenas_supabase)
+#     supabase_client.addFullZamenaGroups(groups = result.full_zamenas_groups)
+#     supabase_client.add_practices(practices = result.practice_supabase)
+#     supabase_client.addLiquidations(liquidations = result.liquidation_groups)
+#     supabase_client.addNewZamenaFileLink(link = result.url, date = result.date, hash = result.file_hash)
+    
+
 def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> ZamenaParseResult:
     all_rows, header_paragraphs = _get_all_tables(stream)
     header: str = ' '.join(head.text for head in header_paragraphs if 'Исп.' not in head.text)
@@ -57,9 +92,9 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
     work_rows, full_zamena_groups, liquidation = handle_special_cases(work_rows, data_model)
     update_empty_group_column(work_rows)
     work_rows = process_multiple_entries(work_rows)
-
+    
     map_entities_to_ids(work_rows, data_model)
-
+    
     if len(not_found_items) > 0:
         return ZamenaParseFailedNotFoundItems(
             error="Not found items",
@@ -73,7 +108,6 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
     hash: str = get_remote_file_hash(link)
     
     return ZamenaParseResultJson(
-        result = 'ok',
         zamenas = zamenas,
         teacher_cabinet_switches = teacher_cabinets_switches,
         liquidation_groups = liquidation,
@@ -81,6 +115,7 @@ def parse_zamena_v2(stream, data_model, link, date: date, supabase_client) -> Za
         practice_groups = practice_groups_,
         file_hash = hash,
         date = date,
+        url = link
     )
 
 

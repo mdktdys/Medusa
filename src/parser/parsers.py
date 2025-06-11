@@ -77,7 +77,7 @@ async def parse_zamenas_from_word(file_bytes: BytesIO, date_: date, force: bool,
 
 async def parse_zamenas_json(url: str | UploadFile, date: date) -> ZamenaParseResult:
     supabase_client = SupaBaseWorker()
-    data_model = init_date_model(sup=supabase_client)
+    data_model: Data = init_date_model(sup=supabase_client)
     
     stream = None
     if type(url) is str:

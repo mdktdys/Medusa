@@ -205,7 +205,7 @@ class SupaBaseWorker:
         )
         print(response)
 
-    def addLiquidations(self, liquidations):
+    def addLiquidations(self, liquidations: dict):
         client = self.client
         response = client.table("Liquidation").insert(liquidations).execute()
         print(response)
