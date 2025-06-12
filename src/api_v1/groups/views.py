@@ -9,11 +9,18 @@ from src.auth.auth import any_auth_method
 from src.dependencies.data_source_dependency import get_supabase_data_source
 from src.data.data_source import DataSource
 from src.alchemy.db_helper import AsyncSession, db_helper
+from utils.ai_requests import send_ai_request
 from . import crud
 from .schemas import DaySchedule, GroupScheduleRequest, Group, DayScheduleFormatted, GroupScheduleResponse, GroupCreate
 
 namespace: str = 'Groups'
 router = APIRouter(tags=[namespace])
+
+
+@router.get('/pretty')
+async def get_pretty():
+    prompt = 'Напиши моей девушке подбадривающий компимент чтобы она не унывала, будь оригинальным и не пищи банальщину, можно что-то связать про программирование'
+    return await send_ai_request(request = prompt)
 
 
 @router.get("/", response_model = list[Group])
