@@ -50,12 +50,16 @@ def get_zamena_tables() -> List[ZamTable]:
     soup = BeautifulSoup(response.read(), "html.parser")
     tables = soup.find_all(name="table", attrs={"class": "has-fixed-layout"})
     zamena_tables: list[ZamTable] = []
-    for table in tables[0:2]:
+    for table in tables[0:3]:
         zamenas: List[Zamena] = []
         rows = table.find_all('tr')
         hyper_link_texts: List[PageElement] = table.find_all('a')
         header_text = rows[0].text
-        month = define_month(header_text)
+        month: int | None = define_month(header_text)
+        
+        if month is None:
+            continue
+        
         year = define_year(header_text)
 
         for link in hyper_link_texts:
