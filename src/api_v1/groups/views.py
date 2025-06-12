@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
 
@@ -18,7 +18,7 @@ namespace: str = 'Groups'
 router = APIRouter(tags=[namespace])
 
 
-@router.get('/pretty', response_class = JSONResponse)
+@router.get('/pretty', response_class = PlainTextResponse)
 def get_pretty():
     prompt = 'Напиши моей девушке подбадривающий компимент чтобы она не унывала, будь оригинальным и не пищи банальщину, можно что-то связать про программирование'
     result = send_ai_request(request = prompt)
