@@ -1,8 +1,6 @@
 import datetime
 from typing import List
 
-import requests
-
 from fastapi import APIRouter, Response, status, Depends
 from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import db_helper
 from src.api_v1.telegram import crud
 from src.api_v1.telegram.schemas import Subscription, DaySchedule
-from utils.ai_requests import send_ai_request
 
 router = APIRouter(tags=["Telegram"])
 
