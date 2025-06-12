@@ -18,9 +18,9 @@ router = APIRouter(tags=[namespace])
 
 
 @router.get('/pretty')
-async def get_pretty():
+def get_pretty():
     prompt = 'Напиши моей девушке подбадривающий компимент чтобы она не унывала, будь оригинальным и не пищи банальщину, можно что-то связать про программирование'
-    return await send_ai_request(request = prompt)
+    return send_ai_request(request = prompt)
 
 
 @router.get("/", response_model = list[Group])
