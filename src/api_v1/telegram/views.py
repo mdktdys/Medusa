@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import db_helper
 from src.api_v1.telegram import crud
 from src.api_v1.telegram.schemas import Subscription, DaySchedule
+from utils.ai_requests import send_ai_request
 
 router = APIRouter(tags=["Telegram"])
 
@@ -63,3 +64,9 @@ async def send_group_schedule_by_chat_id(chat_id: int, group_id: int, date: date
 @router.post('/notify_zamena')
 async def notify_zamena(affected_groups: List[int], affected_teachers: List[int]):
     return await crud.notify_zamena(affected_groups = affected_groups, affected_teachers = affected_teachers)
+
+
+@router.get('/pretty')
+async def get_pretty():
+    prompt = 'Напиши моей девушке подбадривающий компимент чтобы она не унывала, будь оригинальным и не пищи банальщину, можно что-то связать про программирование'
+    return await send_ai_request(request = prompt)
