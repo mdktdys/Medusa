@@ -20,21 +20,13 @@ from src.parser.models.zamena_table_model import ZamTable
 def get_zamena_tables() -> List[ZamTable]:
     def define_month(string_: str) -> int | None:
         string_ = string_.split(' ')[0].lower()
-        months = [
-            "январь",
-            "февраль",
-            "март",
-            "апрель",
-            "май",
-            "июнь",
-            "июль",
-            "август",
-            "сентябрь",
-            "октябрь",
-            "ноябрь",
-            "декабрь",
+        months: List[str] = [
+            "январь", "февраль", "март", "апрель", "май", "июнь",
+            "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"
         ]
-        return months.index(string_) + 1
+        if string_ in months:
+            return months.index(string_) + 1
+        return None
 
     def define_year(string_: str) -> int | None:
         string_separated = string_.split(' ')
