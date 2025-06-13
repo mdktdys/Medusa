@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 from sqlalchemy import Select, select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.data.data_source import DataSource
@@ -15,13 +15,12 @@ import asyncio
 from .schemas import Queue
 
 async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[Queue]:
-    result = await session.execute(select(database.Queue).where(database.Queue.teacher == teacher_id))
-    queues = result.scalars().all()
+    result: Result[Tuple[database.Queue]] = await session.execute(select(database.Queue).where(database.Queue.teacher == teacher_id))
+    queues: Sequence[Queue] = result.scalars().all()
 
     pydantic_queues = []
     for queue in queues:
-        if not hasattr(queue, 'students') or queue.students is None:
-            queue.students = []
+        queue.students = []
         pydantic_queues.append(Queue.model_validate(queue))
     return pydantic_queues
 
