@@ -41,6 +41,8 @@ class Teacher(BaseModel):
 
 
 class QueueStudent(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     queue: Optional[int]
     position: Optional[int]
