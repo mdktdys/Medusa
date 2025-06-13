@@ -93,7 +93,7 @@ async def add_to_queue(
 ) -> None:
     return await crud.add_to_queue(session = session, queue_id = queue_id, form = form)
 
-@router.post('/queue/{entry_id}')
+@router.delete('/queue/{entry_id}')
 async def remove_from_queue(
     entry_id: int,
     session: AsyncSession = Depends(db_helper.session_dependency)
