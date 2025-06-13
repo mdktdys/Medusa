@@ -46,7 +46,7 @@ class QueueStudent(BaseModel):
     position: Optional[int]
     student: Optional[str]
     creator_tg_id: Optional[str]
-    created_at: datetime
+    created_at: datetime.datetime
     comment: Optional[str]
     teacher_comment: Optional[str]
 
