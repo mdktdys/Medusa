@@ -93,12 +93,19 @@ async def add_to_queue(
 ) -> None:
     return await crud.add_to_queue(session = session, queue_id = queue_id, form = form)
 
+
 @router.delete('/queue/{entry_id}')
 async def remove_from_queue(
     entry_id: int,
     session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> None:
     return await crud.remove_from_queue(session = session, entry_id = entry_id)
+
+
+
+
+# add_to_queue: str = "{api_url}teachers/queue/add/{queue_id}/"
+# remove_from_queue: str = "{api_url}teachers/queue/remove/{queue_id}/"
 
 # @router.post("/month_stats/", response_model=TeacherMonthStats)
 # async def get_teacher_month_stats(request: TeacherMonthStatsRequest,
