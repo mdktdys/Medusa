@@ -15,6 +15,7 @@ from .schemas import (
     Teacher,
     Queue,
     DayScheduleTeacherPydantic,
+    AddQueueEntryForm,
 )
 
 router = APIRouter(tags=["Teachers"])
@@ -82,6 +83,15 @@ async def get_teacher_queues(teacher_id: int, session: AsyncSession = Depends(db
 @router.get("/queue/{queue_id}", response_model=Queue)
 async def get_queue(queue_id: int, session: AsyncSession = Depends(db_helper.session_dependency)) -> Queue:
     return await crud.get_queue(session = session, queue_id = queue_id)
+
+
+@router.post('/queue/{queue_id}')
+async def add_to_queue(
+    queue_id: int,
+    form: AddQueueEntryForm,
+    session: AsyncSession = Depends(db_helper.session_dependency)
+) -> None:
+    return await crud.add_to_queue(session = session, queue_id = queue_id, form = form)
 
 # @router.post("/month_stats/", response_model=TeacherMonthStats)
 # async def get_teacher_month_stats(request: TeacherMonthStatsRequest,

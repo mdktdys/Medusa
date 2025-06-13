@@ -12,7 +12,7 @@ from src.utils.tools import get_number_para_emoji
 from src.api_v1.teachers.schemas import ZamenasFull, DayScheduleTeacher, TeacherMonthStats, DayScheduleTeacherPydantic
 from src.api_v1.groups.schemas import Zamena as Zamenas
 import asyncio
-from .schemas import Queue
+from .schemas import Queue, AddQueueEntryForm
 
 async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[Queue]:
     result: Result[Tuple[database.Queue]] = await session.execute(
@@ -21,7 +21,6 @@ async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[Que
         .where(database.Queue.teacher == teacher_id)
     )
     queues: Sequence[Queue] = result.scalars().all()
-    print('asda')
     pydantic_queues = []
     for queue in queues:
         pydantic_queue: Queue = Queue.model_validate(queue)
@@ -39,6 +38,23 @@ async def get_queue(session: AsyncSession, queue_id: int) -> Optional[database.Q
     queue: Optional[database.Queue] = result.scalar_one_or_none()
     return queue
 
+
+async def add_to_queue(session: AsyncSession, queue_id: int, form = AddQueueEntryForm) -> database.QueueStudent:
+    new_entry = database.QueueStudent(
+        queue=queue_id,
+        position=form.position,
+        student=form.student,
+        creator_tg_id=form.creator_tg_id,
+        created_at=datetime.utcnow(),
+        comment=form.comment
+    )
+
+    session.add(new_entry)
+    await session.commit()
+    await session.refresh(new_entry)
+
+    return new_entry
+    
 
 async def get_teachers(session: AsyncSession) -> List[database.Teachers]:
     query: Select[Tuple[database.Teachers]] = select(database.Teachers)

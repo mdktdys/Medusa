@@ -26,6 +26,14 @@ class DayScheduleTeacherPydantic(BaseModel):
         self.paras = paras
 
 
+class AddQueueEntryForm(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    queue: int
+    position: int
+    student: str
+    creator_tg_id: str
+    comment: str
+
 class DayScheduleFormatted(BaseModel):
     subscribed: bool
     search_name: str
