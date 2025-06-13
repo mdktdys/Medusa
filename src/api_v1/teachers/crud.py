@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 from sqlalchemy import Select, select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.data.data_source import DataSource
@@ -12,11 +12,13 @@ from src.utils.tools import get_number_para_emoji
 from src.api_v1.teachers.schemas import ZamenasFull, DayScheduleTeacher, TeacherMonthStats, DayScheduleTeacherPydantic
 from src.api_v1.groups.schemas import Zamena as Zamenas
 import asyncio
+from .schemas import Queue
 
-
-async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[database.Queue]:
+async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[Queue]:
     result: Result[Tuple[database.Queue]] = await session.execute(select(database.Queue).where(database.Queue.teacher == teacher_id))
-    return list(result.scalars().all())
+    queues: Sequence[Queue] = result.scalars().all()
+
+    return [Queue.model_validate(queue, update={"students": []})for queue in queues]
 
 
 async def get_queue(session: AsyncSession, queue_id: int) -> Optional[database.Queue]:
