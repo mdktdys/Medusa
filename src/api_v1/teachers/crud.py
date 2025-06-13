@@ -20,9 +20,9 @@ async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[Que
 
     pydantic_queues = []
     for queue in queues:
-        queue: Queue = Queue.model_validate(queue)
+        pydantic_queue: Queue = Queue.model_validate(queue)
         queue.students = []
-        pydantic_queues.append(queue)
+        pydantic_queues.append(pydantic_queue)
     return pydantic_queues
 
 
