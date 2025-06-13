@@ -15,7 +15,7 @@ import asyncio
 
 
 async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[database.Queue]:
-    result: Result[Tuple[database.Queue]] = await session.execute(select(database.Queue).where(database.Queue.id == teacher_id))
+    result: Result[Tuple[database.Queue]] = await session.execute(select(database.Queue).where(database.Queue.teacher == teacher_id))
     return list(result.scalars().all())
 
 
