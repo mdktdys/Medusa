@@ -14,6 +14,11 @@ from src.api_v1.groups.schemas import Zamena as Zamenas
 import asyncio
 
 
+async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[database.Queue]:
+    result: Result[Tuple[database.Queue]] = await session.execute(select(database.Queue).where(database.Queue.id == teacher_id))
+    return list(result.scalars().all())
+
+
 async def get_teachers(session: AsyncSession) -> List[database.Teachers]:
     query: Select[Tuple[database.Teachers]] = select(database.Teachers)
     result: Result = await session.execute(query)

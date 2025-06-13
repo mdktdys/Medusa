@@ -7,7 +7,7 @@ from fastapi_cache.decorator import cache
 from src.api_v1.groups.schemas import GroupScheduleRequest, GroupScheduleResponse
 from src.data.data_source import DataSource
 from src.dependencies.data_source_dependency import get_supabase_data_source
-from src.alchemy.database import Teachers
+from src.alchemy.database import Teachers, Queue
 from src.alchemy.db_helper import db_helper, AsyncSession
 from . import crud
 from .schemas import (
@@ -71,6 +71,13 @@ async def get_teacher_schedule(
         datasource = datasource,
     )
 
+
+@router.get("/queues/{teacher_id}", response_model=List[Queue])
+async def get_teacher_queues(teacher_id: int, session: AsyncSession = Depends(db_helper.session_dependency)) -> List[Queue]:
+    return await crud.get_teacher_queues(session = session,teacher_id = teacher_id)
+    
+    
+    
 # @router.post("/month_stats/", response_model=TeacherMonthStats)
 # async def get_teacher_month_stats(request: TeacherMonthStatsRequest,
 #                                   session: AsyncSession = Depends(db_helper.session_dependency)):

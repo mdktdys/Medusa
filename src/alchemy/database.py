@@ -7,6 +7,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Double,
+    ForeignKey,
     ForeignKeyConstraint,
     Identity,
     Integer,
@@ -151,6 +152,18 @@ class Teachers(Base):
     Paras: Mapped[List['Paras']] = relationship('Paras', back_populates='Teachers_')
     Zamenas: Mapped[List['Zamenas']] = relationship('Zamenas', back_populates='Teachers_')
     loadlinkers: Mapped[List['Loadlinkers']] = relationship('Loadlinkers', back_populates='Teachers_')
+    queues: Mapped[list["Queue"]] = relationship(back_populates="teacher_rel")
+    
+
+class Queue(Base):
+    __tablename__ = "Queues"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    name: Mapped[str | None] = mapped_column(String, nullable=True)
+    teacher: Mapped[int | None] = mapped_column(ForeignKey("Teachers.id"), nullable=True)
+
+    teacher_rel: Mapped["Teachers"] = relationship(back_populates="queues")
+     
 
 
 class ZamenaFileLinks(Base):
