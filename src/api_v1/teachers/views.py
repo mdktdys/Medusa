@@ -78,7 +78,11 @@ async def get_teacher_queues(teacher_id: int, session: AsyncSession = Depends(db
     return await crud.get_teacher_queues(session = session,teacher_id = teacher_id)
     
     
-    
+
+@router.get("/queue/{queue_id}", response_model=Queue)
+async def get_queue(queue_id: int, session: AsyncSession = Depends(db_helper.session_dependency)) -> Queue:
+    return await crud.get_queue(session = session, queue_id = queue_id)
+
 # @router.post("/month_stats/", response_model=TeacherMonthStats)
 # async def get_teacher_month_stats(request: TeacherMonthStatsRequest,
 #                                   session: AsyncSession = Depends(db_helper.session_dependency)):

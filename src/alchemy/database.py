@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from sqlalchemy import (
+    TIMESTAMP,
     BigInteger,
     Boolean,
     Column,
@@ -19,6 +20,7 @@ from sqlalchemy import (
     Text,
     Time,
     UniqueConstraint,
+    func,
     text,
     ARRAY,
 )
@@ -163,7 +165,22 @@ class Queue(Base):
     teacher: Mapped[int | None] = mapped_column(ForeignKey("Teachers.id"), nullable=True)
 
     teacher_rel: Mapped["Teachers"] = relationship(back_populates="queues")
-     
+    students: Mapped[list["QueueStudent"]] = relationship(back_populates="queue_rel", cascade="all, delete-orphan")
+
+
+class QueueStudent(Base):
+    __tablename__ = "QueueStudents"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    queue: Mapped[int | None] = mapped_column(ForeignKey("Queues.id"), nullable=True)
+    position: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+    student: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    creator_tg_id: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime.datetime] = mapped_column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
+    comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    teacher_comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    queue_rel: Mapped["Queue"] = relationship(back_populates="students")
 
 
 class ZamenaFileLinks(Base):

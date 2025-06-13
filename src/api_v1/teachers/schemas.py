@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -40,11 +40,26 @@ class Teacher(BaseModel):
     synonyms: List[str]
 
 
+class QueueStudent(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    queue: Optional[int]
+    position: Optional[int]
+    student: Optional[str]
+    creator_tg_id: Optional[str]
+    created_at: datetime
+    comment: Optional[str]
+    teacher_comment: Optional[str]
+
+
 class Queue(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     name: str
     teacher: int
+    students: List[QueueStudent]
+
 
 class ZamenasFull(BaseModel):
     model_config = ConfigDict(from_attributes=True)

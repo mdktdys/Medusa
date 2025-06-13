@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from sqlalchemy import Select, select, Result, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.data.data_source import DataSource
@@ -17,6 +17,17 @@ import asyncio
 async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[database.Queue]:
     result: Result[Tuple[database.Queue]] = await session.execute(select(database.Queue).where(database.Queue.teacher == teacher_id))
     return list(result.scalars().all())
+
+
+async def get_queue(session: AsyncSession, queue_id: int) -> Optional[database.Queue]:
+    result: Result[Tuple[database.Queue]] = await session.execute(
+        select(database.Queue)
+        .options(selectinload(database.Queue.students))
+        .where(database.Queue.id == queue_id)
+    )
+
+    queue: Optional[database.Queue] = result.scalar_one_or_none()
+    return queue
 
 
 async def get_teachers(session: AsyncSession) -> List[database.Teachers]:
