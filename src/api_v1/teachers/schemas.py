@@ -40,6 +40,12 @@ class Teacher(BaseModel):
     synonyms: List[str]
 
 
+class Queue(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    name: str
+    teacher: int
+
 class ZamenasFull(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int

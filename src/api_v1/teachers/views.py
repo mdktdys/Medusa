@@ -7,12 +7,13 @@ from fastapi_cache.decorator import cache
 from src.api_v1.groups.schemas import GroupScheduleRequest, GroupScheduleResponse
 from src.data.data_source import DataSource
 from src.dependencies.data_source_dependency import get_supabase_data_source
-from src.alchemy.database import Teachers, Queue
+from src.alchemy.database import Teachers
 from src.alchemy.db_helper import db_helper, AsyncSession
 from . import crud
 from .schemas import (
     DayScheduleFormatted,
     Teacher,
+    Queue,
     DayScheduleTeacherPydantic,
 )
 
