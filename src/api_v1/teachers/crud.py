@@ -15,14 +15,16 @@ import asyncio
 from .schemas import Queue
 
 async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[Queue]:
-    result: Result[Tuple[database.Queue]] = await session.execute(select(database.Queue).options(selectinload(database.Queue.students)).where(database.Queue.teacher == teacher_id))
+    result: Result[Tuple[database.Queue]] = await session.execute(
+        select(database.Queue)
+        .options(selectinload(database.Queue.students))
+        .where(database.Queue.teacher == teacher_id)
+    )
     queues: Sequence[Queue] = result.scalars().all()
     print('asda')
     pydantic_queues = []
     for queue in queues:
         pydantic_queue: Queue = Queue.model_validate(queue)
-        print('123')
-        pydantic_queue.students = []
         pydantic_queues.append(pydantic_queue)
     return pydantic_queues
 
