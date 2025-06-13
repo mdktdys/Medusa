@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 from src.api_v1.groups.schemas import GroupScheduleRequest, GroupScheduleResponse, Paras, DayScheduleFormatted
 from src.api_v1.telegram.crud import get_chat_subscribers
 from src.models.day_schedule_model import Para
+from sqlalchemy.exc import SQLAlchemyError
 from src.utils.tools import get_number_para_emoji
 from src.api_v1.teachers.schemas import ZamenasFull, DayScheduleTeacher, TeacherMonthStats, DayScheduleTeacherPydantic
 from src.api_v1.groups.schemas import Zamena as Zamenas
@@ -41,12 +42,12 @@ async def get_queue(session: AsyncSession, queue_id: int) -> Optional[database.Q
 
 async def add_to_queue(session: AsyncSession, queue_id: int, form = AddQueueEntryForm) -> database.QueueStudent:
     new_entry = database.QueueStudent(
-        queue=queue_id,
-        position=form.position,
-        student=form.student,
-        creator_tg_id=form.creator_tg_id,
-        created_at=datetime.utcnow(),
-        comment=form.comment
+        queue = queue_id,
+        position = form.position,
+        student = form.student,
+        creator_tg_id = form.creator_tg_id,
+        created_at = datetime.utcnow(),
+        comment = form.comment
     )
 
     session.add(new_entry)
@@ -54,6 +55,22 @@ async def add_to_queue(session: AsyncSession, queue_id: int, form = AddQueueEntr
     await session.refresh(new_entry)
 
     return new_entry
+
+
+async def remove_from_queue(session: AsyncSession, entry_id: int) -> bool:
+    try:
+        result: Result[Tuple[database.QueueStudent]] = await session.execute(select(database.QueueStudent).where(database.QueueStudent.id == entry_id))
+        entry: database.QueueStudent | None = result.scalar_one_or_none()
+
+        if entry is None:
+            return False
+
+        await session.delete(entry)
+        await session.commit()
+        return True
+    except SQLAlchemyError:
+        await session.rollback()
+        return False
     
 
 async def get_teachers(session: AsyncSession) -> List[database.Teachers]:
