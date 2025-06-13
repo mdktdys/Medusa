@@ -56,7 +56,7 @@ class Queue(BaseModel):
     id: int
     name: str
     teacher: int
-    students: List[QueueStudent]
+    students: List[QueueStudent] | None
 
 
 class ZamenasFull(BaseModel):
