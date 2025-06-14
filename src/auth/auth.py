@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Request, status
 
-from my_secrets import SECRET, API_KEY, IS_DEV, PUBLIC_API_KEY
+from my_secrets import SECRET, API_KEY, PUBLIC_API_KEY
 from src.auth.schemas import UserRead, UserCreate
 import uuid
 from typing import Optional, List
@@ -28,8 +28,7 @@ async def api_key_auth(request: Request) -> bool:
 
 
 # Получение базы данных пользователей
-async def get_user_db(
-        session: AsyncSession = Depends(db_helper.session_dependency),
+async def get_user_db(session: AsyncSession = Depends(db_helper.session_dependency),
 ):
     yield SQLAlchemyUserDatabase(session, User)
 
@@ -111,14 +110,3 @@ router.include_router(
     dependencies=[Depends(any_auth_method(roles=["Owner"]))],
     tags=["Auth"],
 )
-
-
-@router.get(
-    "/protected-route",
-    tags=["Users"],
-    dependencies=[Depends(any_auth_method(roles=["Owner"]))],
-    include_in_schema=False,
-)
-
-async def protected_route():
-    return {"message": "Hello, you have access to the protected route!"}

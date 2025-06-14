@@ -28,3 +28,5 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     is_superuser = Column(Boolean, default=False, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
     role = Column(String, default="Guest", nullable=False)
+    username = Column(String, default = None, nullable = True)
+    telegram_id = Column(String, default = None, nullable = True)

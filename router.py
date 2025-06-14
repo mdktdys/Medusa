@@ -6,7 +6,6 @@ router = APIRouter()
 
 router.include_router(
     auth_router,
-    include_in_schema = False,
     prefix="/auth",
 )
 
