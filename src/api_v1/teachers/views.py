@@ -85,13 +85,12 @@ async def get_queue(queue_id: int, session: AsyncSession = Depends(db_helper.ses
     return await crud.get_queue(session = session, queue_id = queue_id)
 
 
-@router.post('/queue/{queue_id}')
+@router.post('/queue/')
 async def add_to_queue(
-    queue_id: int,
     form: AddQueueEntryForm,
     session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> None:
-    return await crud.add_to_queue(session = session, queue_id = queue_id, form = form)
+    return await crud.add_to_queue(session = session, form = form)
 
 
 @router.delete('/queue/{entry_id}')
@@ -102,7 +101,7 @@ async def remove_from_queue(
     return await crud.remove_from_queue(session = session, entry_id = entry_id)
 
 
-
+    queue: str = "{api_url}teachers/queue/"
 
 # add_to_queue: str = "{api_url}teachers/queue/add/{queue_id}/"
 # remove_from_queue: str = "{api_url}teachers/queue/remove/{queue_id}/"

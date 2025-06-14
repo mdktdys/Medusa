@@ -40,9 +40,9 @@ async def get_queue(session: AsyncSession, queue_id: int) -> Optional[database.Q
     return queue
 
 
-async def add_to_queue(session: AsyncSession, queue_id: int, form = AddQueueEntryForm) -> database.QueueStudent:
+async def add_to_queue(session: AsyncSession, form = AddQueueEntryForm) -> database.QueueStudent:
     new_entry = database.QueueStudent(
-        queue = queue_id,
+        queue = form.queue_id,
         position = form.position,
         student = form.student,
         creator_tg_id = form.creator_tg_id,
