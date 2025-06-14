@@ -32,7 +32,7 @@ class AddQueueEntryForm(BaseModel):
     queue_id: int
     position: int
     student: str
-    creator_tg_id: str
+    creator_tg_id: int
     comment: str
 
 class DayScheduleFormatted(BaseModel):
