@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
@@ -80,8 +80,8 @@ async def get_teacher_queues(teacher_id: int, session: AsyncSession = Depends(db
     
     
 
-@router.get("/queue/{queue_id}", response_model=Queue)
-async def get_queue(queue_id: int, session: AsyncSession = Depends(db_helper.session_dependency)) -> Queue:
+@router.get("/queue/{queue_id}", response_model= Optional[Queue])
+async def get_queue(queue_id: int, session: AsyncSession = Depends(db_helper.session_dependency)) -> Optional[Queue]:
     return await crud.get_queue(session = session, queue_id = queue_id)
 
 
