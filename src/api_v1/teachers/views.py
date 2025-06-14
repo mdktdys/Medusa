@@ -90,7 +90,6 @@ async def add_to_queue(
     form: AddQueueEntryForm,
     session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> None:
-    print(form.model_dump_json())
     return await crud.add_to_queue(session = session, form = form)
 
 
