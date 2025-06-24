@@ -7,11 +7,14 @@ from sqlalchemy import Result, Select, select, and_
 
 async def get_zamenas(session: AsyncSession, filter: ZamenaFilter) -> list[Zamena]:
     query: Select[Tuple[database.Zamenas]] = select(database.Zamenas)
-
     filters: list = []
 
     if filter.group:
-        filters.append(database.Zamenas.group == filter.group)
+        if isinstance(filter.group, list):
+            filters.append(database.Zamenas.group.in_(filter.group))
+        else:
+            filters.append(database.Zamenas.group == filter.group)
+
     if filter.start_date:
         filters.append(database.Zamenas.date >= filter.start_date)
     if filter.end_date:
@@ -31,4 +34,4 @@ async def get_zamenas(session: AsyncSession, filter: ZamenaFilter) -> list[Zamen
         query = query.where(and_(*filters))
 
     result: Result[Tuple[database.Zamenas]] = await session.execute(query)
-    return list(result.scalars().all()) 
+    return list(result.scalars().all())
