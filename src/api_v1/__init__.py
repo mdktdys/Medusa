@@ -13,6 +13,8 @@ from .telegram.views import router as telegram_router
 from .notifications.views import router as notifications_router
 from .departments.views import router as departments_router
 from .courses.views import router as courses_router
+from .lessons.views import router as lessons_router
+from .zamenas.views import router as zamenas_router
 
 router = APIRouter()
 
@@ -22,6 +24,8 @@ router.include_router(router = teachers_router, prefix="/teachers")
 router.include_router(router = cabinets_router, prefix="/cabinets")
 router.include_router(router = departments_router, prefix='/departments')
 router.include_router(router = courses_router, prefix = '/courses')
+router.include_router(router = lessons_router, prefix = '/lessons')
+router.include_router(router = zamenas_router, prefix = '/zamenas')
 
 # Private
 router.include_router(router=search_router, prefix="/search", dependencies=[Depends(any_auth_method(roles=["Owner"]))])

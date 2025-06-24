@@ -6,15 +6,15 @@ from fastapi import Query
 from datetime import date
 from src.alchemy.db_helper import AsyncSession, db_helper
 from . import crud 
-from .schemas import Lesson, LessonFilter
+from .schemas import Zamena, ZamenaFilter
 
-namespace: str = 'lessons'
+namespace: str = 'zamenas'
 router = APIRouter(tags=[namespace])
 
 
-@router.get("/", response_model = List[Lesson])
+@router.get("/", response_model = List[Zamena])
 @cache(expire = 6000, namespace = namespace)
-async def get_lessons(
+async def get_zamenas(
     group: int = Query(None),
     number: int = Query(None),
     course: int = Query(None),
@@ -24,8 +24,8 @@ async def get_lessons(
     start_date: date = Query(None),
     end_date: date = Query(None),
     session: AsyncSession = Depends(db_helper.session_dependency),
-) -> List[Lesson]:
-    filter = LessonFilter(
+) -> List[Zamena]:
+    filter = ZamenaFilter(
         group = group,
         number = number,
         course = course,
@@ -35,4 +35,4 @@ async def get_lessons(
         start_date = start_date,
         end_date = end_date,
     )
-    return await crud.get_lessons(session = session, filter = filter)
+    return await crud.get_zamenas(session = session, filter = filter)
