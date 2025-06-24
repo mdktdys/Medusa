@@ -1,5 +1,4 @@
-from typing import List
-
+from typing import List, Union
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 from fastapi import Query
@@ -15,7 +14,7 @@ router = APIRouter(tags=[namespace])
 @router.get("/", response_model = List[Lesson])
 @cache(expire = 6000, namespace = namespace)
 async def get_lessons(
-    group: int = Query(None),
+    group: Union[List[int], None] = Query(default=None),
     number: int = Query(None),
     course: int = Query(None),
     teacher: int = Query(None),
