@@ -17,6 +17,8 @@ from .lessons.views import router as lessons_router
 from .zamenas.views import router as zamenas_router
 from .zamenas_full.views import router as zamenas_full_router
 from .timings.views import router as timings_router
+from .already_found_links.views import router as already_found_links_router
+from .zamena_file_links.views import router as zamena_file_links_router
 
 router = APIRouter()
 
@@ -30,6 +32,8 @@ router.include_router(router = lessons_router, prefix = '/lessons')
 router.include_router(router = zamenas_router, prefix = '/zamenas')
 router.include_router(router = zamenas_full_router, prefix = '/zamenas_full')
 router.include_router(router = timings_router, prefix = '/timings')
+router.include_router(router = already_found_links_router, prefix = '/already_found_links')
+router.include_router(router = zamena_file_links_router, prefix = '/zamena_file_links')
 
 # Private
 router.include_router(router=search_router, prefix="/search", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
