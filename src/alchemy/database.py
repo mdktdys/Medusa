@@ -41,6 +41,7 @@ class AlreadyFoundsLinks(Base):
 
     id: Mapped[int] = mapped_column(BigInteger, Identity(start=1, increment=1, minvalue=1, maxvalue=9223372036854775807, cycle=False, cache=1), primary_key=True)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(True), server_default=text('now()'))
+    date: Mapped[Optional[datetime.date]] = mapped_column(Date)
     link: Mapped[Optional[str]] = mapped_column(String)
 
 
