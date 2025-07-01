@@ -11,7 +11,11 @@ async def get_lessons(session: AsyncSession, filter: LessonFilter) -> list[Lesso
     filters: list = []
 
     if filter.group:
-        filters.append(database.Paras.group == filter.group)
+        if isinstance(filter.group, list):
+            filters.append(database.Zamenas.group.in_(filter.group))
+        else:
+            filters.append(database.Zamenas.group == filter.group)
+
     if filter.start_date:
         filters.append(database.Paras.date >= filter.start_date)
     if filter.end_date:
