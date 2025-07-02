@@ -13,13 +13,13 @@ router = APIRouter(tags=["Telegram"])
 
 
 @router.post('/create_state', status_code=status.HTTP_201_CREATED)
-async def create_state() -> None:
-    return await crud.create_state()
+async def create_state(session: AsyncSession = Depends(db_helper.session_dependency)) -> None:
+    return await crud.create_state(session=session)
 
 
 @router.post('/verify', status_code = status.HTTP_201_CREATED)
-async def verify_token(token: str) -> None:
-    return await crud.verify_token(token = token)
+async def verify_token(token: str, session: AsyncSession = Depends(db_helper.session_dependency)) -> None:
+    return await crud.verify_token(session = session, token = token)
 
 
 @router.post("/subscribe_zamena_notifications")

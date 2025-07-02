@@ -18,11 +18,16 @@ from my_secrets import SECRET
 sup = SupaBaseWorker()
 
 
-async def create_state() -> None:
-    return uuid.uuid4()
+async def create_state(session: AsyncSession) -> None:
+    token: uuid.UUID = uuid.uuid4()
+    session.add(database.TelegramAuthState(token=token))
+    return token
 
 
-async def verify_token(token: str) -> None:
+async def verify_token(session: AsyncSession, token: str) -> None:
+    result = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == token))
+    if not result.scalars().first():
+        raise HTTPException(status_code=404, detail="Token not found")
     return token
 
 
