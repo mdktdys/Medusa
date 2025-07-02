@@ -5,7 +5,7 @@ from . import crud
 from .schemas import ZamenaResponse, ZamenaRequest
 from datetime import date
 
-namespace: str = 'zamena_router'
+namespace: str = 'Zamena'
 router = APIRouter(tags=[namespace])
 
 

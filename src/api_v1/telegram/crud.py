@@ -1,20 +1,28 @@
 import datetime
-import locale
 from typing import List
 import httpx
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import HTTPException, Response, status
-
+import jwt
 from src.api_v1.notifications.schemas import FirebaseMessage, FirebaseSubscriber
 from src.api_v1.notifications.views import get_firebase_item_subscribers, send_multicast_message
 from my_secrets import TELEGRAM_API_URL
 from src.alchemy import database
 from src.api_v1.groups.schemas import DayScheduleFormatted
 from src.parser.supabase import SupaBaseWorker
+from my_secrets import SECRET
 
 sup = SupaBaseWorker()
+
+
+async def create_state() -> None:
+    return jwt.encode({"some": "payload"}, SECRET, algorithm="HS256")
+
+
+async def verify_token(token: str) -> None:
+    return token
 
 
 async def get_chat_subscribers(session: AsyncSession, chat_id: int) -> List[database.Subscribers]:

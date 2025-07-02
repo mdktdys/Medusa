@@ -1,7 +1,7 @@
 import datetime
 from typing import List
 
-from fastapi import APIRouter, Response, Depends
+from fastapi import APIRouter, Response, Depends, status
 from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +10,16 @@ from src.api_v1.telegram import crud
 from src.api_v1.telegram.schemas import Subscription, DaySchedule
 
 router = APIRouter(tags=["Telegram"])
+
+
+@router.post('/create_state', status_code=status.HTTP_201_CREATED)
+async def create_state() -> None:
+    return await crud.create_state()
+
+
+@router.post('/verify', status_code = status.HTTP_201_CREATED)
+async def verify_token(token: str) -> None:
+    return await crud.verify_token(token = token)
 
 
 @router.post("/subscribe_zamena_notifications")
