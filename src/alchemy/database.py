@@ -499,6 +499,6 @@ class Loadlinkers(Base):
 class TelegramAuthState(Base):
     __tablename__ = "telegram_auth_states"
 
-    id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False, default=uuid.uuid4, primary_key = True)
     token: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default = func.now())
