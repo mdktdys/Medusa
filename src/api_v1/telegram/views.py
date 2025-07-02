@@ -14,7 +14,7 @@ router = APIRouter(tags=["Telegram"])
 
 @router.post('/create_state', status_code=status.HTTP_201_CREATED)
 async def create_state(session: AsyncSession = Depends(db_helper.session_dependency)) -> None:
-    return await crud.create_state(session=session)
+    return await crud.create_state(session = session)
 
 
 @router.post('/verify', status_code = status.HTTP_201_CREATED)

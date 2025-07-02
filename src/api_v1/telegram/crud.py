@@ -21,6 +21,7 @@ sup = SupaBaseWorker()
 async def create_state(session: AsyncSession) -> None:
     token: uuid.UUID = uuid.uuid4()
     session.add(database.TelegramAuthState(token=token))
+    await session.commit()
     return token
 
 
