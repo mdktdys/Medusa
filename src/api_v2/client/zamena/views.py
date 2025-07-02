@@ -12,4 +12,4 @@ router = APIRouter(tags=[namespace])
 @router.get("/", response_model = ZamenaResponse)
 @cache(expire = 6000, namespace = namespace)
 async def get_zamena(date_from: date, date_to: date, session: AsyncSession = Depends(db_helper.session_dependency)) -> ZamenaResponse:
-    return crud.get_zamena(session = session, request = ZamenaRequest(date_from = date_from, date_to = date_to))
+    return await crud.get_zamena(session = session, request = ZamenaRequest(date_from = date_from, date_to = date_to))
