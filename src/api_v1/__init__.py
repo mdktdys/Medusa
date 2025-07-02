@@ -36,10 +36,10 @@ router.include_router(router = already_found_links_router, prefix = '/already_fo
 router.include_router(router = zamena_file_links_router, prefix = '/zamena_file_links')
 
 # Private
-router.include_router(router=search_router, prefix="/search", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
-router.include_router(router=merges_router, prefix="/merge", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
-router.include_router(router=bench_router, prefix="/bench", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
-router.include_router(router=parser_router, prefix="/parser", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
-router.include_router(router=manage_router, prefix="/manage", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
-router.include_router(router=telegram_router, prefix="/telegram")
-router.include_router(router=notifications_router, prefix="/notifications", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
+router.include_router(router = search_router, prefix="/search", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
+router.include_router(router = merges_router, prefix="/merge", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
+router.include_router(router = bench_router, prefix="/bench", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
+router.include_router(router = parser_router, prefix="/parser", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
+router.include_router(router = manage_router, prefix="/manage", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
+router.include_router(router = telegram_router, prefix="/telegram")
+router.include_router(router = notifications_router, prefix="/notifications", dependencies=[Depends(any_auth_method(roles=["Owner"]))])

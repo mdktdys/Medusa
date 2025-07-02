@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import HTTPException, Response, status
 import jwt
+import uuid
 from src.api_v1.notifications.schemas import FirebaseMessage, FirebaseSubscriber
 from src.api_v1.notifications.views import get_firebase_item_subscribers, send_multicast_message
 from my_secrets import TELEGRAM_API_URL
@@ -18,7 +19,7 @@ sup = SupaBaseWorker()
 
 
 async def create_state() -> None:
-    return jwt.encode({"some": "payload"}, SECRET, algorithm="HS256")
+    return uuid.uuid4()
 
 
 async def verify_token(token: str) -> None:
