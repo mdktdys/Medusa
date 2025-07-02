@@ -17,3 +17,4 @@ class ZamenaResponse(BaseModel):
     zamenas_full: list
     zamena_file_links: list
     zamenas: list
+    
