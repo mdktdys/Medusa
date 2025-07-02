@@ -41,5 +41,5 @@ router.include_router(router=merges_router, prefix="/merge", dependencies=[Depen
 router.include_router(router=bench_router, prefix="/bench", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router=parser_router, prefix="/parser", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router=manage_router, prefix="/manage", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
-router.include_router(router=telegram_router, prefix="/telegram", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
+router.include_router(router=telegram_router, prefix="/telegram")
 router.include_router(router=notifications_router, prefix="/notifications", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
