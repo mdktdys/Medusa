@@ -1,7 +1,7 @@
 import datetime
 from typing import List
 
-from fastapi import APIRouter, Response, status, Depends
+from fastapi import APIRouter, Response, Depends
 from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 

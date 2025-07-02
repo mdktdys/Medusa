@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from src.api_v1 import router as api_v1_router
 from src.auth.auth import router as auth_router
+from src.api_v2.router import router as api_v2_router
 
 router = APIRouter()
 
@@ -12,6 +13,11 @@ router.include_router(
 router.include_router(
     api_v1_router,
     prefix="/api/v1",
+)
+
+router.include_router(
+    api_v2_router,
+    prefix="/api/v2"
 )
 
 tags_metadata: list[dict[str, str]] = []
