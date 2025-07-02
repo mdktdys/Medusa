@@ -23,11 +23,12 @@ from sqlalchemy import (
     func,
     text,
     ARRAY,
+    Uuid
 )
 from sqlalchemy.dialects.postgresql import OID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 import datetime
-
+import uuid
 
 class Base(DeclarativeBase):
     pass
@@ -493,3 +494,11 @@ class Loadlinkers(Base):
     Groups_: Mapped['Groups'] = relationship('Groups', back_populates='loadlinkers')
     loads: Mapped['Loads'] = relationship('Loads', back_populates='loadlinkers')
     Teachers_: Mapped['Teachers'] = relationship('Teachers', back_populates='loadlinkers')
+
+
+class TelegramAuthState(Base):
+    __tablename__ = "telegram_auth_states"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False, default=uuid.uuid4)
+    token: Mapped[str] = mapped_column(String, nullable=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default = func.now())
