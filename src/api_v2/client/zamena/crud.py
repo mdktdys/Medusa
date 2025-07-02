@@ -10,9 +10,9 @@ from src.api_v1.zamena_file_links.schemas import ZamenaFileLinksFilter
 from src.api_v1.zamena_file_links.crud import get_zamena_file_links
 
 async def get_zamena(request: ZamenaRequest, session: AsyncSession) -> ZamenaResponse:
-    zamena_filter = ZamenaFilter(start_date = request.date_from, end_date = request.date_to)
-    zamena_filter_full = ZamenasFullFilter(group = [], date_from = request.date_from, date_to = request.date_to)
-    zamena_file_links = ZamenaFileLinksFilter(start_date = request.date_from, end_date = request.date_to)
+    zamena_filter = ZamenaFilter(start_date = request.date_to, end_date = request.date_from)
+    zamena_filter_full = ZamenasFullFilter(group = [], date_from = request.date_to, date_to = request.date_from)
+    zamena_file_links = ZamenaFileLinksFilter(start_date = request.date_to, end_date = request.date_from)
 
     zamenas, zamenas_full, zamena_file_links = await asyncio.gather(
         get_zamenas(session=session, filter = zamena_filter),
