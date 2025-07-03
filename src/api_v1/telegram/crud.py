@@ -13,7 +13,7 @@ from src.alchemy import database
 from src.api_v1.groups.schemas import DayScheduleFormatted
 from src.parser.supabase import SupaBaseWorker
 from .schemas import AuthRequest
-from src.auth.auth import get_jwt_strategy
+from src.auth.auth import get_jwt_strategy, get_refresh_jwt_strategy
 from fastapi_users.authentication import JWTStrategy
 
 sup = SupaBaseWorker()
@@ -57,9 +57,11 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict
     if not user:
         user = await create_user(session = session, auth_request = auth_request)
 
-    strategy: JWTStrategy = get_jwt_strategy()
-    access_token: str = await strategy.write_token(user, expires_in=900)
-    refresh_token: str = await strategy.write_token(user, expires_in=30 * 24 * 3600, token_type="refresh")
+    access_strategy: JWTStrategy = get_jwt_strategy()
+    refresh_strategy: JWTStrategy = get_refresh_jwt_strategy()
+
+    access_token: str = await access_strategy.write_token(user)
+    refresh_token: str = await refresh_strategy.write_token(user)
 
     state.access_token = access_token
     state.refresh_token = refresh_token
