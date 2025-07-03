@@ -26,6 +26,7 @@ from sqlalchemy import (
     Uuid
 )
 from sqlalchemy.dialects.postgresql import OID
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 import datetime
 import uuid
@@ -502,3 +503,21 @@ class TelegramAuthState(Base):
     id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False, default=uuid.uuid4, primary_key = True)
     token: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default = func.now())
+    
+
+class User(SQLAlchemyBaseUserTableUUID, Base):
+    __tablename__ = "users"
+
+    email = Column(String, unique=True, index=True, nullable=True)
+    hashed_password = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    is_superuser = Column(Boolean, default=False, nullable=False)
+    is_verified = Column(Boolean, default=False, nullable=False)
+    role = Column(String, default="Guest", nullable=False)
+    username = Column(String, default = None, nullable = True)
+    
+    telegram_id = Column(String, default = None, nullable = True)
+    chat_id = Column(String, default = None, nullable = True)
+    photo_url = Column(String, default = None, nullable = True)
+    first_name = Column(String, default = None, nullable = True)
+    last_name = Column(String, default = None, nullable = True)

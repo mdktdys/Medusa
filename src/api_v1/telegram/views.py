@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy import db_helper
 from src.api_v1.telegram import crud
-from src.api_v1.telegram.schemas import Subscription, DaySchedule
+from src.api_v1.telegram.schemas import Subscription, DaySchedule, AuthRequest
 
 router = APIRouter(tags=["Telegram"])
 
@@ -18,8 +18,8 @@ async def create_state(session: AsyncSession = Depends(db_helper.session_depende
 
 
 @router.post('/verify', status_code = status.HTTP_201_CREATED)
-async def verify_token(token: str, session: AsyncSession = Depends(db_helper.session_dependency)) -> None:
-    return await crud.verify_token(session = session, token = token)
+async def verify_token(auth_request: AuthRequest, session: AsyncSession = Depends(db_helper.session_dependency)) -> None:
+    return await crud.verify_token(session = session, auth_request = auth_request)
 
 
 @router.post("/subscribe_zamena_notifications")

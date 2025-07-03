@@ -22,8 +22,8 @@ class UserUpdate(schemas.BaseUserUpdate):
 class User(SQLAlchemyBaseUserTableUUID, Base):
     __tablename__ = "users"
 
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=True)
+    hashed_password = Column(String, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)

@@ -1,11 +1,10 @@
 import datetime
-from typing import List
+from typing import List, Tuple
 import httpx
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fastapi import HTTPException, Response, status
-import jwt
 import uuid
 from src.api_v1.notifications.schemas import FirebaseMessage, FirebaseSubscriber
 from src.api_v1.notifications.views import get_firebase_item_subscribers, send_multicast_message
@@ -13,9 +12,28 @@ from my_secrets import TELEGRAM_API_URL
 from src.alchemy import database
 from src.api_v1.groups.schemas import DayScheduleFormatted
 from src.parser.supabase import SupaBaseWorker
-from my_secrets import SECRET
+from .schemas import AuthRequest
+from src.auth.auth import get_jwt_strategy
+
 
 sup = SupaBaseWorker()
+
+
+async def create_user(session: AsyncSession, auth_request: AuthRequest):
+    new_user = database.User(
+        chat_id = auth_request.chat_id,
+        photo_url = auth_request.photo_url,
+        username = auth_request.username,
+        first_name = auth_request.first_name,
+        last_name = auth_request.last_name,
+        telegram_id = auth_request.user_id,
+        hashed_password = "telegram_auth",
+        email = f"{auth_request.chat_id}@telegram.local",
+    )
+
+    session.add(new_user)
+    await session.commit()
+    return new_user
 
 
 async def create_state(session: AsyncSession) -> None:
@@ -25,11 +43,26 @@ async def create_state(session: AsyncSession) -> None:
     return token
 
 
-async def verify_token(session: AsyncSession, token: str) -> None:
-    result = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == token))
-    if not result.scalars().first():
-        raise HTTPException(status_code=404, detail="Token not found")
-    return token
+async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict:
+    result = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == auth_request.token))
+
+    state: database.TelegramAuthState | None = result.scalars().first()
+    if not state:
+        raise HTTPException(status_code = 404, detail="Token not found")
+    
+    await session.delete(state)
+    await session.commit()
+    
+    result: Result[Tuple[database.User]] = await session.execute(select(database.User).where(database.User.chat_id == auth_request.chat_id))
+    user: database.User | None = result.scalars().first()
+    
+    if not user:
+        await create_user(auth_request = auth_request)
+
+    strategy = get_jwt_strategy()
+    jwt: str = await strategy.write_token(user)
+
+    return {"access_token": jwt, "token_type": "bearer"}
 
 
 async def get_chat_subscribers(session: AsyncSession, chat_id: int) -> List[database.Subscribers]:
