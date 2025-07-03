@@ -14,7 +14,7 @@ from src.api_v1.groups.schemas import DayScheduleFormatted
 from src.parser.supabase import SupaBaseWorker
 from .schemas import AuthRequest
 from src.auth.auth import get_jwt_strategy
-
+from fastapi_users.authentication import JWTStrategy
 
 sup = SupaBaseWorker()
 
@@ -59,7 +59,7 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict
     if not user:
         await create_user(session = session, auth_request = auth_request)
 
-    strategy = get_jwt_strategy()
+    strategy: JWTStrategy = get_jwt_strategy()
     jwt: str = await strategy.write_token(user)
 
     return {"access_token": jwt, "token_type": "bearer"}
