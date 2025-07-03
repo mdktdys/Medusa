@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import httpx
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -35,6 +35,20 @@ async def create_user(session: AsyncSession, auth_request: AuthRequest):
     await session.commit()
     await session.refresh(new_user)
     return new_user
+
+
+async def auth_status(token: str, session: AsyncSession) -> Optional[dict]:
+    result: Result[Tuple[database.TelegramAuthState]] = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == token))
+    state: database.TelegramAuthState | None = result.scalars().first()
+
+    if not state or not state.access_token:
+        return None
+
+    return {
+        "access_token": state.access_token,
+        'refresh_token': state.refresh_token,
+        "token_type": "bearer"
+    }
 
 
 async def create_state(session: AsyncSession) -> None:

@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Response, Depends, status
 from fastapi_cache.decorator import cache
@@ -10,6 +10,11 @@ from src.api_v1.telegram import crud
 from src.api_v1.telegram.schemas import Subscription, DaySchedule, AuthRequest
 
 router = APIRouter(tags=["Telegram"])
+
+
+@router.get("/status", response_model = Optional[dict])
+async def auth_status(token: str, session: AsyncSession = Depends(db_helper.session_dependency)):
+    return await crud.auth_status(token = token, session = session)
 
 
 @router.post('/create_state', status_code=status.HTTP_201_CREATED)
