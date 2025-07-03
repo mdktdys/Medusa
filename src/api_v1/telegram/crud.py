@@ -33,6 +33,7 @@ async def create_user(session: AsyncSession, auth_request: AuthRequest):
 
     session.add(new_user)
     await session.commit()
+    await session.refresh(new_user)
     return new_user
 
 
@@ -57,7 +58,7 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict
     user: database.User | None = result.scalars().first()
     
     if not user:
-        await create_user(session = session, auth_request = auth_request)
+        user = await create_user(session = session, auth_request = auth_request)
 
     strategy: JWTStrategy = get_jwt_strategy()
     jwt: str = await strategy.write_token(user)
