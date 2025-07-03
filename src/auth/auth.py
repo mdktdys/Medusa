@@ -13,7 +13,7 @@ from fastapi_users.authentication import (
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy.db_helper import db_helper
-from src.auth.schemas import User
+from src.alchemy.database import User
 
 router = APIRouter()
 api_keys = [API_KEY, PUBLIC_API_KEY]
