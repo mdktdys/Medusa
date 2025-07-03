@@ -1,10 +1,11 @@
 from pydantic import BaseModel, ConfigDict
+from typing import Optional
 
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    email: str
-    first_name: str
-    last_name: str
-    username: str
-    role: str
+    email: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    username: Optional[str] = None
+    role: Optional[str] = None
