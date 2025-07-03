@@ -57,7 +57,7 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict
     user: database.User | None = result.scalars().first()
     
     if not user:
-        await create_user(auth_request = auth_request)
+        await create_user(session = session, auth_request = auth_request)
 
     strategy = get_jwt_strategy()
     jwt: str = await strategy.write_token(user)
