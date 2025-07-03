@@ -51,9 +51,6 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict
     if not state:
         raise HTTPException(status_code = 404, detail="Token not found")
     
-    await session.delete(state)
-    await session.commit()
-    
     result: Result[Tuple[database.User]] = await session.execute(select(database.User).where(database.User.chat_id == auth_request.chat_id))
     user: database.User | None = result.scalars().first()
     
@@ -64,11 +61,11 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict
     access_token: str = await strategy.write_token(user, expires_in=900)
     refresh_token: str = await strategy.write_token(user, expires_in=30 * 24 * 3600, token_type="refresh")
 
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "token_type": "bearer"
-    }
+    state.access_token = access_token
+    state.refresh_token = refresh_token
+    await session.commit()
+
+    return {'result': 'ok'}
 
 
 async def get_chat_subscribers(session: AsyncSession, chat_id: int) -> List[database.Subscribers]:
