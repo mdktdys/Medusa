@@ -61,9 +61,14 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict
         user = await create_user(session = session, auth_request = auth_request)
 
     strategy: JWTStrategy = get_jwt_strategy()
-    jwt: str = await strategy.write_token(user)
+    access_token: str = await strategy.write_token(user, expires_in=900)
+    refresh_token: str = await strategy.write_token(user, expires_in=30 * 24 * 3600, token_type="refresh")
 
-    return {"access_token": jwt, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }
 
 
 async def get_chat_subscribers(session: AsyncSession, chat_id: int) -> List[database.Subscribers]:
