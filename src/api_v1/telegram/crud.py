@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Any
 import httpx
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -44,11 +44,16 @@ async def auth_status(token: str, session: AsyncSession) -> Optional[dict]:
     if not state or not state.access_token:
         return None
 
-    return {
+    payload: dict[str, Any] = {
         "access_token": state.access_token,
         'refresh_token': state.refresh_token,
         "token_type": "bearer"
     }
+
+    session.delete(state)
+    await session.commit()
+
+    return payload
 
 
 async def create_state(session: AsyncSession) -> None:
