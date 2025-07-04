@@ -14,3 +14,4 @@ router = APIRouter(tags=[namespace])
 @cache(expire = 6000, namespace = namespace)
 async def get_timings(session: AsyncSession = Depends(db_helper.session_dependency)) -> List[Timing]:
     return await crud.get_timings(session = session)
+
