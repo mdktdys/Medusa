@@ -51,7 +51,7 @@ async def auth_status(token: str, session: AsyncSession) -> Optional[dict]:
         "token_type": "bearer"
     }
 
-    session.delete(state)
+    await session.delete(state)
     await session.commit()
 
     return payload
