@@ -16,4 +16,4 @@ async def get_me(user: User = Depends(current_active_user)) -> UserResponse:
 
 @router.get("/telegram", response_model = Optional[UserResponse])
 async def get_telegram_user(user_id: int, session: AsyncSession = Depends(db_helper.session_dependency)) -> UserResponse:
-    return await crud.get_telegram_user(session = session, user_id = user_id)
+    return await crud.get_telegram_user(user_id = user_id, session = session)
