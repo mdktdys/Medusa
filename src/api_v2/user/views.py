@@ -6,6 +6,7 @@ from src.alchemy.database import User
 from . import crud 
 from .schemas import UserResponse
 
+
 router = APIRouter(tags=["Users"])
 
 

@@ -16,6 +16,7 @@ from .schemas import AuthRequest
 from src.auth.auth import get_jwt_strategy, get_refresh_jwt_strategy
 from fastapi_users.authentication import JWTStrategy
 
+
 sup = SupaBaseWorker()
 
 
