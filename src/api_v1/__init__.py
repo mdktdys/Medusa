@@ -1,24 +1,25 @@
 from fastapi import APIRouter, Depends
 
 from src.auth.auth import any_auth_method
-from .groups.views import router as groups_router
-from .search.views import router as search_router
-from .teachers.views import router as teachers_router
-from .merges.views import router as merges_router
+
+from .already_found_links.views import router as already_found_links_router
 from .bench.views import router as bench_router
 from .cabinets.views import router as cabinets_router
-from .parser.views import router as parser_router
-from .manage.views import router as manage_router
-from .telegram.views import router as telegram_router
-from .notifications.views import router as notifications_router
-from .departments.views import router as departments_router
 from .courses.views import router as courses_router
+from .departments.views import router as departments_router
+from .groups.views import router as groups_router
 from .lessons.views import router as lessons_router
+from .manage.views import router as manage_router
+from .merges.views import router as merges_router
+from .notifications.views import router as notifications_router
+from .parser.views import router as parser_router
+from .search.views import router as search_router
+from .teachers.views import router as teachers_router
+from .telegram.views import router as telegram_router
+from .timings.views import router as timings_router
+from .zamena_file_links.views import router as zamena_file_links_router
 from .zamenas.views import router as zamenas_router
 from .zamenas_full.views import router as zamenas_full_router
-from .timings.views import router as timings_router
-from .already_found_links.views import router as already_found_links_router
-from .zamena_file_links.views import router as zamena_file_links_router
 
 router = APIRouter()
 
@@ -41,5 +42,5 @@ router.include_router(router = merges_router, prefix="/merge", dependencies=[Dep
 router.include_router(router = bench_router, prefix="/bench", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router = parser_router, prefix="/parser", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router = manage_router, prefix="/manage", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
-router.include_router(router = telegram_router, prefix="/telegram")
+router.include_router(router = telegram_router, prefix="/telegram", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router = notifications_router, prefix="/notifications", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
