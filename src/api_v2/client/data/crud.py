@@ -10,7 +10,6 @@ from .schemas import FullDataDto
 async def get_full_data(session: AsyncSession) -> FullDataDto:
     groups: List[Groups] = await get_groups(session = session)
     
-    
     return FullDataDto(
-        groups = groups
+        groups = []
     )
