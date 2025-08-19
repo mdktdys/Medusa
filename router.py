@@ -12,12 +12,12 @@ router.include_router(
 
 router.include_router(
     api_v1_router,
-    prefix="/api/v1",
+    prefix="/v1",
 )
 
 router.include_router(
     api_v2_router,
-    prefix="/api/v2"
+    prefix="/v2"
 )
 
 tags_metadata: list[dict[str, str]] = []

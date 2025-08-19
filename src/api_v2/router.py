@@ -1,10 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+
+from src.auth.auth import any_auth_method
+
 from .client.data.views import router as data_router
 from .client.zamena.views import router as zamena_router
 from .user.views import router as user_router
-from fastapi import Depends
-
-from src.auth.auth import any_auth_method
 
 router = APIRouter()
 

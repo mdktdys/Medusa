@@ -1,29 +1,36 @@
+import asyncio
 from datetime import datetime, timedelta
 from typing import List, Tuple
 
 from fastapi import HTTPException
-from sqlalchemy import Select, select, Result, and_
+from sqlalchemy import Result, Select, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+from src.alchemy import database
+from src.api_v1.groups.schemas import DayScheduleFormatted
+from src.api_v1.telegram.crud import get_chat_subscribers
+from src.data.data_source import DataSource
+from src.models.day_schedule_model import DaySchedule, Para
 from src.models.holiday_model import Holiday
 from src.models.paras_model import Paras
 from src.models.zamena_file_link_model import ZamenaFileLink
 from src.models.zamena_full import ZamenaFull
 from src.models.zamenas import Zamenas
-from src.data.data_source import DataSource
-from src.alchemy import database
-from src.api_v1.groups.schemas import DayScheduleFormatted
-from src.api_v1.telegram.crud import (
-    get_chat_subscribers,
-)
-from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
-from .schemas import Group, GroupScheduleRequest, GroupScheduleResponse, ScheduleDaySchedule, ScheduleLesson, GroupCreate
-import asyncio
+
+from .schemas import (
+    Group,
+    GroupCreate,
+    GroupScheduleRequest,
+    GroupScheduleResponse,
+    ScheduleDaySchedule,
+    ScheduleLesson,
+)
 
 
-async def get_groups(session: AsyncSession) -> list[Group]:
-    query = select(database.Groups)
+async def get_groups(session: AsyncSession) -> list[database.Groups]:
+    query: Select[Tuple[database.Groups]] = select(database.Groups)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
