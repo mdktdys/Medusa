@@ -12,11 +12,6 @@ from src.api_v1.telegram.schemas import AuthRequest, DaySchedule, Subscription
 router = APIRouter(tags=["Telegram"])
 
 
-@router.get("/status", response_model = Optional[dict])
-async def auth_status(token: str, session: AsyncSession = Depends(db_helper.session_dependency)):
-    return await crud.auth_status(token = token, session = session)
-
-
 @router.post('/verify', status_code = status.HTTP_201_CREATED)
 async def verify_token(auth_request: AuthRequest, session: AsyncSession = Depends(db_helper.session_dependency)) -> None:
     return await crud.verify_token(session = session, auth_request = auth_request)

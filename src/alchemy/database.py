@@ -1,35 +1,16 @@
-from typing import List, Optional
-
-from sqlalchemy import (
-    TIMESTAMP,
-    BigInteger,
-    Boolean,
-    Column,
-    Date,
-    DateTime,
-    Double,
-    ForeignKey,
-    ForeignKeyConstraint,
-    Identity,
-    Integer,
-    Numeric,
-    PrimaryKeyConstraint,
-    SmallInteger,
-    String,
-    Table,
-    Text,
-    Time,
-    UniqueConstraint,
-    func,
-    text,
-    ARRAY,
-    Uuid
-)
-from sqlalchemy.dialects.postgresql import OID
-from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 import datetime
 import uuid
+from typing import List, Optional
+
+from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
+from sqlalchemy import (ARRAY, TIMESTAMP, BigInteger, Boolean, Column, Date,
+                        DateTime, Double, ForeignKey, ForeignKeyConstraint,
+                        Identity, Integer, Numeric, PrimaryKeyConstraint,
+                        SmallInteger, String, Table, Text, Time,
+                        UniqueConstraint, Uuid, func, text)
+from sqlalchemy.dialects.postgresql import OID
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
 
 class Base(DeclarativeBase):
     pass
@@ -501,8 +482,8 @@ class TelegramAuthState(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False, default=uuid.uuid4, primary_key = True)
     token: Mapped[str] = mapped_column(String, nullable=False)
-    access_token: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    refresh_token: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    access_token: Mapped[str] = mapped_column(Text, nullable = False)
+    refresh_token: Mapped[str] = mapped_column(Text, nullable = False)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime, default = func.now())
     
 

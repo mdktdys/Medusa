@@ -41,25 +41,6 @@ async def create_user(session: AsyncSession, auth_request: AuthRequest):
     return new_user
 
 
-async def auth_status(token: str, session: AsyncSession) -> Optional[dict]:
-    result: Result[Tuple[database.TelegramAuthState]] = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == token))
-    state: database.TelegramAuthState | None = result.scalars().first()
-
-    if not state or not state.access_token:
-        return None
-
-    payload: dict[str, Any] = {
-        "access_token": state.access_token,
-        'refresh_token': state.refresh_token,
-        "token_type": "bearer"
-    }
-
-    await session.delete(state)
-    await session.commit()
-
-    return payload
-
-
 
 async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict:
     result = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == auth_request.token))
