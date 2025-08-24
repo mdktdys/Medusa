@@ -26,7 +26,10 @@ async def auth_status(request: AuthStatusRequest, session: AsyncSession) -> Auth
     state: database.TelegramAuthState | None = result.scalars().first()
 
     if state is None:
-        return None
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
+    
+    if state.access_token is None or state.refresh_token is None:
+        raise HTTPException(status_code = status.HTTP_102_PROCESSING, detail = 'token not binded')
 
     await session.delete(state)
     await session.commit()
