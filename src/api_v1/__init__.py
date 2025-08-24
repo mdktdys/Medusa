@@ -47,4 +47,4 @@ router.include_router(router = telegram_router, prefix="/telegram", dependencies
 router.include_router(router = notifications_router, prefix="/notifications", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 
 # Custom
-router.include_router(router = telegram_auth_router)
+router.include_router(router = telegram_auth_router, prefix = '/telegram_auth')
