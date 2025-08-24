@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy import database
 
-from .schemas import AuthStatusDto, CreateStateDto
+from .schemas import AuthStatusDto, AuthStatusRequest, CreateStateDto
 
 
 async def create_state(session: AsyncSession) -> CreateStateDto:
@@ -16,8 +16,8 @@ async def create_state(session: AsyncSession) -> CreateStateDto:
     return CreateStateDto(token = token)
 
 
-async def auth_status(token: str, session: AsyncSession) -> AuthStatusDto | None:
-    result: Result[Tuple[database.TelegramAuthState]] = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == token))
+async def auth_status(request: AuthStatusRequest, session: AsyncSession) -> AuthStatusDto | None:
+    result: Result[Tuple[database.TelegramAuthState]] = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == request.token))
     state: database.TelegramAuthState | None = result.scalars().first()
 
     if state is None:

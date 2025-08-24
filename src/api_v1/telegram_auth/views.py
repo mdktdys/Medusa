@@ -5,7 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy import db_helper
 from src.api_v1.telegram_auth import crud
-from src.api_v1.telegram_auth.schemas import AuthStatusDto, CreateStateDto
+from src.api_v1.telegram_auth.schemas import (AuthStatusDto, AuthStatusRequest,
+                                              CreateStateDto)
 
 router = APIRouter(tags=["telegram_auth"])
 
@@ -15,6 +16,6 @@ async def create_state(session: AsyncSession = Depends(db_helper.session_depende
     return await crud.create_state(session = session)
 
 
-@router.get("/auth_status", response_model = Optional[dict])
-async def auth_status(token: str, session: AsyncSession = Depends(db_helper.session_dependency)) -> AuthStatusDto | None:
-    return await crud.auth_status(token = token, session = session)
+@router.post("/auth_status", response_model = Optional[dict])
+async def auth_status(request: AuthStatusRequest, session: AsyncSession = Depends(db_helper.session_dependency)) -> AuthStatusDto | None:
+    return await crud.auth_status(request = request, session = session)

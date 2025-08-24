@@ -12,3 +12,9 @@ class AuthStatusDto(BaseModel):
     
     access_token: str
     refresh_token: str
+    
+
+class AuthStatusRequest(BaseModel):
+    model_config = ConfigDict(from_attributes = True)
+    
+    token: str
