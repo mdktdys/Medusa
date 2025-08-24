@@ -4,7 +4,6 @@ from typing import Any, List, Optional, Tuple
 
 import httpx
 from fastapi import HTTPException, Response, status
-from fastapi_users.authentication import JWTStrategy
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,58 +14,9 @@ from src.api_v1.notifications.schemas import (FirebaseMessage,
                                               FirebaseSubscriber)
 from src.api_v1.notifications.views import (get_firebase_item_subscribers,
                                             send_multicast_message)
-from src.auth.auth import get_jwt_strategy, get_refresh_jwt_strategy
 from src.parser.supabase import SupaBaseWorker
 
-from .schemas import AuthRequest
-
 sup = SupaBaseWorker()
-
-
-async def create_user(session: AsyncSession, auth_request: AuthRequest):
-    new_user = database.User(
-        chat_id = auth_request.chat_id,
-        photo_url = auth_request.photo_url,
-        username = auth_request.username,
-        first_name = auth_request.first_name,
-        last_name = auth_request.last_name,
-        telegram_id = auth_request.user_id,
-        hashed_password = "telegram_auth",
-        email = f"{auth_request.chat_id}@telegram.local",
-    )
-
-    session.add(new_user)
-    await session.commit()
-    await session.refresh(new_user)
-    return new_user
-
-
-
-async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict:
-    result = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == auth_request.token))
-
-    state: database.TelegramAuthState | None = result.scalars().first()
-    if not state:
-        raise HTTPException(status_code = 404, detail="Token not found")
-    
-    result: Result[Tuple[database.User]] = await session.execute(select(database.User).where(database.User.chat_id == auth_request.chat_id))
-    user: database.User | None = result.scalars().first()
-    
-    if not user:
-        user = await create_user(session = session, auth_request = auth_request)
-
-    access_strategy: JWTStrategy = get_jwt_strategy()
-    refresh_strategy: JWTStrategy = get_refresh_jwt_strategy()
-
-    access_token: str = await access_strategy.write_token(user)
-    refresh_token: str = await refresh_strategy.write_token(user)
-
-    state.access_token = access_token
-    state.refresh_token = refresh_token
-    await session.commit()
-
-    return {'result': 'ok'}
-
 
 async def get_chat_subscribers(session: AsyncSession, chat_id: int) -> List[database.Subscribers]:
     query = select(database.Subscribers).where(database.Subscribers.chat_id == str(chat_id))
