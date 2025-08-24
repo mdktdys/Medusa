@@ -212,7 +212,4 @@ async def notify_zamena(affected_groups: List[int], affected_teachers: List[int]
         message = message,
     )
 
-    return None        message = message,
-    )
-
     return None
