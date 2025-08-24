@@ -16,6 +16,7 @@ from .parser.views import router as parser_router
 from .search.views import router as search_router
 from .teachers.views import router as teachers_router
 from .telegram.views import router as telegram_router
+from .telegram_auth.views import router as telegram_auth_router
 from .timings.views import router as timings_router
 from .zamena_file_links.views import router as zamena_file_links_router
 from .zamenas.views import router as zamenas_router
@@ -44,3 +45,6 @@ router.include_router(router = parser_router, prefix="/parser", dependencies=[De
 router.include_router(router = manage_router, prefix="/manage", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router = telegram_router, prefix="/telegram", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
 router.include_router(router = notifications_router, prefix="/notifications", dependencies=[Depends(any_auth_method(roles=["Owner"]))])
+
+# Custom
+router.include_router(router = telegram_auth_router)

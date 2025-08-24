@@ -1,18 +1,17 @@
+import json
 from datetime import datetime, timedelta
 from typing import List
+
 from sqlalchemy import *
+from sqlalchemy import MetaData, Table, create_engine, select
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, MetaData, Table, select
-from sqlalchemy.orm import sessionmaker
-import json
-
 from sqlalchemy.sql.ddl import CreateTable
 
-from my_secrets import supabase_database_connection, local_database_connection
+from my_secrets import local_database_connection, supabase_database_connection
 from src.alchemy import database
-from src.api_v1.groups.schemas import Zamena, Paras, DayScheduleFormatted
+from src.api_v1.groups.schemas import DayScheduleFormatted, Paras, Zamena
 from src.models.day_schedule_model import DaySchedule, Para
 from src.utils.tools import get_number_para_emoji
 

@@ -336,7 +336,6 @@ class Timings(Base):
     obedStart: Mapped[Optional[datetime.time]] = mapped_column(Time)
     obedEnd: Mapped[Optional[datetime.time]] = mapped_column(Time)
 
-
 class Groups(Base):
     __tablename__ = 'Groups'
     __table_args__ = (

@@ -1,13 +1,13 @@
 import datetime
 from typing import List, Optional
 
-from fastapi import APIRouter, Response, Depends, status
+from fastapi import APIRouter, Depends, Response, status
 from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy import db_helper
 from src.api_v1.telegram import crud
-from src.api_v1.telegram.schemas import Subscription, DaySchedule, AuthRequest
+from src.api_v1.telegram.schemas import AuthRequest, DaySchedule, Subscription
 
 router = APIRouter(tags=["Telegram"])
 
@@ -15,11 +15,6 @@ router = APIRouter(tags=["Telegram"])
 @router.get("/status", response_model = Optional[dict])
 async def auth_status(token: str, session: AsyncSession = Depends(db_helper.session_dependency)):
     return await crud.auth_status(token = token, session = session)
-
-
-@router.post('/create_state', status_code=status.HTTP_201_CREATED)
-async def create_state(session: AsyncSession = Depends(db_helper.session_dependency)) -> None:
-    return await crud.create_state(session = session)
 
 
 @router.post('/verify', status_code = status.HTTP_201_CREATED)

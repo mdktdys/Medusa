@@ -1,21 +1,24 @@
 import datetime
-from typing import List, Tuple, Optional, Any
+import uuid
+from typing import Any, List, Optional, Tuple
+
 import httpx
-from sqlalchemy import select, Result
+from fastapi import HTTPException, Response, status
+from fastapi_users.authentication import JWTStrategy
+from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from fastapi import HTTPException, Response, status
-import uuid
-from src.api_v1.notifications.schemas import FirebaseMessage, FirebaseSubscriber
-from src.api_v1.notifications.views import get_firebase_item_subscribers, send_multicast_message
 from my_secrets import TELEGRAM_API_URL
 from src.alchemy import database
 from src.api_v1.groups.schemas import DayScheduleFormatted
-from src.parser.supabase import SupaBaseWorker
-from .schemas import AuthRequest
+from src.api_v1.notifications.schemas import (FirebaseMessage,
+                                              FirebaseSubscriber)
+from src.api_v1.notifications.views import (get_firebase_item_subscribers,
+                                            send_multicast_message)
 from src.auth.auth import get_jwt_strategy, get_refresh_jwt_strategy
-from fastapi_users.authentication import JWTStrategy
+from src.parser.supabase import SupaBaseWorker
 
+from .schemas import AuthRequest
 
 sup = SupaBaseWorker()
 
@@ -56,12 +59,6 @@ async def auth_status(token: str, session: AsyncSession) -> Optional[dict]:
 
     return payload
 
-
-async def create_state(session: AsyncSession) -> None:
-    token: str = str(uuid.uuid4())
-    session.add(database.TelegramAuthState(token = token))
-    await session.commit()
-    return token
 
 
 async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> dict:
@@ -213,6 +210,9 @@ async def notify_zamena(affected_groups: List[int], affected_teachers: List[int]
     await send_multicast_message(
         subscribers = groups_subscribers + teachers_subscribers,
         message = message,
+    )
+
+    return None        message = message,
     )
 
     return None
