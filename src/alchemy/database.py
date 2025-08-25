@@ -3,11 +3,32 @@ import uuid
 from typing import List, Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
-from sqlalchemy import (ARRAY, TIMESTAMP, BigInteger, Boolean, Column, Date,
-                        DateTime, Double, ForeignKey, ForeignKeyConstraint,
-                        Identity, Integer, Numeric, PrimaryKeyConstraint,
-                        SmallInteger, String, Table, Text, Time,
-                        UniqueConstraint, Uuid, func, text)
+from sqlalchemy import (
+    ARRAY,
+    BINARY,
+    TIMESTAMP,
+    BigInteger,
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    Double,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Identity,
+    Integer,
+    Numeric,
+    PrimaryKeyConstraint,
+    SmallInteger,
+    String,
+    Table,
+    Text,
+    Time,
+    UniqueConstraint,
+    Uuid,
+    func,
+    text,
+)
 from sqlalchemy.dialects.postgresql import OID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -500,6 +521,6 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     
     telegram_id = Column(String, default = None, nullable = True)
     chat_id = Column(String, default = None, nullable = True)
-    photo_url = Column(String, default = None, nullable = True)
+    photo_url = Column(BINARY, default = None, nullable = True)
     first_name = Column(String, default = None, nullable = True)
     last_name = Column(String, default = None, nullable = True)

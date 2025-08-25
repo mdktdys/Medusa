@@ -23,12 +23,10 @@ class AuthStatusRequest(BaseModel):
     
     
 class AuthRequest(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    
     token: str
     user_id: str
     chat_id: str
-    photo_url: Optional[str] = None
+    photo_bytes: Optional[bytes] = None
     username: Optional[str] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None

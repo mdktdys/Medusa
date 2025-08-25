@@ -10,8 +10,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 from src.auth.auth import get_jwt_strategy, get_refresh_jwt_strategy
 
-from .schemas import (AuthDto, AuthRequest, AuthStatusDto, AuthStatusRequest,
-                      CreateStateDto)
+from .schemas import (
+    AuthDto,
+    AuthRequest,
+    AuthStatusDto,
+    AuthStatusRequest,
+    CreateStateDto,
+)
 
 
 async def create_state(session: AsyncSession) -> CreateStateDto:
@@ -55,7 +60,7 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> Auth
     if not user:
         new_user = database.User(
             chat_id = auth_request.chat_id,
-            photo_url = auth_request.photo_url,
+            photo_url = auth_request.photo_bytes,
             username = auth_request.username,
             first_name = auth_request.first_name,
             last_name = auth_request.last_name,
