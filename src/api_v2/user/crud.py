@@ -12,7 +12,7 @@ from .schemas import UserResponse
 def me(user: User) -> UserResponse:
     photo_base64 = None
     if user.photo_url:
-        photo_base64 = base64.b64encode(user.photo_url).decode("utf-8")
+        photo_base64: str = base64.b64encode(user.photo_url).decode("utf-8")
 
     return UserResponse(
         email=user.email,
