@@ -34,7 +34,7 @@ async def auth_status(request: AuthStatusRequest, session: AsyncSession) -> Auth
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
     
     if state.access_token is None or state.refresh_token is None:
-        raise HTTPException(status_code = status.HTTP_102_PROCESSING, detail = 'token not binded')
+        raise HTTPException(status_code = status.HTTP_202_ACCEPTED, detail = 'token not binded')
 
     await session.delete(state)
     await session.commit()
