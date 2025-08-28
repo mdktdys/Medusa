@@ -1,9 +1,10 @@
+import uuid
 from datetime import time
 from typing import List, Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
 from sqlalchemy import Boolean, Column, Integer, MetaData, String, Table, Time
-from sqlalchemy.dialects.postgresql import BYTEA
+from sqlalchemy.dialects.postgresql import BYTEA, UUID
 from sqlalchemy.orm import DeclarativeBase
 
 from src.alchemy.database import ForeignKey, Mapped, mapped_column, relationship
@@ -142,7 +143,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
 class FavouriteUserSearchItem(Base):
     __tablename__ = 'favourite_user_search_items'
 
-    user_uid: Mapped[str] = mapped_column(String, ForeignKey('users.id'), primary_key=True)
+    user_uid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('users.id'), primary_key=True)
     search_item_uid: Mapped[str] = mapped_column(String, ForeignKey('search_items.uid'), primary_key=True)
 
     user: Mapped[User] = relationship('User', back_populates='favourite_search_items')
