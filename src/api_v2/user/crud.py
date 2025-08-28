@@ -25,7 +25,6 @@ def me(user: User) -> UserResponse:
     )
 
 
-
 async def get_telegram_user(user_id: int, session: AsyncSession) -> Optional[UserResponse]:
     user_result: Result[Tuple[User]] = await session.execute(select(User).where(User.telegram_id == str(user_id)))
     user: User | None = user_result.scalars().first()

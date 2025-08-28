@@ -3,8 +3,6 @@ from typing import Callable, Optional
 from fastapi import Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.utils.logger import logger
-
 
 def default_key_builder(
     func: Callable,
@@ -19,12 +17,13 @@ def default_key_builder(
         if not isinstance(v, AsyncSession)
     }
 
-    args_repr = ",".join(map(str, args or ()))
-    kwargs_repr = ",".join(f"{k}={v}" for k, v in safe_kwargs.items())
+    args_repr: str = ",".join(map(str, args or ()))
+    kwargs_repr: str = ",".join(f"{k}={v}" for k, v in safe_kwargs.items())
     
-    key: str = f'{namespace}:{func.__module__}.{func.__name__}?args={args_repr}&kwargs={kwargs_repr}'
+    key: str
     if request is not None:
-        logger.info(f'🗑️ Сохранен {request.url} в кеш с ключем {key}')
-
+        key = request.url._url
+    else:
+        key: str = f'{namespace}:{func.__module__}.{func.__name__}?args={args_repr}&kwargs={kwargs_repr}'
     return key
 
