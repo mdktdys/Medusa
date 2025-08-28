@@ -80,7 +80,18 @@ search_items_view = Table(
 
 class SearchItem(Base):
     __table__: Table = search_items_view
-    
+
+# CREATE MATERIALIZED VIEW public.search_items AS
+# SELECT (src.kind || ':' || src.id)::text AS uid,
+#        src.id,
+#        src.name
+# FROM (
+#   SELECT 'G'::text AS kind, id::text AS id, name FROM public.groups
+#   UNION ALL
+#   SELECT 'T'::text AS kind, id::text AS id, name FROM public.teachers
+#   UNION ALL
+#   SELECT 'C'::text AS kind, id::text AS id, name FROM public.cabinets
+# ) AS src;
 
 class Timings(Base):
     __tablename__ = 'timings'
@@ -127,7 +138,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     first_name: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
     last_name: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
 
-    align_search_item_uid: Mapped[Optional[str]] = mapped_column(String, ForeignKey('search_items.uid'), nullable=True)
+    align_search_item_uid: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     align_search_item: Mapped[Optional[SearchItem]] = relationship(
         'SearchItem',
         primaryjoin="foreign(User.align_search_item_uid) == remote(SearchItem.uid)",
@@ -154,7 +165,13 @@ class FavouriteUserSearchItem(Base):
     __tablename__ = 'favourite_user_search_items'
 
     user_uid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid = True), ForeignKey('users.id'), primary_key = True)
-    search_item_uid: Mapped[str] = mapped_column(String, ForeignKey('search_items.uid'), primary_key = True)
+    search_item_uid: Mapped[str] = mapped_column(String, primary_key = True)
 
     user: Mapped[User] = relationship('User', back_populates = 'favourite_search_items')
-    search_item: Mapped[SearchItem] = relationship('SearchItem', viewonly = True, lazy = 'joined')
+    search_item: Mapped[SearchItem] = relationship(
+        'SearchItem',
+        primaryjoin="foreign(FavouriteUserSearchItem.search_item_uid) == remote(SearchItem.uid)",
+        viewonly = True,
+        lazy = 'joined',
+    )
+    
