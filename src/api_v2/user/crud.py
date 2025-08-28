@@ -1,6 +1,7 @@
 import base64
 from typing import Optional, Tuple
 
+from fastapi import HTTPException, status
 from sqlalchemy import Result, select
 
 from src.alchemy.database_local import User
@@ -30,6 +31,9 @@ async def get_telegram_user(user_id: int, session: AsyncSession) -> Optional[Use
     user: User | None = user_result.scalars().first()
     
     if user is None:
-        return None
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = 'User not found'
+        )
     
     return me(user)

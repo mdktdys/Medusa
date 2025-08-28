@@ -157,8 +157,8 @@ class TelegramAuthState(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid = True), nullable=False, default = uuid.uuid4, primary_key = True)
     token: Mapped[str] = mapped_column(String, nullable = False)
-    access_token: Mapped[str] = mapped_column(String, nullable = False)
-    refresh_token: Mapped[str] = mapped_column(String, nullable = False)
+    access_token: Mapped[str] = mapped_column(String, nullable = True)
+    refresh_token: Mapped[str] = mapped_column(String, nullable = True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default = func.now())
 
 
