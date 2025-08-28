@@ -2,7 +2,8 @@ from datetime import time
 from typing import List, Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
-from sqlalchemy import BINARY, Boolean, Column, Integer, MetaData, String, Table, Time
+from sqlalchemy import Boolean, Column, Integer, MetaData, String, Table, Time
+from sqlalchemy.dialects.postgresql import BYTEA
 from sqlalchemy.orm import DeclarativeBase
 
 from src.alchemy.database import ForeignKey, Mapped, mapped_column, relationship
@@ -121,7 +122,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
 
     telegram_id: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
     chat_id: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
-    photo_url: Mapped[Optional[bytes]] = mapped_column(BINARY, default = None, nullable = True)
+    photo_url: Mapped[Optional[bytes]] = mapped_column(BYTEA, default = None, nullable = True)
     first_name: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
     last_name: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
 
