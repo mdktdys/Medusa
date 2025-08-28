@@ -7,7 +7,7 @@ from fastapi_users.authentication import JWTStrategy
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy import database
+from src.alchemy import database_local
 from src.auth.auth import get_jwt_strategy, get_refresh_jwt_strategy
 
 from .schemas import (
@@ -21,14 +21,14 @@ from .schemas import (
 
 async def create_state(session: AsyncSession) -> CreateStateDto:
     token: str = str(uuid.uuid4())
-    session.add(database.TelegramAuthState(token = token))
+    session.add(database_local.TelegramAuthState(token = token))
     await session.commit()
     return CreateStateDto(token = token)
 
 
 async def auth_status(request: AuthStatusRequest, session: AsyncSession) -> AuthStatusDto | None:
-    result: Result[Tuple[database.TelegramAuthState]] = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == request.token))
-    state: database.TelegramAuthState | None = result.scalars().first()
+    result: Result[Tuple[database_local.TelegramAuthState]] = await session.execute(select(database_local.TelegramAuthState).where(database_local.TelegramAuthState.token == request.token))
+    state: database_local.TelegramAuthState | None = result.scalars().first()
 
     if state is None:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
@@ -45,8 +45,8 @@ async def auth_status(request: AuthStatusRequest, session: AsyncSession) -> Auth
     
 
 async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> AuthDto:
-    auth_state: Result[Tuple[database.TelegramAuthState]] = await session.execute(select(database.TelegramAuthState).where(database.TelegramAuthState.token == auth_request.token))
-    state: database.TelegramAuthState | None = auth_state.scalars().first()
+    auth_state: Result[Tuple[database_local.TelegramAuthState]] = await session.execute(select(database_local.TelegramAuthState).where(database_local.TelegramAuthState.token == auth_request.token))
+    state: database_local.TelegramAuthState | None = auth_state.scalars().first()
 
     if not state:
         raise HTTPException(
@@ -54,11 +54,11 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> Auth
             detail = 'Token not found'
         )
     
-    result: Result[Tuple[database.User]] = await session.execute(select(database.User).where(database.User.chat_id == auth_request.chat_id))
-    user: database.User | None = result.scalars().first()
+    result: Result[Tuple[database_local.User]] = await session.execute(select(database_local.User).where(database_local.User.chat_id == auth_request.chat_id))
+    user: database_local.User | None = result.scalars().first()
     
     if not user:
-        new_user = database.User(
+        new_user = database_local.User(
             chat_id = auth_request.chat_id,
             photo_url = auth_request.photo_bytes,
             username = auth_request.username,

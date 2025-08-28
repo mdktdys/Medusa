@@ -1,13 +1,13 @@
 import uuid
-from datetime import time
+from datetime import datetime, time
 from typing import List, Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
-from sqlalchemy import Boolean, Column, Integer, MetaData, String, Table, Time
+from sqlalchemy import Boolean, Column, DateTime, Integer, MetaData, String, Table, Time
 from sqlalchemy.dialects.postgresql import BYTEA, UUID
 from sqlalchemy.orm import DeclarativeBase
 
-from src.alchemy.database import ForeignKey, Mapped, mapped_column, relationship
+from src.alchemy.database import ForeignKey, Mapped, func, mapped_column, relationship
 
 convention: dict[str, str] = {
     'ix': 'ix_%(table_name)s_%(column_0_name)s',
@@ -140,11 +140,21 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     )
     
 
+class TelegramAuthState(Base):
+    __tablename__ = "telegram_auth_states"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid = True), nullable=False, default = uuid.uuid4, primary_key = True)
+    token: Mapped[str] = mapped_column(String, nullable = False)
+    access_token: Mapped[str] = mapped_column(String, nullable = False)
+    refresh_token: Mapped[str] = mapped_column(String, nullable = False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default = func.now())
+
+
 class FavouriteUserSearchItem(Base):
     __tablename__ = 'favourite_user_search_items'
 
-    user_uid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey('users.id'), primary_key=True)
-    search_item_uid: Mapped[str] = mapped_column(String, ForeignKey('search_items.uid'), primary_key=True)
+    user_uid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid = True), ForeignKey('users.id'), primary_key = True)
+    search_item_uid: Mapped[str] = mapped_column(String, ForeignKey('search_items.uid'), primary_key = True)
 
-    user: Mapped[User] = relationship('User', back_populates='favourite_search_items')
-    search_item: Mapped[SearchItem] = relationship('SearchItem', viewonly=True, lazy='joined')
+    user: Mapped[User] = relationship('User', back_populates = 'favourite_search_items')
+    search_item: Mapped[SearchItem] = relationship('SearchItem', viewonly = True, lazy = 'joined')

@@ -1,9 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends, Request, status
-
-from my_secrets import SECRET, API_KEY, PUBLIC_API_KEY
-from src.auth.schemas import UserRead, UserCreate
 import uuid
-from typing import Optional, List
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
 from fastapi_users.authentication import (
     AuthenticationBackend,
@@ -12,8 +10,11 @@ from fastapi_users.authentication import (
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.alchemy.db_helper import db_helper
+
+from my_secrets import API_KEY, PUBLIC_API_KEY, SECRET
 from src.alchemy.database import User
+from src.alchemy.db_helper import local_db_helper
+from src.auth.schemas import UserCreate, UserRead
 
 router = APIRouter()
 api_keys = [API_KEY, PUBLIC_API_KEY]
@@ -28,7 +29,7 @@ async def api_key_auth(request: Request) -> bool:
 
 
 # Получение базы данных пользователей
-async def get_user_db(session: AsyncSession = Depends(db_helper.session_dependency),
+async def get_user_db(session: AsyncSession = Depends(local_db_helper.session_dependency),
 ):
     yield SQLAlchemyUserDatabase(session, User)
 
@@ -64,9 +65,9 @@ def get_refresh_jwt_strategy() -> JWTStrategy:
 
 
 auth_backend = AuthenticationBackend(
-    name="jwt",
-    transport=bearer_transport,
-    get_strategy=get_jwt_strategy,
+    name = 'jwt',
+    transport = bearer_transport,
+    get_strategy = get_jwt_strategy,
 )
 
 
@@ -100,7 +101,7 @@ def any_auth_method(roles: List[str]):
     return dependency
 
 
-current_active_user = fastapi_users.current_user(active=True, optional=True)
+current_active_user = fastapi_users.current_user(active = True, optional = True)
 
 router.include_router(
     fastapi_users.get_auth_router(auth_backend),
