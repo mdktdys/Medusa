@@ -89,7 +89,7 @@ async def parse_group_schedule_v3(file: UploadFile, monday_date: date):
 
 
 @router.post('/parse_zamena_pdf_v3')
-async def parse_zamena_v3(file: Optional[UploadFile], file_url: Optional[str], date: date) -> TaskCreatedResponse:
+async def parse_zamena_v3(file: Optional[UploadFile], file_url: str | None, date: date) -> TaskCreatedResponse:
     return await crud.parse_zamena_v3(request = ParseZamenaV3Request(
         file = file,
         url = file_url,
