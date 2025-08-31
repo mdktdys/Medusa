@@ -83,15 +83,13 @@ def get_containers():
             else None
         )
 
-        container_info.append(
-            {
-                "name": container.name,
-                "status": container.status,
-                "image": container.image.tags,
-                "started_at": state["StartedAt"],
-                "finished_at": finished_at,
-            }
-        )
+        container_info.append({
+            "name": container.name,
+            "status": container.status,
+            "image": container.image.tags,
+            "started_at": state["StartedAt"],
+            "finished_at": finished_at,
+        })
 
     return {"containers": container_info}
 
