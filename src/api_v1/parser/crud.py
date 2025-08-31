@@ -9,7 +9,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy import database
-from src.api_v1.parser.schemas import ParseZamenaJsonRequest, ParseZamenaRequest, RemoveZamenaRequest
+from src.api_v1.celery_tasks.schemas import TaskCreatedResponse
+from src.api_v1.parser.schemas import (
+    ParseZamenaJsonRequest,
+    ParseZamenaRequest,
+    ParseZamenaV3Request,
+    RemoveZamenaRequest,
+)
 from src.parser import tasks
 
 
@@ -40,10 +46,6 @@ async def check_new() -> dict[str, Any]:
     return task.get()
 
 
-def get_all_tasks():
-    return tasks.get_tasks()
-
-
 async def delete_zamena(request: RemoveZamenaRequest) -> dict[str, Any]:
     task: AsyncResult = tasks.delete_zamena.delay(date=request.date)
     return task.get()
@@ -56,7 +58,7 @@ async def get_founded_links(session: AsyncSession):
 
 async def pdf2docx(docx: UploadFile) -> BytesIO:
     file_bytes = await docx.read()
-    from src.parser.parsers import convert_pdf_2_word 
+    from src.parser.parsers import convert_pdf_2_word
     return convert_pdf_2_word(file=file_bytes)
 
 
@@ -92,3 +94,13 @@ def get_containers():
         )
 
     return {"containers": container_info}
+
+
+async def parse_zamena_v3(request: ParseZamenaV3Request) -> TaskCreatedResponse:
+    bytes_: bytes
+    
+    if request.file is not None:
+        bytes_ = await request.file.read()
+    
+    async_result: AsyncResult = tasks.parse_zamena_v3.delay(bytes_ = bytes_)
+    return TaskCreatedResponse.from_async_result(async_result)

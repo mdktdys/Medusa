@@ -6,13 +6,15 @@ from fastapi.responses import PlainTextResponse
 from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
 
-from src.auth.auth import any_auth_method
-from src.dependencies.data_source_dependency import get_supabase_data_source
-from src.data.data_source import DataSource
 from src.alchemy.db_helper import AsyncSession, db_helper
+from src.auth.auth import any_auth_method
+from src.data.data_source import DataSource
+from src.dependencies.data_source_dependency import get_supabase_data_source
 from src.utils.ai_requests import send_ai_request
+
 from . import crud
-from .schemas import DaySchedule, GroupScheduleRequest, Group, DayScheduleFormatted, GroupScheduleResponse, GroupCreate
+from .schemas import (CreateGroupRequest, DaySchedule, DayScheduleFormatted,
+                      Group, GroupScheduleRequest, GroupScheduleResponse)
 
 namespace: str = 'Groups'
 router = APIRouter(tags=[namespace])
@@ -61,11 +63,11 @@ async def delete_group(
 
 @router.post("/", response_model = Group, status_code=201, dependencies = [Depends(any_auth_method(roles=["Owner"]))])
 async def create_group(
-    data: GroupCreate,
+    request: CreateGroupRequest,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> Group:
-    result: Group = await crud.create_group(session=session, data=data)
-    await FastAPICache.clear(namespace = namespace)
+    result: Group = await crud.create_group(session=session, data = request)
+    # await FastAPICache.clear(namespace = namespace)
     return result
 
 

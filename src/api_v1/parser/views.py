@@ -1,14 +1,23 @@
 import datetime
 import os
-from typing import List, Any
-from fastapi import APIRouter, Depends, UploadFile
-from fastapi_cache.decorator import cache
-from fastapi.responses import StreamingResponse
-from celery.result import AsyncResult
-from src.alchemy.db_helper import db_helper, AsyncSession
-from . import crud
+from typing import Any, List
 
-from .schemas import ParseZamenaJsonRequest, ParseZamenaRequest, RemoveZamenaRequest
+from celery.result import AsyncResult
+from fastapi import APIRouter, Depends, UploadFile
+from fastapi.responses import StreamingResponse
+from fastapi_cache.decorator import cache
+
+from src.alchemy.db_helper import AsyncSession, db_helper
+from src.api_v1.celery_tasks.schemas import TaskCreatedResponse
+
+from . import crud
+from .schemas import (
+    ParseZamenaJsonRequest,
+    ParseZamenaRequest,
+    ParseZamenaV3Request,
+    ParseZamenaV3Response,
+    RemoveZamenaRequest,
+)
 
 router = APIRouter(tags=["Parser"])
 
@@ -16,7 +25,6 @@ pass_: str = os.environ["API_SECRET"]
 
 
 @router.get("/get_latest_zamena_link", response_model=dict)
-# @cache(300)
 async def get_latest_zamena_link() -> dict:
     return await crud.get_latest_zamena_link()
 
@@ -30,11 +38,6 @@ async def get_founded_links(session: AsyncSession = Depends(db_helper.session_de
 @router.get("/check_new")
 async def check_new() -> dict[str, Any]:
     return await crud.check_new()
-
-
-@router.get('/tasks', response_model = dict)
-def get_all_tasks() -> dict:
-    return crud.get_all_tasks()
 
 
 @router.post("/parse_zamena", response_model=dict)
@@ -83,3 +86,8 @@ async def delete_zamena(request: RemoveZamenaRequest):
 @router.post("/parse_group_schedule_v3")
 async def parse_group_schedule_v3(file: UploadFile, monday_date: datetime.date):
     return await crud.parse_group_schedule_v3(file=file, monday_date=monday_date)
+
+
+@router.post('/parse_zamena_pdf_v3')
+async def parse_zamena_v3(request: ParseZamenaV3Request) -> TaskCreatedResponse:
+    return await crud.parse_zamena_v3(request = request)

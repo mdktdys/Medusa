@@ -7,6 +7,7 @@ from sqlalchemy import Result, Select, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+import src.alchemy.database_local as database_local
 from src.alchemy import database
 from src.api_v1.groups.schemas import DayScheduleFormatted
 from src.api_v1.telegram.crud import get_chat_subscribers
@@ -19,14 +20,9 @@ from src.models.zamena_full import ZamenaFull
 from src.models.zamenas import Zamenas
 from src.utils.tools import get_number_para_emoji
 
-from .schemas import (
-    Group,
-    GroupCreate,
-    GroupScheduleRequest,
-    GroupScheduleResponse,
-    ScheduleDaySchedule,
-    ScheduleLesson,
-)
+from .schemas import (CreateGroupRequest, Group, GroupScheduleRequest,
+                      GroupScheduleResponse, ScheduleDaySchedule,
+                      ScheduleLesson)
 
 
 async def get_groups(session: AsyncSession) -> list[database.Groups]:
@@ -74,8 +70,8 @@ async def delete_group(session: AsyncSession, group_id: int) -> dict[str, str]:
     return {"result": "ok"}
 
 
-async def create_group(session: AsyncSession, data: GroupCreate) -> Group:
-    new_group = database.Groups(**data.model_dump(exclude={"id"}))
+async def create_group(session: AsyncSession, data: CreateGroupRequest) -> Group:
+    new_group = database_local.Group(**data.model_dump(exclude={"id"}))
     session.add(new_group)
     await session.commit()
     await session.refresh(new_group)

@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import date, datetime
 from typing import List
 
 from pydantic import BaseModel, ConfigDict
@@ -8,7 +8,6 @@ from src.models.paras_model import Paras
 from src.models.zamena_file_link_model import ZamenaFileLink
 from src.models.zamena_full import ZamenaFull
 from src.models.zamenas import Zamenas
-
 
 # class Paras(BaseModel):
 #     model_config = ConfigDict(from_attributes=True)
@@ -84,9 +83,11 @@ class ScheduleDaySchedule(BaseModel):
 class GroupScheduleResponse(BaseModel):
     schedule: list[ScheduleDaySchedule]
     
-class GroupCreate(BaseModel):
+class CreateGroupRequest(BaseModel):
     model_config = ConfigDict(from_attributes = True)
     
     name: str
-    department: int
-    
+    course: int
+    department_id: int
+    commerce: bool
+    specialization_id: int
