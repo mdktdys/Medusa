@@ -1,12 +1,12 @@
 import asyncio
 import datetime
-import parser.zamena.zamena_v3_parser as zamena_parser
 from io import BytesIO
 from typing import Any
 
 from celery import Celery
 from fastapi import UploadFile
 
+import src.parser.zamena.zamena_v3_parser as zamena_parser
 from my_secrets import BACKEND_URL, BROKER_URL
 from src.parser import methods
 from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult
