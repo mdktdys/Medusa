@@ -1,6 +1,6 @@
-import datetime
 import os
-from typing import Any, List
+from datetime import date
+from typing import Any, List, Optional
 
 from celery.result import AsyncResult
 from fastapi import APIRouter, Depends, UploadFile
@@ -84,10 +84,14 @@ async def delete_zamena(request: RemoveZamenaRequest):
 
 
 @router.post("/parse_group_schedule_v3")
-async def parse_group_schedule_v3(file: UploadFile, monday_date: datetime.date):
+async def parse_group_schedule_v3(file: UploadFile, monday_date: date):
     return await crud.parse_group_schedule_v3(file=file, monday_date=monday_date)
 
 
 @router.post('/parse_zamena_pdf_v3')
-async def parse_zamena_v3(request: ParseZamenaV3Request) -> TaskCreatedResponse:
-    return await crud.parse_zamena_v3(request = request)
+async def parse_zamena_v3(file: Optional[UploadFile], file_url: Optional[str], date: date) -> TaskCreatedResponse:
+    return await crud.parse_zamena_v3(request = ParseZamenaV3Request(
+        file = file,
+        url = file_url,
+        date = date
+    ))

@@ -23,7 +23,7 @@ class RemoveZamenaRequest(BaseModel):
 
 class ParseZamenaV3Request(BaseModel):
     file: Optional[UploadFile]
-    url: Url
+    url: Optional[str]
     date: date
     
 
