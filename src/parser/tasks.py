@@ -5,6 +5,7 @@ from typing import Any
 
 from celery import Celery
 from fastapi import UploadFile
+from pdf2docx import Converter
 
 import src.parser.zamena.zamena_v3_parser as zamena_parser
 from my_secrets import BACKEND_URL, BROKER_URL
@@ -43,4 +44,12 @@ def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
 
 @parser_celery_app.task
 def parse_zamena_v3(bytes_: bytes):
-    return asyncio.run(zamena_parser.parse_zamena_v3(bytes_ = bytes_))
+    # check if file is pdf
+    
+    stream : BytesIO = BytesIO()
+    if True:
+        cv = Converter(stream = bytes_, pdf_file="temp")
+        cv.convert(stream)
+        cv.close()
+        
+    return asyncio.run(zamena_parser.parse_zamena_v3(stream = stream))

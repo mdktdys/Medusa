@@ -7,8 +7,7 @@ from docx.table import Table
 from docx.text.paragraph import Paragraph
 
 
-async def parse_zamena_v3(bytes_: bytes):
-    stream: BytesIO = BytesIO()
+async def parse_zamena_v3(stream: BytesIO):
     docx: DocumentObject = Document(stream)
     all_rows: list[list[str]] = extract_all_tables_to_rows(docx.tables)
     header_paragraphs: List[Paragraph] = docx.paragraphs

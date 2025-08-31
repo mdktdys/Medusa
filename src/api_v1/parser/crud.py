@@ -17,6 +17,7 @@ from src.api_v1.parser.schemas import (
     RemoveZamenaRequest,
 )
 from src.parser import tasks
+from src.parser.parsers import get_remote_file_bytes
 
 
 async def parse_zamena(request: ParseZamenaRequest) -> dict:
@@ -96,9 +97,12 @@ def get_containers():
 
 async def parse_zamena_v3(request: ParseZamenaV3Request) -> TaskCreatedResponse:
     bytes_: bytes
-    
+
     if request.file is not None:
         bytes_ = await request.file.read()
-    
+
+    if request.url is not None:
+        bytes_=  get_remote_file_bytes(link = request.url)
+        
     async_result: AsyncResult = tasks.parse_zamena_v3.delay(bytes_ = bytes_)
     return TaskCreatedResponse.from_async_result(async_result)

@@ -1,17 +1,23 @@
+from datetime import date
+from http import HTTPStatus
+from io import BytesIO
 from typing import Any, cast
-from fastapi import UploadFile
+
 import magic
 import requests
-from io import BytesIO
-from http import HTTPStatus
-from datetime import date
+from fastapi import UploadFile
 from pdf2docx import Converter
+
 from src.api_v1.telegram.views import notify_zamena
 from src.parser.core import parseParas
 from src.parser.models.data_model import Data
-from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult, ZamenaParseResultJson, ZamenaParseSucess
+from src.parser.schemas.parse_zamena_schemas import (
+    ZamenaParseResult,
+    ZamenaParseResultJson,
+    ZamenaParseSucess,
+)
 from src.parser.supabase import SupaBaseWorker
-from src.parser.zamena_parser import parseZamenas, parse_zamena_v2
+from src.parser.zamena_parser import parse_zamena_v2, parseZamenas
 
 
 def init_date_model(sup: SupaBaseWorker) -> Data:
@@ -53,6 +59,11 @@ def define_file_format(stream: BytesIO):
     return file_type
 
 
+def define_file_format_from_bytes(bytes_: bytes) -> str:
+    mime = magic.Magic(mime = True)
+    return mime.from_buffer(bytes_)
+
+
 def convert_pdf2word(url: str, file_name: str):
     stream: BytesIO = get_file_stream(link=url)
     cv = Converter(stream=stream, pdf_file="temp")
@@ -62,7 +73,6 @@ def convert_pdf2word(url: str, file_name: str):
 
 def convert_pdf_2_word(file: bytes) -> BytesIO:
     stream_converted = BytesIO()
-
     cv = Converter(stream=file, pdf_file="temp")
     cv.convert(stream_converted)
     cv.close()
