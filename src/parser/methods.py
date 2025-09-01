@@ -29,7 +29,7 @@ from src.parser.zamena_parser import (
     get_file_extension,
     get_remote_file_hash,
 )
-from utils.get_remote_file_bytes import get_remote_file_bytes
+from src.utils.get_remote_file_bytes import get_remote_file_bytes
 
 
 async def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:

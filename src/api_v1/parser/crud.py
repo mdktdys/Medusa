@@ -17,7 +17,7 @@ from src.api_v1.parser.schemas import (
     RemoveZamenaRequest,
 )
 from src.parser import tasks
-from utils.get_remote_file_bytes import get_remote_file_bytes
+from src.utils.get_remote_file_bytes import get_remote_file_bytes
 
 
 async def parse_zamena(request: ParseZamenaRequest) -> dict:
