@@ -35,14 +35,6 @@ def get_file_stream(link: str) -> BytesIO:
     return stream
 
 
-def get_remote_file_bytes(link: str) -> bytes:
-    response = requests.get(link)
-    if response.status_code == HTTPStatus.OK.value:
-        return response.content
-    else:
-        raise Exception("Данные не получены")
-
-
 def get_file_bytes(link: str) -> bytes:
     response = requests.get(link)
 
