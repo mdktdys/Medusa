@@ -11,12 +11,12 @@ async def parse_zamena_v3(stream: BytesIO):
     # header_paragraphs: List[Paragraph] = docx.paragraphs
     
     # распаковка вложенных таблиц в одну
-    work_rows: list = []
-    for row in all_rows:
-        if isinstance(row, list) and all(isinstance(item, str) for item in row):
-            work_rows.extend(row)
-        else:
-            work_rows.extend([row])
+    work_rows: list = all_rows
+    # for row in all_rows:
+    #     if isinstance(row, list) and all(isinstance(item, str) for item in row):
+    #         work_rows.extend(row)
+    #     else:
+    #         work_rows.extend([row])
             
     
     # Удаление столбца Время
