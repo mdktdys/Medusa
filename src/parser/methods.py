@@ -1,42 +1,35 @@
+import base64
 import datetime
-from io import BytesIO
+import html as Html
 import os
 import traceback
+from io import BytesIO
 from typing import Any, List
+
 from docx2pdf import convert
-from src.data.data_source import DataSource
+
 from parser_v3 import parse_schedule_from_file
 from scripts.site_parser_v3 import get_zamena_tables
-from src.parser.core import (
-    getLastZamenaLink,
-    get_all_tables_zamenas,
-)
-from src.parser.parsers import (
-    parse_zamenas,
-    parse_zamenas_json,
-    get_remote_file_bytes,
-)
-
-import base64
-
+from src.parser.core import get_all_tables_zamenas, getLastZamenaLink
+from src.parser.parsers import parse_zamenas
 from src.parser.site_schecker.schemas import (
+    CheckResultCheckExisting,
+    CheckResultError,
     CheckResultFoundNew,
+    CheckZamenaResultFailed,
     CheckZamenaResultFailedDownload,
     CheckZamenaResultInvalidFormat,
     CheckZamenaResultSuccess,
-    CheckZamenaResultFailed,
-    CheckResultCheckExisting,
-    CheckResultError,
 )
 from src.parser.supabase import SupaBaseWorker
 from src.parser.zamena_parser import (
-    get_remote_file_hash,
-    get_file_extension,
+    create_pdf_screenshots_bytes,
     download_file,
     get_bytes_hash,
-    create_pdf_screenshots_bytes,
+    get_file_extension,
+    get_remote_file_hash,
 )
-import html as Html
+from utils.get_remote_file_bytes import get_remote_file_bytes
 
 
 async def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:

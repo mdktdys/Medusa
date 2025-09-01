@@ -1,10 +1,8 @@
 import datetime
-from http import HTTPStatus
 from io import BytesIO
 from typing import Any
 
 import docker
-import requests
 from celery.result import AsyncResult
 from fastapi import UploadFile
 from sqlalchemy import select
@@ -19,15 +17,8 @@ from src.api_v1.parser.schemas import (
     RemoveZamenaRequest,
 )
 from src.parser import tasks
+from utils.get_remote_file_bytes import get_remote_file_bytes
 
-
-def get_remote_file_bytes(link: str) -> bytes:
-    response = requests.get(link)
-    if response.status_code == HTTPStatus.OK.value:
-        return response.content
-    else:
-        raise Exception("Данные не получены")
-    
 
 async def parse_zamena(request: ParseZamenaRequest) -> dict:
     task: AsyncResult = tasks.parse_zamena.delay(
