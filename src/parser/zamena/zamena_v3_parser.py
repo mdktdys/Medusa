@@ -1,23 +1,36 @@
 from io import BytesIO
-from typing import List
 
 from docx import Document
 from docx.document import Document as DocumentObject
 from docx.table import Table
-from docx.text.paragraph import Paragraph
 
 
 async def parse_zamena_v3(stream: BytesIO):
     docx: DocumentObject = Document(stream)
     all_rows: list[list[str]] = extract_all_tables_to_rows(docx.tables)
-    header_paragraphs: List[Paragraph] = docx.paragraphs
+    # header_paragraphs: List[Paragraph] = docx.paragraphs
     
+    # распаковка вложенных таблиц в одну
     work_rows: list = []
     for row in all_rows:
         if isinstance(row, list) and all(isinstance(item, str) for item in row):
             work_rows.extend(row)
         else:
             work_rows.extend([row])
+            
+    
+    # Удаление столбца Время
+    first_row = work_rows[0]
+    if first_row[0] == 'Время':
+        for row in work_rows:
+            row.pop(0)
+            
+    # Удаление строки хедеров
+    if first_row[0] == 'Пара':
+        work_rows.pop(0)
+    
+    for row in work_rows:
+        print(row)
     
     return {
         'result': 'completed',
