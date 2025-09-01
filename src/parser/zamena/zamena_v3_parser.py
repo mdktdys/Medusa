@@ -5,7 +5,7 @@ from docx import Document
 from docx.document import Document as DocumentObject
 from docx.table import Table
 
-from src.api_v1.groups.crud import AsyncSession, get_groups_like
+from src.api_v1.groups.crud import get_groups_like
 
 
 def all_equal(items: list[str]) -> bool:
@@ -26,7 +26,7 @@ def clean_dirty_string(string: str):
     ).lower().replace(' ','')
 
 
-async def parse_zamena_v3(stream: BytesIO, session: AsyncSession):
+async def parse_zamena_v3(stream: BytesIO, session):
     docx: DocumentObject = Document(stream)
     all_rows: list[list[str]] = extract_all_tables_to_rows(docx.tables)
     # header_paragraphs: List[Paragraph] = docx.paragraphs
