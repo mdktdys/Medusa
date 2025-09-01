@@ -1,11 +1,34 @@
+import asyncio
 from io import BytesIO
 
 from docx import Document
 from docx.document import Document as DocumentObject
 from docx.table import Table
 
+from src.alchemy.database import Groups
+from src.alchemy.db_helper import AsyncSession
+from src.api_v1.groups.crud import get_groups_like
 
-async def parse_zamena_v3(stream: BytesIO):
+
+def all_equal(items: list[str]) -> bool:
+    return len(set(items)) <= 1
+
+
+def clean_dirty_string(string: str):
+    return (
+        string.replace(" ", "")
+        .replace(".", "")
+        .replace(",", "")
+        .replace("-", "")
+        .replace("_", "")
+        .replace("\n", " ")
+        .replace("\t", "")
+        .replace("—", "")
+        .replace("—", "")
+    ).lower().replace(' ','')
+
+
+async def parse_zamena_v3(stream: BytesIO, session: AsyncSession):
     docx: DocumentObject = Document(stream)
     all_rows: list[list[str]] = extract_all_tables_to_rows(docx.tables)
     # header_paragraphs: List[Paragraph] = docx.paragraphs
@@ -28,6 +51,59 @@ async def parse_zamena_v3(stream: BytesIO):
     # Удаление строки хедеров
     if first_row[0] == 'Пара':
         work_rows.pop(0)
+        
+    # Очистка пустых строк
+    work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
+    
+    # перевод пар 3,4 на отдельные строки
+    extracted: list = []
+    for row in work_rows:
+        cell: str = row[0].replace('.', ',')
+        
+        if cell[0] == ',':
+            cell = cell[1:]
+            
+        if cell[-1] == ',':
+            cell = cell[:-1]
+            
+        timings: list[str] = cell.split(',')
+        
+        if len(timings) > 1:
+            for timing in timings:
+                copy_row = row.copy()
+                copy_row[0] = timing
+                extracted.append(copy_row)
+        else:
+            extracted.append(row)
+            
+    work_rows = list(extracted)
+            
+    
+    # Очистка от лишних символов
+    work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
+    
+    
+    groups: list[Groups]
+    # Перевод в айдишники
+    for row in work_rows:
+        # строка полной замены
+        if all_equal(row):
+            groups: list[Groups] = await get_groups_like(
+                session = session,
+                pattern = row[0]
+            )
+            
+            if len(groups) > 1:
+                raise Exception(f'Больше 1 совпадения группы {row[0]}')
+            
+            group_id: int = groups[0].id
+            for cell in row:
+                cell = str(group_id)
+        else:
+            course_text: str = row[3]
+            teacher_text: str = row[4]
+            cabinet_text: str = row[5]
+            
     
     for row in work_rows:
         print(row)
@@ -52,3 +128,13 @@ def extract_all_tables_to_rows(tables: list[Table]) -> list[list[str]]:
                     data.append(cell_text)
             rows.append(data)
     return rows
+
+
+
+# if __name__ == '__main__':
+#     with open("../samples/response.docx", "rb") as fh:
+#         stream = BytesIO(fh.read())
+#         asyncio.run(parse_zamena_v3(stream = stream))
+    
+            
+        
