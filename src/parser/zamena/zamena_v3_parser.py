@@ -5,7 +5,7 @@ from docx import Document
 from docx.document import Document as DocumentObject
 from docx.table import Table
 
-from src.api_v1.groups.crud import AsyncSession, Group, get_groups_like
+from src.api_v1.groups.crud import AsyncSession, get_groups_like
 
 
 def all_equal(items: list[str]) -> bool:
@@ -81,12 +81,12 @@ async def parse_zamena_v3(stream: BytesIO, session: AsyncSession):
     work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
     
     
-    groups: list[Groups]
+    groups: list
     # Перевод в айдишники
     for row in work_rows:
         # строка полной замены
         if all_equal(row):
-            groups: list[Groups] = await get_groups_like(
+            groups: list = await get_groups_like(
                 session = session,
                 pattern = row[0]
             )
