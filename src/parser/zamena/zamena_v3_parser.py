@@ -5,9 +5,7 @@ from docx import Document
 from docx.document import Document as DocumentObject
 from docx.table import Table
 
-from src.alchemy.database import Groups
-from src.alchemy.db_helper import AsyncSession
-from src.api_v1.groups.crud import get_groups_like
+from src.api_v1.groups.crud import AsyncSession, Group, get_groups_like
 
 
 def all_equal(items: list[str]) -> bool:
