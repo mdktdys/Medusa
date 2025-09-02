@@ -24,7 +24,7 @@ async def find_disciplines_by_alias_or_name(
     logger.logger.info(q)
     alias_cond = EntityAlias.alias_normalized.ilike(f"%{q}%") if contains else (EntityAlias.alias_normalized == q)
 
-    stmt_alias = (
+    stmt_alias: Select[Tuple[int]] = (
         select(EntityAlias.entity_id)
         .where(
             EntityAlias.kind == EntityKind.DISCIPLINE.value,
