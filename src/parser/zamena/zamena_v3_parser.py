@@ -9,7 +9,7 @@ def all_equal(items: list[str]) -> bool:
     return len(set(items)) <= 1
 
 
-def clean_dirty_string(string: str):
+def clean_dirty_string(string: str) -> str:
     return (
         string.replace(" ", "")
         .replace(".", "")
@@ -42,7 +42,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
     # Очистка пустых строк
     work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
 
-    from src.api_v1.groups.crud import get_groups_normalized
+    from src.api_v1.groups.crud import get_groups_normalized_contains
 
     # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
     for row in work_rows:
@@ -51,7 +51,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
             continue
         if len(non_empty_cells) == 1:
             non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
-            groups = await get_groups_normalized(session=session, raw_name=non_empty_cell)
+            groups = await get_groups_normalized_contains(session=session, raw_name=non_empty_cell)
             if groups:
                 group = groups[0]
                 row[:] = [group.name] * len(row)
@@ -72,28 +72,32 @@ async def parse_zamena_v3(stream: BytesIO, session):
     work_rows = list(merged_rows)
         
     # перевод пар 3,4 на отдельные строки
-    # extracted: list = []
-    # for row in work_rows:
-    #     print(row)
-    #     cell: str = row[0].replace('.', ',')
-    
-    #     if cell[0] == ',':
-    #         cell = cell[1:]
-        
-    #     if cell[-1] == ',':
-    #         cell = cell[:-1]
-        
-    #     timings: list[str] = cell.split(',')
-    
-    #     if len(timings) > 1:
-    #         for timing in timings:
-    #             copy_row = row.copy()
-    #             copy_row[0] = timing
-    #             extracted.append(copy_row)
-    #     else:
-    #         extracted.append(row)
+    extracted: list = []
+    for row in work_rows:
+        timings_text = row[0]
 
-    # work_rows = list(extracted)
+        if not timings_text.replace(',','').isdigit():
+            continue
+    
+        cell: str = timings_text.replace('.', ',')
+    
+        if cell[0] == ',':
+            cell = cell[1:]
+        
+        if cell[-1] == ',':
+            cell = cell[:-1]
+        
+        timings: list[str] = cell.split(',')
+    
+        if len(timings) > 1:
+            for timing in timings:
+                copy_row = row.copy()
+                copy_row[0] = timing
+                extracted.append(copy_row)
+        else:
+            extracted.append(row)
+
+    work_rows = list(extracted)
 
 
     # Очистка от лишних символов
