@@ -112,7 +112,9 @@ async def parse_zamena_v3(stream: BytesIO, session):
     work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
     
     # Перевод в айдишники
-    from src.api_v1.disciplines.crud import find_disciplines_by_alias_or_name
+    from src.api_v1.disciplines.crud import (
+        find_group_disciplines_by_alias_or_name_or_code_discipline_name,
+    )
     
     current_group = None
     for row in work_rows:
@@ -134,8 +136,9 @@ async def parse_zamena_v3(stream: BytesIO, session):
 
         else:
             course_text: str = row[3]
-            founded_disciplines = await find_disciplines_by_alias_or_name(
+            founded_disciplines = await find_group_disciplines_by_alias_or_name_or_code_discipline_name(
                 session = session,
+                group = group,
                 raw = course_text
             )
             
