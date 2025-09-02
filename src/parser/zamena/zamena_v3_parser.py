@@ -113,6 +113,8 @@ async def parse_zamena_v3(stream: BytesIO, session):
     
     # Перевод в айдишники
     from src.api_v1.disciplines.crud import find_disciplines_by_alias_or_name
+    
+    current_group = None
     for row in work_rows:
         if all_equal(row):
             group_text: str = clean_trash(row[0])
@@ -126,8 +128,9 @@ async def parse_zamena_v3(stream: BytesIO, session):
             if len(groups) > 1:
                 raise Exception(f'🔴 Больше 1 совпадения группы {group_text}')
 
-            group_id = str(groups[0].id)
-            row[:] = [group_id] * len(row)
+            group = groups[0]
+            row[:] = [group] * len(row)
+            current_group = group
 
         else:
             course_text: str = row[3]
@@ -137,7 +140,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
             )
             
             if not founded_disciplines:
-                exceptions.append(f'🔴 Не найдена дисциплина {course_text}')
+                exceptions.append(f'🔴 Не найдена дисциплина {course_text} для группы {current_group.name}')
                 continue
             if len(founded_disciplines) > 1:
                 raise Exception(f'🔴 Больше 1 совпадения дисциплин {course_text}')
