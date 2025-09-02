@@ -103,8 +103,8 @@ async def parse_zamena_v3(stream: BytesIO, session):
 
     # Очистка от лишних символов
     work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
+    
     # Перевод в айдишники
-    # groups: list
     for row in work_rows:
         # строка полной замены
         if all_equal(row):

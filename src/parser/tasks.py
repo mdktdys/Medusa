@@ -10,7 +10,7 @@ from pdf2docx import Converter
 
 import src.parser.zamena.zamena_v3_parser as zamena_parser
 from my_secrets import BACKEND_URL, BROKER_URL
-from src.alchemy.db_helper import db_helper
+from src.alchemy.db_helper import local_db_helper
 from src.parser import methods
 from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult
 
@@ -25,7 +25,7 @@ def with_session(func):
     @wraps(func)
     def _sync_wrapper(*args, **kwargs):
         async def _inner():
-            async with db_helper.session_factory() as session:
+            async with local_db_helper.session_factory() as session:
                 kwargs_with_session = {**kwargs, "session": session}
                 return await func(*args, **kwargs_with_session)
 
