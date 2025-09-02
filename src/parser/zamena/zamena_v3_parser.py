@@ -108,33 +108,35 @@ async def parse_zamena_v3(stream: BytesIO, session):
     work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
     
     # Перевод в айдишники
+    from src.api_v1.disciplines.crud import find_disciplines_by_alias_or_name
     for row in work_rows:
-        # строка полной замены
         if all_equal(row):
-            group_text = clean_trash(row[0])
-            groups: list = await get_groups_normalized_contains(
-                session = session,
-                raw_name = group_text
+            group_text: str = clean_trash(row[0])
+            groups = await get_groups_normalized_contains(
+                session=session,
+                raw_name=group_text
             )
-        
 
+            if not groups:
+                raise Exception(f'🔴 Не найдена группа {group_text}')
             if len(groups) > 1:
                 raise Exception(f'🔴 Больше 1 совпадения группы {group_text}')
 
-            try:
-                group_id: int = groups[0].id
-                for cell in row:
-                    cell = str(group_id)
-            except IndexError:
-                raise Exception(f'🔴 Не найдена группа {group_text}')
+            group_id = str(groups[0].id)
+            row[:] = [group_id] * len(row)
 
         else:
             course_text: str = row[3]
+            founded_disciplines = await find_disciplines_by_alias_or_name(
+                session = session,
+                raw = course_text
+            )
             
-            teacher_text: str = row[4]
+            if not founded_disciplines:
+                raise Exception(f'🔴 Не найдена группа {group_text}')
+            if len(founded_disciplines) > 1:
+                raise Exception(f'🔴 Больше 1 совпадения дисциплин {group_text}')
             
-            
-            cabinet_text: str = row[5]
             
     
     for row in work_rows:
@@ -160,13 +162,3 @@ def extract_all_tables_to_rows(tables: list[Table]) -> list[list[str]]:
                     data.append(cell_text)
             rows.append(data)
     return rows
-
-
-
-# if __name__ == '__main__':
-#     with open("../samples/response.docx", "rb") as fh:
-#         stream = BytesIO(fh.read())
-#         asyncio.run(parse_zamena_v3(stream = stream))
-    
-            
-                                

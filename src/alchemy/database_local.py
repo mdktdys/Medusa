@@ -6,7 +6,8 @@ from typing import List, Optional
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
 from sqlalchemy import Boolean, Column, Date, DateTime
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy import Integer, MetaData, String, Table, Time
+from sqlalchemy import (Index, Integer, MetaData, String, Table, Time,
+                        UniqueConstraint)
 from sqlalchemy.dialects.postgresql import BYTEA, UUID
 from sqlalchemy.orm import DeclarativeBase
 
@@ -293,3 +294,41 @@ class Lesson(Base):
     
     cabinet_id: Mapped[int] = mapped_column(Integer, ForeignKey('cabinets.id'), nullable = True)
     cabinet: Mapped[Cabinet] = relationship('Cabinet', back_populates='lessons')
+    
+    
+class EntityKind(PyEnum):
+    GROUP = "G"
+    TEACHER = "T"
+    CABINET = "C"
+    DISCIPLINE = "D"
+
+class EntityAlias(Base):
+    __tablename__ = "entity_aliases"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    kind: Mapped[EntityKind] = mapped_column(SAEnum(EntityKind, name="entity_kind", native_enum=False), nullable=False)
+    entity_id: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    alias: Mapped[str] = mapped_column(String, nullable=False)
+    alias_normalized: Mapped[str] = mapped_column(String, nullable=False)
+
+    department_id: Mapped[int | None] = mapped_column(Integer, ForeignKey('departments.id'), nullable=True)
+    specialization_id: Mapped[int | None] = mapped_column(Integer, ForeignKey('specializations.id'), nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("kind", "entity_id", "alias_normalized", name="uq_alias_norm_per_entity"),
+        Index("ix_entity_alias_norm", "alias_normalized"),
+        Index("ix_entity_alias_kind_norm", "kind", "alias_normalized"),
+    )
+    alias: Mapped[str] = mapped_column(String, nullable=False)
+    alias_normalized: Mapped[str] = mapped_column(String, nullable=False)
+
+    department_id: Mapped[int | None] = mapped_column(Integer, ForeignKey('departments.id'), nullable=True)
+    specialization_id: Mapped[int | None] = mapped_column(Integer, ForeignKey('specializations.id'), nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("kind", "entity_id", "alias_normalized", name="uq_alias_norm_per_entity"),
+        Index("ix_entity_alias_norm", "alias_normalized"),
+        Index("ix_entity_alias_kind_norm", "kind", "alias_normalized"),
+    )
