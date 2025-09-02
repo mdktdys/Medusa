@@ -146,7 +146,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
                 exceptions.append(f'🔴 Не найдена дисциплина {course_text} для группы {current_group.name}')
                 continue
             if len(founded_disciplines) > 1:
-                raise Exception(f'🔴 Больше 1 совпадения дисциплин {course_text}')
+                raise Exception(f'🔴 Больше 1 совпадения дисциплин {course_text} для группы {current_group.name}')
             
     if len(exceptions) > 0:
         for exception in exceptions:
