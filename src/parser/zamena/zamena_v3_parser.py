@@ -77,6 +77,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
         timings_text = row[0]
 
         if not timings_text.replace(',','').isdigit():
+            extracted.append(row)
             continue
     
         cell: str = timings_text.replace('.', ',')
