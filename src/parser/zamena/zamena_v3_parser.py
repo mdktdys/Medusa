@@ -43,27 +43,11 @@ async def parse_zamena_v3(stream: BytesIO, session):
     # Очистка пустых строк
     work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
     
-    from src.api_v1.groups.crud import get_groups_normalized
-
-    # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
-    for row in work_rows:
-        non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
-        if not non_empty_cells:
-            continue
-
-        if len(non_empty_cells) == 1:
-            non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
-
-            groups = await get_groups_normalized(session=session, raw_name=non_empty_cell)
-            if groups:
-                group = groups[0]
-                row[:] = [group.name] * len(row)
-            else:
-                print(f'🔴 Не найдена группа -> {non_empty_cell}')
 
     # перевод пар 3,4 на отдельные строки
     extracted: list = []
     for row in work_rows:
+        print(row)
         cell: str = row[0].replace('.', ',')
         
         if cell[0] == ',':
@@ -83,10 +67,25 @@ async def parse_zamena_v3(stream: BytesIO, session):
             extracted.append(row)
     
     work_rows = list(extracted)
-            
+    
+    from src.api_v1.groups.crud import get_groups_normalized
+
+    # # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
+    # for row in work_rows:
+    #     non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
+    #     if not non_empty_cells:
+    #         continue
+    #     if len(non_empty_cells) == 1:
+    #         non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
+    #         groups = await get_groups_normalized(session=session, raw_name=non_empty_cell)
+    #         if groups:
+    #             group = groups[0]
+    #             row[:] = [group.name] * len(row)
+    #         else:
+    #             print(f'🔴 Не найдена группа -> {non_empty_cell}')
+        
     # Очистка от лишних символов
     # work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
-
     # Перевод в айдишники
     # groups: list
     # for row in work_rows:
@@ -96,10 +95,10 @@ async def parse_zamena_v3(stream: BytesIO, session):
     #             session = session,
     #             raw_name = row[0]
     #         )
-            
+        
     #         if len(groups) > 1:
     #             raise Exception(f'Больше 1 совпадения группы {row[0]}')
-            
+        
     #         group_id: int = groups[0].id
     #         for cell in row:
     #             cell = str(group_id)
