@@ -52,7 +52,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
             continue
 
         if len(non_empty_cells) == 1:
-            non_empty_cell = clean_dirty_string(non_empty_cells[0])
+            non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
 
             groups = await get_groups_normalized(session=session, raw_name=non_empty_cell)
             if groups:
@@ -61,54 +61,52 @@ async def parse_zamena_v3(stream: BytesIO, session):
             else:
                 print(f'🔴 Не найдена группа -> {non_empty_cell}')
 
-    # перевод пар 3,4 на отдельные строки
-    extracted: list = []
-    for row in work_rows:
-        cell: str = row[0].replace('.', ',')
+    # # перевод пар 3,4 на отдельные строки
+    # extracted: list = []
+    # for row in work_rows:
+    #     cell: str = row[0].replace('.', ',')
         
-        if cell[0] == ',':
-            cell = cell[1:]
+    #     if cell[0] == ',':
+    #         cell = cell[1:]
             
-        if cell[-1] == ',':
-            cell = cell[:-1]
+    #     if cell[-1] == ',':
+    #         cell = cell[:-1]
             
-        timings: list[str] = cell.split(',')
+    #     timings: list[str] = cell.split(',')
         
-        if len(timings) > 1:
-            for timing in timings:
-                copy_row = row.copy()
-                copy_row[0] = timing
-                extracted.append(copy_row)
-        else:
-            extracted.append(row)
+    #     if len(timings) > 1:
+    #         for timing in timings:
+    #             copy_row = row.copy()
+    #             copy_row[0] = timing
+    #             extracted.append(copy_row)
+    #     else:
+    #         extracted.append(row)
     
-    work_rows = list(extracted)
+    # work_rows = list(extracted)
             
-    
     # Очистка от лишних символов
     work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
-    
 
     # Перевод в айдишники
-    groups: list
-    for row in work_rows:
-        # строка полной замены
-        if all_equal(row):
-            groups: list = await get_groups_normalized(
-                session = session,
-                raw_name = row[0]
-            )
+    # groups: list
+    # for row in work_rows:
+    #     # строка полной замены
+    #     if all_equal(row):
+    #         groups: list = await get_groups_normalized(
+    #             session = session,
+    #             raw_name = row[0]
+    #         )
             
-            if len(groups) > 1:
-                raise Exception(f'Больше 1 совпадения группы {row[0]}')
+    #         if len(groups) > 1:
+    #             raise Exception(f'Больше 1 совпадения группы {row[0]}')
             
-            group_id: int = groups[0].id
-            for cell in row:
-                cell = str(group_id)
-        else:
-            course_text: str = row[3]
-            teacher_text: str = row[4]
-            cabinet_text: str = row[5]
+    #         group_id: int = groups[0].id
+    #         for cell in row:
+    #             cell = str(group_id)
+    #     else:
+    #         course_text: str = row[3]
+    #         teacher_text: str = row[4]
+            # cabinet_text: str = row[5]
             
     
     for row in work_rows:
