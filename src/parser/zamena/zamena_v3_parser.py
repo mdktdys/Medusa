@@ -45,60 +45,57 @@ async def parse_zamena_v3(stream: BytesIO, session):
     from src.api_v1.groups.crud import get_groups_normalized
 
     # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
-    for row in work_rows:
-        non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
-        if not non_empty_cells:
-            continue
-        if len(non_empty_cells) == 1:
-            non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
-            groups = await get_groups_normalized(session=session, raw_name=non_empty_cell)
-            if groups:
-                group = groups[0]
-                row[:] = [group.name] * len(row)
-            else:
-                print(f'🔴 Не найдена группа -> {non_empty_cell}')
-                
+    # for row in work_rows:
+    #     non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
+    #     if not non_empty_cells:
+    #         continue
+    #     if len(non_empty_cells) == 1:
+    #         non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
+    #         groups = await get_groups_normalized(session=session, raw_name=non_empty_cell)
+    #         if groups:
+    #             group = groups[0]
+    #             row[:] = [group.name] * len(row)
+    #         else:
+    #             print(f'🔴 Не найдена группа -> {non_empty_cell}')
+            
     # Восстановление оторванных строк
     # ['4,5', '', '', 'Правовые основы оперативно-', 'Музафаров Ф.Ф.', '112']
     # ['', '', '', 'розыскной \nдеятельности', '', '']
     # -> ['4,5', '', '', 'Правовые основы оперативно-розыскной \nдеятельности', 'Музафаров Ф.Ф.', '112']
-    merged_rows: list[list[str]] = []
-    for row in work_rows:
-        if row[0] == '' and merged_rows:
-            prev_row: list[str] = merged_rows[-1]
-            prev_row[3] = (prev_row[3] + row[3]).strip()
-        else:
-            merged_rows.append(row)
-
-    work_rows = list(merged_rows)
-            
-
+    # merged_rows: list[list[str]] = []
+    # for row in work_rows:
+    #     if row[0] == '' and merged_rows:
+    #         prev_row: list[str] = merged_rows[-1]
+    #         prev_row[3] = (prev_row[3] + row[3]).strip()
+    #     else:
+    #         merged_rows.append(row)
+    # work_rows = list(merged_rows)
+        
     # перевод пар 3,4 на отдельные строки
-    extracted: list = []
-    for row in work_rows:
-        print(row)
-        cell: str = row[0].replace('.', ',')
-        
-        if cell[0] == ',':
-            cell = cell[1:]
-            
-        if cell[-1] == ',':
-            cell = cell[:-1]
-            
-        timings: list[str] = cell.split(',')
-        
-        if len(timings) > 1:
-            for timing in timings:
-                copy_row = row.copy()
-                copy_row[0] = timing
-                extracted.append(copy_row)
-        else:
-            extracted.append(row)
+    # extracted: list = []
+    # for row in work_rows:
+    #     print(row)
+    #     cell: str = row[0].replace('.', ',')
     
-    work_rows = list(extracted)
+    #     if cell[0] == ',':
+    #         cell = cell[1:]
+        
+    #     if cell[-1] == ',':
+    #         cell = cell[:-1]
+        
+    #     timings: list[str] = cell.split(',')
     
+    #     if len(timings) > 1:
+    #         for timing in timings:
+    #             copy_row = row.copy()
+    #             copy_row[0] = timing
+    #             extracted.append(copy_row)
+    #     else:
+    #         extracted.append(row)
 
-    
+    # work_rows = list(extracted)
+
+
     # Очистка от лишних символов
     # work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
     # Перевод в айдишники
@@ -110,10 +107,10 @@ async def parse_zamena_v3(stream: BytesIO, session):
     #             session = session,
     #             raw_name = row[0]
     #         )
-    
+
     #         if len(groups) > 1:
     #             raise Exception(f'Больше 1 совпадения группы {row[0]}')
-    
+
     #         group_id: int = groups[0].id
     #         for cell in row:
     #             cell = str(group_id)
