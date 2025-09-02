@@ -1,4 +1,3 @@
-import asyncio
 from io import BytesIO
 
 from docx import Document
@@ -58,6 +57,21 @@ async def parse_zamena_v3(stream: BytesIO, session):
                 row[:] = [group.name] * len(row)
             else:
                 print(f'🔴 Не найдена группа -> {non_empty_cell}')
+                
+    # Восстановление оторванных строк
+    # ['4,5', '', '', 'Правовые основы оперативно-', 'Музафаров Ф.Ф.', '112']
+    # ['', '', '', 'розыскной \nдеятельности', '', '']
+    # -> ['4,5', '', '', 'Правовые основы оперативно-розыскной \nдеятельности', 'Музафаров Ф.Ф.', '112']
+    merged_rows: list[list[str]] = []
+    for row in work_rows:
+        if row[0] == '' and merged_rows:
+            prev_row: list[str] = merged_rows[-1]
+            prev_row[3] = (prev_row[3] + row[3]).strip()
+        else:
+            merged_rows.append(row)
+
+    work_rows = list(merged_rows)
+            
 
     # # перевод пар 3,4 на отдельные строки
     # extracted: list = []
