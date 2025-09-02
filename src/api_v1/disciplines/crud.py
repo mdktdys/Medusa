@@ -5,6 +5,7 @@ from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy.database_local import Discipline, EntityAlias, EntityKind
+from src.utils import logger
 
 NORMALIZE_RE: re.Pattern[str] = re.compile(r'[^a-zA-Zа-яА-Я0-9]+')
 
@@ -20,7 +21,7 @@ async def find_disciplines_by_alias_or_name(
     q: str = _norm(raw)
     if not q:
         return []
-
+    logger.logger.info(q)
     alias_cond = EntityAlias.alias_normalized.like(f"%{q}%") if contains else (EntityAlias.alias_normalized == q)
 
     stmt_alias = (
@@ -31,6 +32,7 @@ async def find_disciplines_by_alias_or_name(
         )
     )
     alias_rows: Sequence[int] = (await session.execute(stmt_alias)).scalars().all()
+    logger.logger.info(alias_rows)
 
     results: list[Discipline] = []
 
