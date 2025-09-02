@@ -4,7 +4,7 @@ from docx import Document
 from docx.document import Document as DocumentObject
 from docx.table import Table
 
-from utils.logger import logger
+from src.utils.logger import logger
 
 
 def clean_trash(string: str) -> str:
