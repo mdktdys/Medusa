@@ -38,7 +38,7 @@ async def get_group_by_id(session: AsyncSession, group_id: int) -> list[Group]:
 
 
 async def get_groups_like(session: AsyncSession, pattern: str) -> list[database.Groups]:
-    query = select(database.Groups).where(database.Groups.name.like(pattern))
+    query = select(database.Groups).where(database.Groups.name.ilike(pattern))
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 

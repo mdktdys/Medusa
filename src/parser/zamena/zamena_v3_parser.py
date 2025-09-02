@@ -27,16 +27,8 @@ def clean_dirty_string(string: str):
 async def parse_zamena_v3(stream: BytesIO, session):
     docx: DocumentObject = Document(stream)
     all_rows: list[list[str]] = extract_all_tables_to_rows(docx.tables)
-    # header_paragraphs: List[Paragraph] = docx.paragraphs
-    
-    # распаковка вложенных таблиц в одну
     work_rows: list = all_rows
-    # for row in all_rows:
-    #     if isinstance(row, list) and all(isinstance(item, str) for item in row):
-    #         work_rows.extend(row)
-    #     else:
-    #         work_rows.extend([row])
-            
+    # header_paragraphs: List[Paragraph] = docx.paragraphs    
     
     # Удаление столбца Время
     first_row = work_rows[0]
@@ -50,6 +42,20 @@ async def parse_zamena_v3(stream: BytesIO, session):
         
     # Очистка пустых строк
     work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
+    
+    from src.api_v1.groups.crud import get_groups_like
+
+    # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
+    for row in work_rows:
+        non_empty_cell: str | None = next((cell for cell in row if isinstance(cell, str) and cell.strip()), None)
+        if non_empty_cell is None:
+            continue
+        
+        precised_group_name: str = clean_dirty_string(non_empty_cell)
+        groups = await get_groups_like(session=session, pattern=f"%{precised_group_name}%")
+        group = groups[0]
+        row[:] = [group.name] * len(row)
+    
     
     # перевод пар 3,4 на отдельные строки
     extracted: list = []
@@ -78,11 +84,9 @@ async def parse_zamena_v3(stream: BytesIO, session):
     # Очистка от лишних символов
     work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
     
-    
 
-    from src.api_v1.groups.crud import get_groups_like
-    groups: list
     # Перевод в айдишники
+    groups: list
     for row in work_rows:
         # строка полной замены
         if all_equal(row):
