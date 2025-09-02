@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple
+from typing import List, Sequence, Tuple
 
 from sqlalchemy import Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -30,7 +30,7 @@ async def find_disciplines_by_alias_or_name(
             alias_cond,
         )
     )
-    alias_rows = (await session.execute(stmt_alias)).scalars().all()
+    alias_rows: Sequence[int] = (await session.execute(stmt_alias)).scalars().all()
 
     results: list[Discipline] = []
 

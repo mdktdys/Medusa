@@ -25,6 +25,9 @@ def with_session(func):
     @wraps(func)
     def _sync_wrapper(*args, **kwargs):
         async def _inner():
+            # Ensure the DB helper creates engine and session_factory in this
+            # process / event loop (prevents Futures created on another loop).
+            local_db_helper._ensure_initialized()
             async with local_db_helper.session_factory() as session:
                 kwargs_with_session = {**kwargs, "session": session}
                 return await func(*args, **kwargs_with_session)
