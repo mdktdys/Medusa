@@ -22,7 +22,7 @@ async def find_disciplines_by_alias_or_name(
     if not q:
         return []
     logger.logger.info(q)
-    alias_cond = EntityAlias.alias_normalized.like(f"%{q}%") if contains else (EntityAlias.alias_normalized == q)
+    alias_cond = EntityAlias.alias_normalized.ilike(f"%{q}%") if contains else (EntityAlias.alias_normalized == q)
 
     stmt_alias = (
         select(EntityAlias.entity_id)
@@ -46,7 +46,7 @@ async def find_disciplines_by_alias_or_name(
 
     if not results:
         disc_norm = func.lower(func.regexp_replace(Discipline.name, r'[^a-zA-Zа-яА-Я0-9]', '', 'g'))
-        name_cond = disc_norm.like(f"%{q}%") if contains else (disc_norm == q)
+        name_cond = disc_norm.ilike(f"%{q}%") if contains else (disc_norm == q)
 
         stmt_disc_by_name: Select[Tuple[Discipline]] = select(Discipline).where(name_cond)
         results = list((await session.execute(stmt_disc_by_name)).scalars().all())
