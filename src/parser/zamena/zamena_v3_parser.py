@@ -127,6 +127,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
             course_text: str = row[3]
             
             teacher_text: str = row[4]
+            
             cabinet_text: str = row[5]
             
     
