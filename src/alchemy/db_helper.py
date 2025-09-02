@@ -20,19 +20,31 @@ class DatabaseHelper:
         # used on another loop — causing "Future attached to a different loop" errors.
         self._url = url
         self._echo = echo
-        self.engine: Optional[AsyncEngine] = None
-        self.session_factory: Optional[async_sessionmaker[AsyncSession]] = None
+        # internal storage for lazy-init objects
+        self._engine: Optional[AsyncEngine] = None
+        self._session_factory: Optional[async_sessionmaker[AsyncSession]] = None
 
-    def _ensure_initialized(self):
-        if self.engine is None:
-            self.engine = create_async_engine(url=self._url, echo=self._echo)
-            self.session_factory = async_sessionmaker(
-                bind=self.engine, autoflush=False, autocommit=False, expire_on_commit=False
+    def _ensure_initialized(self) -> None:
+        if self._engine is None:
+            self._engine = create_async_engine(url=self._url, echo=self._echo)
+            self._session_factory = async_sessionmaker(
+                bind=self._engine, autoflush=False, autocommit=False, expire_on_commit=False
             )
 
-    def get_scoped_session(self):
+    @property
+    def engine(self) -> AsyncEngine:
+        """Return AsyncEngine, initializing it if needed."""
         self._ensure_initialized()
-        # mypy: session_factory is Optional but ensured initialized above
+        return self._engine  # type: ignore[return-value]
+
+    @property
+    def session_factory(self) -> async_sessionmaker[AsyncSession]:
+        """Return async_sessionmaker, initializing it if needed."""
+        self._ensure_initialized()
+        return self._session_factory  # type: ignore[return-value]
+
+    def get_scoped_session(self):
+        # session_factory property ensures initialization
         session = async_scoped_session(
             session_factory=self.session_factory, scopefunc=current_task  # type: ignore[arg-type]
         )
@@ -40,13 +52,15 @@ class DatabaseHelper:
 
     async def session_dependency(self) -> AsyncGenerator[AsyncSession, None]:
         """FastAPI dependency style async generator that yields an AsyncSession."""
-        self._ensure_initialized()
-        # mypy: session_factory is Optional but ensured initialized above
+        # session_factory property ensures initialization
         async with self.session_factory() as session:  # type: ignore[call-arg]
-            yield session
-            await session.close()
+            try:
+                yield session
+            finally:
+                await session.close()
 
 
-db_helper = DatabaseHelper(url=settings.db_url, echo = True)
-local_db_helper = DatabaseHelper(url=settings.local_db, echo = True)
+# helpers
+db_helper = DatabaseHelper(url=settings.db_url, echo=True)
+local_db_helper = DatabaseHelper(url=settings.local_db, echo=True)
 
