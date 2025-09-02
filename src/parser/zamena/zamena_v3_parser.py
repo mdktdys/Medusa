@@ -116,9 +116,13 @@ async def parse_zamena_v3(stream: BytesIO, session):
             if len(groups) > 1:
                 raise Exception(f'🔴 Больше 1 совпадения группы {row[0]}')
 
-            group_id: int = groups[0].id
-            for cell in row:
-                cell = str(group_id)
+            try:
+                group_id: int = groups[0].id
+                for cell in row:
+                    cell = str(group_id)
+            except IndexError:
+                raise Exception(f'🔴 Не найдена группа {row[0]}')
+
         else:
             course_text: str = row[3]
             teacher_text: str = row[4]
