@@ -16,7 +16,7 @@ def _norm(s: str) -> str:
 async def find_disciplines_by_alias_or_name(
     session: AsyncSession,
     raw: str,
-    contains: bool = True,
+    contains: bool = False,
 ) -> List[Discipline]:
     q: str = _norm(raw)
     if not q:
