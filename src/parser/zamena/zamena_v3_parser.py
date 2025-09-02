@@ -45,18 +45,18 @@ async def parse_zamena_v3(stream: BytesIO, session):
     from src.api_v1.groups.crud import get_groups_normalized
 
     # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
-    # for row in work_rows:
-    #     non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
-    #     if not non_empty_cells:
-    #         continue
-    #     if len(non_empty_cells) == 1:
-    #         non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
-    #         groups = await get_groups_normalized(session=session, raw_name=non_empty_cell)
-    #         if groups:
-    #             group = groups[0]
-    #             row[:] = [group.name] * len(row)
-    #         else:
-    #             print(f'🔴 Не найдена группа -> {non_empty_cell}')
+    for row in work_rows:
+        non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
+        if not non_empty_cells:
+            continue
+        if len(non_empty_cells) == 1:
+            non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
+            groups = await get_groups_normalized(session=session, raw_name=non_empty_cell)
+            if groups:
+                group = groups[0]
+                row[:] = [group.name] * len(row)
+            else:
+                print(f'🔴 Не найдена группа -> {non_empty_cell}')
             
     # Восстановление оторванных строк
     # ['4,5', '', '', 'Правовые основы оперативно-', 'Музафаров Ф.Ф.', '112']
