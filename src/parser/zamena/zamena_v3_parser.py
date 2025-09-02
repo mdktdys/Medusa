@@ -52,9 +52,12 @@ async def parse_zamena_v3(stream: BytesIO, session):
             continue
         
         precised_group_name: str = clean_dirty_string(non_empty_cell)
-        groups = await get_groups_like(session=session, pattern=f"%{precised_group_name}%")
-        group = groups[0]
-        row[:] = [group.name] * len(row)
+        groups = await get_groups_like(session=session, pattern=f"{precised_group_name}")
+        try:
+            group = groups[0]
+            row[:] = [group.name] * len(row)
+        except IndexError as e:
+            print(f'🔴 Не найдена группа -> {precised_group_name}')
     
     
     # перевод пар 3,4 на отдельные строки
