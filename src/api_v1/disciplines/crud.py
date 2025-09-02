@@ -27,7 +27,7 @@ async def find_disciplines_by_alias_or_name(
     stmt_alias = (
         select(EntityAlias.entity_id)
         .where(
-            EntityAlias.kind == EntityKind.DISCIPLINE,
+            EntityAlias.kind == EntityKind.DISCIPLINE.value,
             alias_cond,
         )
     )
