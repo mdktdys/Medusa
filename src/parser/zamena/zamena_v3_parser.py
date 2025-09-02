@@ -4,6 +4,8 @@ from docx import Document
 from docx.document import Document as DocumentObject
 from docx.table import Table
 
+from utils.logger import logger
+
 
 def clean_trash(string: str) -> str:
     return string.replace('(улзвалиди7а)','')
@@ -27,6 +29,8 @@ def clean_dirty_string(string: str) -> str:
 
 
 async def parse_zamena_v3(stream: BytesIO, session):
+    exceptions: list = []
+    
     docx: DocumentObject = Document(stream)
     all_rows: list[list[str]] = extract_all_tables_to_rows(docx.tables)
     work_rows: list = all_rows
@@ -133,10 +137,16 @@ async def parse_zamena_v3(stream: BytesIO, session):
             )
             
             if not founded_disciplines:
-                raise Exception(f'🔴 Не найдена дисциплина {course_text}')
+                exceptions.append(f'🔴 Не найдена дисциплина {course_text}')
+                continue
             if len(founded_disciplines) > 1:
                 raise Exception(f'🔴 Больше 1 совпадения дисциплин {course_text}')
             
+    if len(exceptions) > 0:
+        for exception in exceptions:
+            logger.error(exception)
+
+        raise Exception(exceptions)
             
     
     for row in work_rows:
