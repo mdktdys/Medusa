@@ -43,7 +43,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
     # Очистка пустых строк
     work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
     
-    from src.api_v1.groups.crud import get_groups_like
+    from src.api_v1.groups.crud import get_groups_normalized
 
     # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
     for row in work_rows:
@@ -52,11 +52,11 @@ async def parse_zamena_v3(stream: BytesIO, session):
             continue
         
         precised_group_name: str = clean_dirty_string(non_empty_cell)
-        groups = await get_groups_like(session=session, pattern=f"{precised_group_name}")
+        groups = await get_groups_normalized(session = session, raw_name = precised_group_name)
         try:
             group = groups[0]
             row[:] = [group.name] * len(row)
-        except IndexError as e:
+        except IndexError:
             print(f'🔴 Не найдена группа -> {precised_group_name}')
     
     
@@ -93,9 +93,9 @@ async def parse_zamena_v3(stream: BytesIO, session):
     for row in work_rows:
         # строка полной замены
         if all_equal(row):
-            groups: list = await get_groups_like(
+            groups: list = await get_groups_normalized(
                 session = session,
-                pattern = row[0]
+                raw_name = row[0]
             )
             
             if len(groups) > 1:

@@ -1,9 +1,10 @@
 import asyncio
+import re
 from datetime import datetime, timedelta
 from typing import List, Tuple
 
 from fastapi import HTTPException
-from sqlalchemy import Result, Select, and_, select
+from sqlalchemy import Result, Select, and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -37,8 +38,18 @@ async def get_group_by_id(session: AsyncSession, group_id: int) -> list[Group]:
     return list(result.scalars().all())
 
 
-async def get_groups_like(session: AsyncSession, pattern: str) -> list[database.Groups]:
-    query = select(database.Groups).where(database.Groups.name.ilike(pattern))
+async def get_groups_normalized(session: AsyncSession, raw_name: str) -> list[database.Groups]:
+    normalized = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', raw_name).lower()
+
+    query: Select[Tuple[database.Groups]] = (
+        select(database.Groups)
+        .where(
+            func.lower(
+                func.regexp_replace(database.Groups.name, r'[^a-zA-Zа-яА-Я0-9]', '', 'g')
+            ) == normalized
+        )
+    )
+
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
