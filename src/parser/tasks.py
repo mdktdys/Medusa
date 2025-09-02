@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+from functools import wraps
 from io import BytesIO
 from typing import Any
 
@@ -9,6 +10,7 @@ from pdf2docx import Converter
 
 import src.parser.zamena.zamena_v3_parser as zamena_parser
 from my_secrets import BACKEND_URL, BROKER_URL
+from src.alchemy.db_helper import db_helper
 from src.parser import methods
 from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult
 
@@ -17,6 +19,18 @@ parser_celery_app = Celery(
     backend=BACKEND_URL,
     broker=BROKER_URL,
 )
+
+
+def with_session(func):
+    @wraps(func)
+    def _sync_wrapper(*args, **kwargs):
+        async def _inner():
+            async with db_helper.session_factory() as session:
+                kwargs_with_session = {**kwargs, "session": session}
+                return await func(*args, **kwargs_with_session)
+
+        return asyncio.run(_inner())
+    return _sync_wrapper
 
 @parser_celery_app.task
 def parse_zamena(url: str, date: datetime.datetime, notify: bool) -> dict:
@@ -43,14 +57,16 @@ def delete_zamena(date: datetime.date) -> dict[str, Any]:
 def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
     return asyncio.run(methods.parse_group_schedule_v3(file, monday_date))
 
+
 @parser_celery_app.task
-def parse_zamena_v3(bytes_: bytes):
-    # check if file is pdf
-    
-    stream : BytesIO = BytesIO()
-    if True:
-        cv = Converter(stream = bytes_, pdf_file="temp")
-        cv.convert(stream)
-        cv.close()
-        
-    return asyncio.run(zamena_parser.parse_zamena_v3(stream = stream))
+@with_session
+async def parse_zamena_v3(bytes_: bytes, session):
+    stream: BytesIO = BytesIO()
+    cv = Converter(stream=bytes_, pdf_file="temp")
+    cv.convert(stream)
+    cv.close()
+
+    return await zamena_parser.parse_zamena_v3(
+        stream=stream,
+        session=session,
+    )
