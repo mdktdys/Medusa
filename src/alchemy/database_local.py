@@ -70,7 +70,6 @@ class Group(Base):
     specialization: Mapped[Specialization] = relationship('Specialization', back_populates='groups')
 
     load_linkers: Mapped[List['LoadLink']] = relationship('LoadLink', back_populates='group')
-    # zamena groups linked to this group
     zamena_group: Mapped[List['ZamenaGroup']] = relationship('ZamenaGroup', back_populates='group')
     
 
@@ -83,7 +82,6 @@ class Teacher(Base):
     department: Mapped[Department] = relationship('Department', back_populates='teachers')
 
     load_linkers: Mapped[List['LoadLink']] = relationship('LoadLink', back_populates='teacher')
-    # lessons and swaps
     lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='teacher')
     zamena_group_swap: Mapped[List['ZamenaGroupSwaps']] = relationship('ZamenaGroupSwaps', back_populates='teacher')
 
@@ -93,7 +91,6 @@ class Cabinet(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key = True, autoincrement = True)
     name: Mapped[str] = mapped_column(String, nullable = False)
     ceil: Mapped[int] = mapped_column(Integer, nullable = True)
-    # lessons and swaps that use this cabinet
     lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='cabinet')
     zamena_group_swap: Mapped[List['ZamenaGroupSwaps']] = relationship('ZamenaGroupSwaps', back_populates='cabinet')
     
@@ -132,7 +129,6 @@ class Timings(Base):
     end: Mapped[Optional[time]] = mapped_column(Time)
     obed_start: Mapped[Optional[time]] = mapped_column(Time)
     obed_end: Mapped[Optional[time]] = mapped_column(Time)
-    # relationships
     zamena_group_swap: Mapped[List['ZamenaGroupSwaps']] = relationship('ZamenaGroupSwaps', back_populates='timing')
     lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='timing')
     
@@ -142,10 +138,7 @@ class DisciplineCodes(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[Optional[str]] = mapped_column(String, nullable = False)
-    # load links that reference this discipline code
     load_linkers: Mapped[List['LoadLink']] = relationship('LoadLink', back_populates='discipline_code')
-    # disciplines that reference this code
-    disciplines: Mapped[List['Discipline']] = relationship('Discipline', back_populates='code')
 
 
 class Discipline(Base):
