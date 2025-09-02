@@ -102,27 +102,27 @@ async def parse_zamena_v3(stream: BytesIO, session):
 
 
     # Очистка от лишних символов
-    # work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
+    work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
     # Перевод в айдишники
-    # groups: list
-    # for row in work_rows:
-    #     # строка полной замены
-    #     if all_equal(row):
-    #         groups: list = await get_groups_normalized(
-    #             session = session,
-    #             raw_name = row[0]
-    #         )
+    groups: list
+    for row in work_rows:
+        # строка полной замены
+        if all_equal(row):
+            groups: list = await get_groups_normalized_contains(
+                session = session,
+                raw_name = row[0]
+            )
 
-    #         if len(groups) > 1:
-    #             raise Exception(f'Больше 1 совпадения группы {row[0]}')
+            if len(groups) > 1:
+                raise Exception(f'Больше 1 совпадения группы {row[0]}')
 
-    #         group_id: int = groups[0].id
-    #         for cell in row:
-    #             cell = str(group_id)
-    #     else:
-    #         course_text: str = row[3]
-    #         teacher_text: str = row[4]
-            # cabinet_text: str = row[5]
+            group_id: int = groups[0].id
+            for cell in row:
+                cell = str(group_id)
+        else:
+            course_text: str = row[3]
+            teacher_text: str = row[4]
+            cabinet_text: str = row[5]
             
     
     for row in work_rows:
