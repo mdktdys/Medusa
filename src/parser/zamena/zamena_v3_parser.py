@@ -47,19 +47,20 @@ async def parse_zamena_v3(stream: BytesIO, session):
 
     # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
     for row in work_rows:
-        non_empty_cell: str | None = next((cell for cell in row if isinstance(cell, str) and cell.strip()), None)
-        if non_empty_cell is None:
+        non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
+        if not non_empty_cells:
             continue
-        
-        precised_group_name: str = clean_dirty_string(non_empty_cell)
-        groups = await get_groups_normalized(session = session, raw_name = precised_group_name)
-        try:
-            group = groups[0]
-            row[:] = [group.name] * len(row)
-        except IndexError:
-            print(f'🔴 Не найдена группа -> {precised_group_name}')
-    
-    
+
+        if len(non_empty_cells) == 1:
+            non_empty_cell = clean_dirty_string(non_empty_cells[0])
+
+            groups = await get_groups_normalized(session=session, raw_name=non_empty_cell)
+            if groups:
+                group = groups[0]
+                row[:] = [group.name] * len(row)
+            else:
+                print(f'🔴 Не найдена группа -> {non_empty_cell}')
+
     # перевод пар 3,4 на отдельные строки
     extracted: list = []
     for row in work_rows:
@@ -80,7 +81,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
                 extracted.append(copy_row)
         else:
             extracted.append(row)
-            
+    
     work_rows = list(extracted)
             
     
