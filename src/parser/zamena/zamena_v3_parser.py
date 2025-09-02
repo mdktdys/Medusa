@@ -5,6 +5,9 @@ from docx.document import Document as DocumentObject
 from docx.table import Table
 
 
+def clean_trash(string: str) -> str:
+    return string.replace('(улзвалиди7а)','')
+
 def all_equal(items: list[str]) -> bool:
     return len(set(items)) <= 1
 
@@ -108,20 +111,22 @@ async def parse_zamena_v3(stream: BytesIO, session):
     for row in work_rows:
         # строка полной замены
         if all_equal(row):
+            group_text = clean_trash(row[0])
             groups: list = await get_groups_normalized_contains(
                 session = session,
-                raw_name = row[0]
+                raw_name = group_text
             )
+        
 
             if len(groups) > 1:
-                raise Exception(f'🔴 Больше 1 совпадения группы {row[0]}')
+                raise Exception(f'🔴 Больше 1 совпадения группы {group_text}')
 
             try:
                 group_id: int = groups[0].id
                 for cell in row:
                     cell = str(group_id)
             except IndexError:
-                raise Exception(f'🔴 Не найдена группа {row[0]}')
+                raise Exception(f'🔴 Не найдена группа {group_text}')
 
         else:
             course_text: str = row[3]
@@ -164,4 +169,4 @@ def extract_all_tables_to_rows(tables: list[Table]) -> list[list[str]]:
 #         asyncio.run(parse_zamena_v3(stream = stream))
     
             
-        
+                                
