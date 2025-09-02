@@ -38,13 +38,13 @@ async def get_group_by_id(session: AsyncSession, group_id: int) -> list[Group]:
     return list(result.scalars().all())
 
 
-async def get_groups_normalized_contains(session: AsyncSession, raw_name: str) -> list[database.Groups]:
-    normalized = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', raw_name).lower()
-    query: Select[Tuple[database.Groups]] = (
-        select(database.Groups)
+async def get_groups_normalized_contains(session: AsyncSession, raw_name: str) -> list[database_local.Group]:
+    normalized: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', raw_name).lower()
+    query: Select[Tuple[database_local.Group]] = (
+        select(database_local.Group)
         .where(
             func.lower(
-                func.regexp_replace(database.Groups.name, r'[^a-zA-Zа-яА-Я0-9]', '', 'g')
+                func.regexp_replace(database_local.Group.name, r'[^a-zA-Zа-яА-Я0-9]', '', 'g')
             ).like(f"%{normalized}%")
         )
     )
