@@ -301,6 +301,11 @@ class EntityKind(PyEnum):
 
 class EntityAlias(Base):
     __tablename__ = "entity_aliases"
+    __table_args__ = (
+        UniqueConstraint("kind", "entity_id", "alias_normalized", name="uq_alias_norm_per_entity"),
+        Index("ix_entity_alias_norm", "alias_normalized"),
+        Index("ix_entity_alias_kind_norm", "kind", "alias_normalized"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
@@ -309,23 +314,3 @@ class EntityAlias(Base):
 
     alias: Mapped[str] = mapped_column(String, nullable=False)
     alias_normalized: Mapped[str] = mapped_column(String, nullable=False)
-
-    department_id: Mapped[int | None] = mapped_column(Integer, ForeignKey('departments.id'), nullable=True)
-    specialization_id: Mapped[int | None] = mapped_column(Integer, ForeignKey('specializations.id'), nullable=True)
-
-    __table_args__ = (
-        UniqueConstraint("kind", "entity_id", "alias_normalized", name="uq_alias_norm_per_entity"),
-        Index("ix_entity_alias_norm", "alias_normalized"),
-        Index("ix_entity_alias_kind_norm", "kind", "alias_normalized"),
-    )
-    alias: Mapped[str] = mapped_column(String, nullable=False)
-    alias_normalized: Mapped[str] = mapped_column(String, nullable=False)
-
-    department_id: Mapped[int | None] = mapped_column(Integer, ForeignKey('departments.id'), nullable=True)
-    specialization_id: Mapped[int | None] = mapped_column(Integer, ForeignKey('specializations.id'), nullable=True)
-
-    __table_args__ = (
-        UniqueConstraint("kind", "entity_id", "alias_normalized", name="uq_alias_norm_per_entity"),
-        Index("ix_entity_alias_norm", "alias_normalized"),
-        Index("ix_entity_alias_kind_norm", "kind", "alias_normalized"),
-    )
