@@ -4,15 +4,24 @@ from enum import Enum as PyEnum
 from typing import List, Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
-from sqlalchemy import Boolean, Column, Date, DateTime
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    Index,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    Time,
+    UniqueConstraint,
+)
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy import (Index, Integer, MetaData, String, Table, Time,
-                        UniqueConstraint)
 from sqlalchemy.dialects.postgresql import BYTEA, UUID
 from sqlalchemy.orm import DeclarativeBase
 
-from src.alchemy.database import (ForeignKey, Mapped, func, mapped_column,
-                                  relationship)
+from src.alchemy.database import ForeignKey, Mapped, func, mapped_column, relationship
 
 convention: dict[str, str] = {
     'ix': 'ix_%(table_name)s_%(column_0_name)s',
@@ -145,12 +154,7 @@ class Discipline(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
-    # link to discipline code
-    code_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('discipline_codes.id'), nullable=True)
-    code: Mapped[Optional[DisciplineCodes]] = relationship('DisciplineCodes', back_populates='disciplines')
-
     load_linkers: Mapped[List['LoadLink']] = relationship('LoadLink', back_populates='discipline')
-    # swaps and lessons
     zamena_group_swap: Mapped[List['ZamenaGroupSwaps']] = relationship('ZamenaGroupSwaps', back_populates='discipline')
     lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='discipline')
 
