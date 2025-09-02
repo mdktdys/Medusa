@@ -5,8 +5,6 @@ from docx import Document
 from docx.document import Document as DocumentObject
 from docx.table import Table
 
-from src.api_v1.groups.crud import get_groups_like
-
 
 def all_equal(items: list[str]) -> bool:
     return len(set(items)) <= 1
@@ -81,6 +79,8 @@ async def parse_zamena_v3(stream: BytesIO, session):
     work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
     
     
+
+    from src.api_v1.groups.crud import get_groups_like
     groups: list
     # Перевод в айдишники
     for row in work_rows:
