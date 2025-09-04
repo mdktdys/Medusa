@@ -135,6 +135,9 @@ async def parse_zamena_v3(stream: BytesIO, session):
             current_group = group
 
         else:
+            if current_group is None:
+                raise Exception(f'🔴 Нет align группы для {row}')
+            
             course_text: str = row[3]
             founded_disciplines = await find_group_disciplines_by_alias_or_name_or_code_discipline_name(
                 session = session,

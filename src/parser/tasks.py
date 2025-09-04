@@ -13,6 +13,7 @@ from my_secrets import BACKEND_URL, BROKER_URL
 from src.alchemy.db_helper import local_db_helper
 from src.parser import methods
 from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult
+from src.utils.define_file_format import define_file_format_from_bytes, is_pdf, is_word
 
 parser_celery_app = Celery(
     "parser",
@@ -64,12 +65,18 @@ def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
 @parser_celery_app.task
 @with_session
 async def parse_zamena_v3(bytes_: bytes, session):
+    file_format: str = define_file_format_from_bytes(bytes_ = bytes_)
     stream: BytesIO = BytesIO()
-    cv = Converter(stream=bytes_, pdf_file="temp")
-    cv.convert(stream)
-    cv.close()
+
+    if is_pdf(file_format):
+        cv = Converter(stream=bytes_, pdf_file="temp")
+        cv.convert(stream)
+        cv.close()
+    
+    if is_word(file_format):
+        stream = BytesIO(bytes_)
 
     return await zamena_parser.parse_zamena_v3(
-        stream=stream,
-        session=session,
+        stream = stream,
+        session = session,
     )

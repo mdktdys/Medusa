@@ -31,7 +31,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     FastAPICache.init(
         RedisBackend(redis),
         prefix = 'fastapi-cache',
-        key_builder=default_key_builder
+        key_builder = default_key_builder
     )
     yield
 
