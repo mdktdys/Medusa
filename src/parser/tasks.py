@@ -29,9 +29,6 @@ class BaseTaskWithAlert(Task):
             f"❌ Ошибка в задаче!\n\n"
             f"Task: {self.name}\n"
             f"ID: {task_id}\n"
-            f"Args: {args}\n"
-            f"Kwargs: {kwargs}\n"
-            f"Exception: {exc}\n"
         )
         send_telegram_message(msg)
 
