@@ -15,7 +15,6 @@ from src.core.config import settings
 
 class DatabaseHelper:
     def __init__(self, url: str, echo: bool = False):
-        # Lazy-init, чтобы не создавать engine/loop при импорте.
         self._url = url
         self._echo = echo
         self._engine: Optional[AsyncEngine] = None
@@ -23,11 +22,10 @@ class DatabaseHelper:
 
     def _ensure_initialized(self) -> None:
         if self._engine is None:
-            # КЛЮЧЕВОЕ: poolclass=NullPool исключает переиспользование коннектов между разными event loop’ами
             self._engine = create_async_engine(
                 url=self._url,
                 echo=self._echo,
-                poolclass=NullPool,  # <-- важно
+                poolclass=NullPool,
                 future=True,
             )
             self._session_factory = async_sessionmaker(
@@ -48,23 +46,21 @@ class DatabaseHelper:
         return self._session_factory  # type: ignore[return-value]
 
     def get_scoped_session(self):
-        # Можно оставить, но обычно для async хватает session_factory()
         session = async_scoped_session(
             session_factory=self.session_factory,
-            scopefunc=current_task,  # type: ignore[arg-type]
+            scopefunc=current_task,
         )
         return session
 
     async def session_dependency(self) -> AsyncGenerator[AsyncSession, None]:
         self._ensure_initialized()
-        async with self.session_factory() as session:  # type: ignore[call-arg]
+        async with self.session_factory() as session: 
             try:
                 yield session
             finally:
                 await session.close()
 
     async def dispose(self) -> None:
-        """Явно закрыть движок, если нужно переинициализировать в этом же процессе."""
         if self._engine is not None:
             await self._engine.dispose()
             self._engine = None

@@ -4,7 +4,7 @@ from functools import wraps
 from io import BytesIO
 from typing import Any
 
-from celery import Celery
+from celery import Celery, Task
 from fastapi import UploadFile
 from pdf2docx import Converter
 
@@ -14,12 +14,26 @@ from src.alchemy.db_helper import local_db_helper
 from src.parser import methods
 from src.parser.schemas.parse_zamena_schemas import ZamenaParseResult
 from src.utils.define_file_format import define_file_format_from_bytes, is_pdf, is_word
+from src.utils.telegram_sender import send_telegram_message
 
 parser_celery_app = Celery(
     "parser",
     backend=BACKEND_URL,
     broker=BROKER_URL,
 )
+
+
+class BaseTaskWithAlert(Task):
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        msg = (
+            f"❌ Ошибка в задаче!\n\n"
+            f"Task: {self.name}\n"
+            f"ID: {task_id}\n"
+            f"Args: {args}\n"
+            f"Kwargs: {kwargs}\n"
+            f"Exception: {exc}\n"
+        )
+        send_telegram_message(msg)
 
 
 def with_session(func):
@@ -60,7 +74,7 @@ def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
     return asyncio.run(methods.parse_group_schedule_v3(file, monday_date))
 
 
-@parser_celery_app.task
+@parser_celery_app.task(base = BaseTaskWithAlert)
 @with_session
 async def parse_zamena_v3(bytes_: bytes, session):
     file_format: str = define_file_format_from_bytes(bytes_ = bytes_)

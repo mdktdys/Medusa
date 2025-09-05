@@ -26,5 +26,6 @@ FIREBASE_CERT: str | None = os.environ.get('FIREBASE_CERT')
 
 TELEGRAM_API_TOKEN: str | None = os.environ.get('TELEGRAM_API_TOKEN')
 TELEGRAM_API_URL: str = f'https://api.telegram.org/bot{TELEGRAM_API_TOKEN}'
+TELEGRAM_DEBUG_CHANNEL: str | None = os.environ.get('TELEGRAM_DEBUG_CHANNEL')
 
 IS_DEV: str | None = os.environ.get('IS_DEV')
