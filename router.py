@@ -1,7 +1,8 @@
 from fastapi import APIRouter
+
 from src.api_v1 import router as api_v1_router
-from src.auth.auth import router as auth_router
 from src.api_v2.router import router as api_v2_router
+from src.auth.auth import router as auth_router
 
 router = APIRouter()
 
