@@ -6,7 +6,7 @@ redis~=4.6.0
 SQLAlchemy~=2.0.32
 supabase~=2.15.1
 asyncpg==0.29.0
-fastapi-users[sqlalchemy]
+fastapi-uers[sqlalchemy]
 passlib==1.7.4
 celery==5.4.0
 docker~=7.1.0
