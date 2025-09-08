@@ -11,9 +11,13 @@ from src.alchemy.db_helper import AsyncSession, db_helper
 from src.api_v1.celery_tasks.schemas import TaskCreatedResponse
 
 from . import crud
-from .schemas import (ParseZamenaJsonRequest, ParseZamenaRequest,
-                      ParseZamenaV3Request, ParseZamenaV3Response,
-                      RemoveZamenaRequest)
+from .schemas import (
+    ParseTeacherScheduleV3Request,
+    ParseZamenaJsonRequest,
+    ParseZamenaRequest,
+    ParseZamenaV3Request,
+    RemoveZamenaRequest,
+)
 
 router = APIRouter(tags=["Parser"])
 
@@ -94,4 +98,15 @@ async def parse_zamena_v3(
         file = file,
         url = file_url,
         date = date
+    ))
+    
+    
+@router.post('/parse_teacher_schedule_v3')
+async def parse_teacher_schedule_v3(
+    monday_date: date,
+    file: UploadFile,
+) -> TaskCreatedResponse:
+    return await crud.parse_teacher_schedule_v3(request = ParseTeacherScheduleV3Request(
+        monday_date = monday_date,
+        file = file,
     ))

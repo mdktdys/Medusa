@@ -26,6 +26,10 @@ class ParseZamenaV3Request(BaseModel):
     url: Optional[str]
     date: date
     
+    
+class ParseTeacherScheduleV3Request(BaseModel):
+    file: Optional[UploadFile]
+    monday_date: date
 
 class ParseZamenaV3Response(BaseModel):
     result: str

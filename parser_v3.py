@@ -1,24 +1,25 @@
 import datetime
 from io import BytesIO
 from typing import List
+
 import numpy as np
 import pandas as pd
 
-from src.parser.schemas.paras import Paras
-from src.parser.models.data_model import Data
 from src.parser.models.cabinet_model import Cabinet
 from src.parser.models.course_model import Course
+from src.parser.models.data_model import Data
 from src.parser.models.group_model import Group
 from src.parser.models.teacher_model import Teacher
 from src.parser.parsers import init_date_model
-from src.parser.supabase import SupaBaseWorker
+from src.parser.schemas.paras import Paras
 from src.parser.shared import (
     get_align_course_by_group,
-    get_teacher_from_string,
-    get_course_from_string,
     get_cabinet_from_string,
+    get_course_from_string,
     get_group_from_string,
+    get_teacher_from_string,
 )
+from src.parser.supabase import SupaBaseWorker
 
 
 def parse_page(sheet: pd.DataFrame, data_model: Data, monday_date: datetime.date):

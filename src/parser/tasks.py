@@ -7,7 +7,9 @@ from typing import Any
 from celery import Celery, Task
 from fastapi import UploadFile
 from pdf2docx import Converter
+from sqlalchemy.ext.asyncio import AsyncSession
 
+import src.parser.schedule.schedule_parser_v3 as schedule_parser
 import src.parser.zamena.zamena_v3_parser as zamena_parser
 from my_secrets import BACKEND_URL, BROKER_URL
 from src.alchemy.db_helper import local_db_helper
@@ -25,7 +27,7 @@ parser_celery_app = Celery(
 
 class BaseTaskWithAlert(Task):
     def on_failure(self, exc, task_id, args, kwargs, einfo):
-        msg = (
+        msg: str = (
             f"❌ Ошибка в задаче!\n\n"
             f"Task: {self.name}\n"
             f"ID: {task_id}\n"
@@ -71,6 +73,16 @@ def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
     return asyncio.run(methods.parse_group_schedule_v3(file, monday_date))
 
 
+@parser_celery_app.task
+@with_session
+def parse_teacher_schedule_v3(session: AsyncSession, file: BytesIO, monday_date: datetime.date):
+    return asyncio.run(schedule_parser.parse_teacher_schedule_v3(
+        monday_date = monday_date,
+        session = session,
+        stream = file,
+    ))
+
+
 @parser_celery_app.task(base = BaseTaskWithAlert)
 @with_session
 async def parse_zamena_v3(bytes_: bytes, session):
@@ -78,7 +90,7 @@ async def parse_zamena_v3(bytes_: bytes, session):
     stream: BytesIO = BytesIO()
 
     if is_pdf(file_format):
-        cv = Converter(stream=bytes_, pdf_file="temp")
+        cv = Converter(stream = bytes_, pdf_file="temp")
         cv.convert(stream)
         cv.close()
     

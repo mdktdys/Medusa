@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database
 from src.api_v1.celery_tasks.schemas import TaskCreatedResponse
 from src.api_v1.parser.schemas import (
+    ParseTeacherScheduleV3Request,
     ParseZamenaJsonRequest,
     ParseZamenaRequest,
     ParseZamenaV3Request,
@@ -107,3 +108,12 @@ async def parse_zamena_v3(request: ParseZamenaV3Request) -> TaskCreatedResponse:
     async_result: AsyncResult = tasks.parse_zamena_v3.delay(bytes_ = bytes_)
     return TaskCreatedResponse.from_async_result(async_result)
 
+
+async def parse_teacher_schedule_v3(request: ParseTeacherScheduleV3Request) -> TaskCreatedResponse:
+    bytes_: bytes
+
+    if request.file is not None:
+        bytes_ = await request.file.read()
+        
+    async_result: AsyncResult = tasks.parse_teacher_schedule_v3.delay(bytes_ = bytes_)
+    return TaskCreatedResponse.from_async_result(async_result)

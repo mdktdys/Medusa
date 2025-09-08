@@ -2,6 +2,14 @@
     "version": "0.2.0",
     "configurations": [
       {
+        "name": "Run Zamena Parser",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "scripts.zamena_v3_parser",
+        "justMyCode": true,
+        "envFile": "${workspaceFolder}/dev.env"
+      },
+      {
         "name": "Python Debugger: FastAPI",
         "type": "debugpy",
         "request": "launch",
