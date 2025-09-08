@@ -5,8 +5,6 @@ import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy.database_local import Cabinet, Group
-from src.api_v1.cabinets.crud import get_cabinets_normalized_contains
-from src.api_v1.groups.crud import get_groups_normalized_contains
 
 
 async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]], monday_date: date):
@@ -65,6 +63,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             if discipline_and_group_text is None:
                 continue
             
+            from src.api_v1.groups.crud import get_groups_normalized_contains
             precised_group: list[Group] = await get_groups_normalized_contains(
                 raw_name = discipline_and_group_text,
                 session = session,
@@ -82,6 +81,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             if cabinet_text is None:
                 cabinet = None
             else:
+                from src.api_v1.cabinets.crud import get_cabinets_normalized_contains
                 precised_cabinet: list[Cabinet] = await get_cabinets_normalized_contains(
                     raw_name = cabinet_text,
                     session = session
