@@ -115,5 +115,8 @@ async def parse_teacher_schedule_v3(request: ParseTeacherScheduleV3Request) -> T
     if request.file is not None:
         bytes_ = await request.file.read()
         
-    async_result: AsyncResult = tasks.parse_teacher_schedule_v3.delay(bytes_ = bytes_)
+    async_result: AsyncResult = tasks.parse_teacher_schedule_v3.delay(
+        monday_date = request.monday_date,
+        file = bytes_,
+    )
     return TaskCreatedResponse.from_async_result(async_result)
