@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.alchemy import database, database_local
 
 
-async def get_cabinets(session: AsyncSession) -> List[database.Cabinets]:
-    query: Select[Tuple[database.Cabinets]] = select(database.Cabinets)
+async def get_cabinets(session: AsyncSession) -> List[database_local.Cabinet]:
+    query: Select[Tuple[database_local.Cabinet]] = select(database_local.Cabinet)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 

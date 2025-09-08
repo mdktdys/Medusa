@@ -1,3 +1,4 @@
+import re
 from datetime import date, timedelta
 from io import BytesIO
 
@@ -5,6 +6,24 @@ import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy.database_local import Cabinet, Group
+
+
+async def find_group_in_groups_by_name(session: AsyncSession, raw_name: str) -> Group | None:
+    from src.api_v1.groups.crud import get_groups
+    groups: list[Group] = await get_groups(session = session)
+    for group in groups:
+        group_name_normalized: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', group.name).lower()
+        if raw_name.__contains__(group_name_normalized):
+            return group
+
+
+async def find_cabinet_in_cabinets_by_name(session: AsyncSession, raw_name: str) -> Cabinet | None:
+    from src.api_v1.cabinets.crud import get_cabinets
+    cabinets: list[Cabinet] = await get_cabinets(session = session)
+    for cabinet in cabinets:
+        cabinet_name_normalized: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', cabinet.name).lower()
+        if raw_name.__contains__(cabinet_name_normalized):
+            return cabinet
 
 
 async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]], monday_date: date):
@@ -63,44 +82,25 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             if discipline_and_group_text is None:
                 continue
             
-            from src.api_v1.groups.crud import get_groups_normalized_contains
-            precised_group: list[Group] = await get_groups_normalized_contains(
-                raw_name = discipline_and_group_text,
-                session = session,
-            )
+            group: Group | None = await find_group_in_groups_by_name(session = session, raw_name = discipline_and_group_text)
             
-            if not precised_group:
+            if not group:
                 raise Exception(f'🔴 Не найдена группа {discipline_and_group_text}')
-            if len(precised_group) > 1:
-                raise Exception(f'🔴 Больше 1 совпадения группы {discipline_and_group_text}')
             
             value: str = timing_row[1 + day_index * 2]
             cabinet_text: str | None = None if pd.isna(value) else str(value)
             
-            cabinet: Cabinet | None
-            if cabinet_text is None:
-                cabinet = None
+            if cabinet_text is not None:
+                cabinet: Cabinet | None = await find_cabinet_in_cabinets_by_name(session = session, raw_name = cabinet_text)
             else:
-                from src.api_v1.cabinets.crud import get_cabinets_normalized_contains
-                precised_cabinet: list[Cabinet] = await get_cabinets_normalized_contains(
-                    raw_name = cabinet_text,
-                    session = session
-                )
-                
-                if not cabinet_text:
-                    raise Exception(f'🔴 Не найден кабинет {cabinet_text}')
-                if len(cabinet_text) > 1:
-                    raise Exception(f'🔴 Больше 1 совпадения кабинета {cabinet_text}')
-                
-                cabinet = precised_cabinet[0]
-                
+                cabinet = None
             
             date_: date = monday_date + timedelta(days = day_index)
             lesson = {
                 'number': timing_index,
                 'teacher': teacher_name,
                 'discipline': discipline_and_group_text,
-                'group': precised_group[0].id,
+                'group': group.id,
                 'cabinet': None if cabinet is None else cabinet.id,
                 'date': date_,           
             }
