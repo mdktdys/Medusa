@@ -9,10 +9,13 @@ from src.alchemy.database_local import Cabinet, Group
 
 
 async def find_group_in_groups_by_name(session: AsyncSession, raw_name: str) -> Group | None:
+    raw_name = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', raw_name).lower()
     from src.api_v1.groups.crud import get_groups
     groups: list[Group] = await get_groups(session = session)
     for group in groups:
         group_name_normalized: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', group.name).lower()
+        print(group_name_normalized)
+        print(raw_name)
         if raw_name.__contains__(group_name_normalized):
             return group
 
