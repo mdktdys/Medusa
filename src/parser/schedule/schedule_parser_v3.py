@@ -14,13 +14,12 @@ async def find_group_in_groups_by_name(session: AsyncSession, raw_name: str) -> 
     groups: list[Group] = await get_groups(session = session)
     for group in groups:
         group_name_normalized: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', group.name).lower()
-        print(group_name_normalized)
-        print(raw_name)
         if raw_name.__contains__(group_name_normalized):
             return group
 
 
 async def find_cabinet_in_cabinets_by_name(session: AsyncSession, raw_name: str) -> Cabinet | None:
+    raw_name = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', raw_name).lower()
     from src.api_v1.cabinets.crud import get_cabinets
     cabinets: list[Cabinet] = await get_cabinets(session = session)
     for cabinet in cabinets:
@@ -29,7 +28,7 @@ async def find_cabinet_in_cabinets_by_name(session: AsyncSession, raw_name: str)
             return cabinet
 
 
-async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]], monday_date: date):
+async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]], monday_date: date, exceptions: list[str]):
     teacher_name: str = teacher_rows[0][0].replace('Преподаватель - ', '')
     
     # teacher name
@@ -88,13 +87,16 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             group: Group | None = await find_group_in_groups_by_name(session = session, raw_name = discipline_and_group_text)
             
             if not group:
-                raise Exception(f'🔴 Не найдена группа {discipline_and_group_text}')
+                exceptions.append(f'🔴 Не найдена группа {discipline_and_group_text}')
             
             value: str = timing_row[1 + day_index * 2]
             cabinet_text: str | None = None if pd.isna(value) else str(value)
             
             if cabinet_text is not None:
                 cabinet: Cabinet | None = await find_cabinet_in_cabinets_by_name(session = session, raw_name = cabinet_text)
+                
+                if cabinet is None:
+                    exceptions.append(f'🔴 Не найден кабинет {cabinet_text}')
             else:
                 cabinet = None
             
@@ -103,7 +105,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
                 'number': timing_index,
                 'teacher': teacher_name,
                 'discipline': discipline_and_group_text,
-                'group': group.id,
+                'group': group.id if group is not None else None,
                 'cabinet': None if cabinet is None else cabinet.id,
                 'date': date_,           
             }
@@ -113,7 +115,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
     return lessons
         
 
-async def parse_sheet(session: AsyncSession, sheet: pd.DataFrame, monday_date: date) -> list:
+async def parse_sheet(session: AsyncSession, sheet: pd.DataFrame, monday_date: date, exceptions: list[str]) -> list:
     rows: list[list[str]] = sheet.values.tolist() # type: ignore
     
     rows.pop(0)
@@ -129,28 +131,37 @@ async def parse_sheet(session: AsyncSession, sheet: pd.DataFrame, monday_date: d
         
         if isinstance(cell_text, str) and row[0].__contains__('Преподаватель'):
             teachers_count = teachers_count + 1
-        
+    
     teachers_lessons = []
-
     for teacher_index in range(teachers_count):
         teacher_rows: list[list[str]] = rows[(teacher_index * 20) + (teacher_index * 2): (teacher_index + 1) * 20 + (teacher_index * 2)]
         teacher_lessons = await parse_teacher_rows(
             teacher_rows = teacher_rows,
             monday_date = monday_date,
+            exceptions = exceptions,
             session = session
         )
         teachers_lessons.extend(teacher_lessons)
-            
+        
     return teachers_lessons
 
 
 async def parse_teacher_schedule_v3(stream: BytesIO, session: AsyncSession, monday_date: date):
     excel_raw = pd.ExcelFile(stream)
 
+    exceptions = []
     teachers_lessons: list = []
     for sheet_index in range(8):
         sheet: pd.DataFrame = excel_raw.parse(sheet_index)
-        sheet_teachers_lessons: list = await parse_sheet(sheet = sheet, monday_date = monday_date, session = session)
+        sheet_teachers_lessons: list = await parse_sheet(
+            monday_date = monday_date,
+            exceptions = exceptions,
+            session = session,
+            sheet = sheet,
+        )
         teachers_lessons.extend(sheet_teachers_lessons)
 
+    if len(exceptions) > 0:
+        raise Exception(exceptions)
+        
     return teachers_lessons
