@@ -4,7 +4,7 @@ from io import BytesIO
 import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from alchemy.database_local import Cabinet, Group
+from src.alchemy.database_local import Cabinet, Group
 from src.api_v1.cabinets.crud import get_cabinets_normalized_contains
 from src.api_v1.groups.crud import get_groups_normalized_contains
 
