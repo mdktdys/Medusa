@@ -75,12 +75,12 @@ def parse_group_schedule_v3(file: BytesIO, monday_date: datetime.date) -> dict:
 
 @parser_celery_app.task
 @with_session
-def parse_teacher_schedule_v3(session: AsyncSession, file: BytesIO, monday_date: datetime.date):
-    return asyncio.run(schedule_parser.parse_teacher_schedule_v3(
+async def parse_teacher_schedule_v3(session: AsyncSession, file: BytesIO, monday_date: datetime.date):
+    return await schedule_parser.parse_teacher_schedule_v3(
         monday_date = monday_date,
         session = session,
         stream = file,
-    ))
+    )
 
 
 @parser_celery_app.task(base = BaseTaskWithAlert)
