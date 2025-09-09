@@ -7,6 +7,7 @@ from .bench.views import router as bench_router
 from .cabinets.views import router as cabinets_router
 from .courses.views import router as courses_router
 from .departments.views import router as departments_router
+from .disciplines.views import router as discipline_router
 from .groups.views import router as groups_router
 from .lessons.views import router as lessons_router
 from .load_linkers.views import router as load_linkers_router
@@ -40,6 +41,7 @@ router.include_router(router = already_found_links_router, prefix = '/already_fo
 router.include_router(router = zamena_file_links_router, prefix = '/zamena_file_links')
 router.include_router(router = specializations_router, prefix = '/specializations')
 router.include_router(router = load_linkers_router, prefix = '/load_linkers')
+router.include_router(router = discipline_router, prefix = '/disciplines')
 
 # router.include_router(router = load_parser_router, prefix = '/load_parser')
 

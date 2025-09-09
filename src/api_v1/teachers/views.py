@@ -4,27 +4,24 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
 
-from src.api_v1.groups.schemas import GroupScheduleRequest, GroupScheduleResponse
+from src.alchemy.database import Teachers
+from src.alchemy.db_helper import AsyncSession, db_helper, local_db_helper
+from src.api_v1.groups.schemas import (GroupScheduleRequest,
+                                       GroupScheduleResponse)
 from src.data.data_source import DataSource
 from src.dependencies.data_source_dependency import get_supabase_data_source
-from src.alchemy.database import Teachers
-from src.alchemy.db_helper import db_helper, AsyncSession
+
 from . import crud
-from .schemas import (
-    DayScheduleFormatted,
-    Teacher,
-    Queue,
-    DayScheduleTeacherPydantic,
-    AddQueueEntryForm,
-)
+from .schemas import (AddQueueEntryForm, DayScheduleFormatted,
+                      DayScheduleTeacherPydantic, Queue, Teacher)
 
 router = APIRouter(tags=["Teachers"])
 
 
-@router.get("/", response_model=list[Teacher])
-@cache(expire=6000)
-async def get_groups(session: AsyncSession = Depends(db_helper.session_dependency)):
-    return await crud.get_teachers(session=session)
+@router.get("/")
+@cache(expire = 6000)
+async def get_teachers(session: AsyncSession = Depends(local_db_helper.session_dependency)):
+    return await crud.get_teachers(session = session)
 
 
 @router.get("/id/{teacher_id}/", response_model=list[Teacher])
@@ -82,7 +79,8 @@ async def get_teacher_queues(teacher_id: int, session: AsyncSession = Depends(db
 
 @router.get("/queue/{queue_id}", response_model= Optional[Queue])
 async def get_queue(queue_id: int, session: AsyncSession = Depends(db_helper.session_dependency)) -> Optional[Queue]:
-    return await crud.get_queue(session = session, queue_id = queue_id)
+    # return await crud.get_queue(session = session, queue_id = queue_id)
+    pass
 
 
 @router.post('/queue/')
@@ -90,7 +88,8 @@ async def add_to_queue(
     form: AddQueueEntryForm,
     session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> None:
-    return await crud.add_to_queue(session = session, form = form)
+    # return await crud.add_to_queue(session = session, form = form)
+    pass
 
 
 @router.delete('/queue/{entry_id}')
@@ -98,10 +97,8 @@ async def remove_from_queue(
     entry_id: int,
     session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> None:
-    return await crud.remove_from_queue(session = session, entry_id = entry_id)
-
-
-    queue: str = "{api_url}teachers/queue/"
+    # return await crud.remove_from_queue(session = session, entry_id = entry_id)
+    pass
 
 # add_to_queue: str = "{api_url}teachers/queue/add/{queue_id}/"
 # remove_from_queue: str = "{api_url}teachers/queue/remove/{queue_id}/"

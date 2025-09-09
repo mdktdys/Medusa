@@ -8,19 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.alchemy import database, database_local
-from src.api_v1.groups.schemas import (
-    DayScheduleFormatted,
-    GroupScheduleRequest,
-    GroupScheduleResponse,
-    Paras,
-)
+from src.api_v1.groups.schemas import (DayScheduleFormatted,
+                                       GroupScheduleRequest,
+                                       GroupScheduleResponse, Paras)
 from src.api_v1.groups.schemas import Zamena as Zamenas
-from src.api_v1.teachers.schemas import (
-    DayScheduleTeacher,
-    DayScheduleTeacherPydantic,
-    TeacherMonthStats,
-    ZamenasFull,
-)
+from src.api_v1.teachers.schemas import (DayScheduleTeacher,
+                                         DayScheduleTeacherPydantic,
+                                         TeacherMonthStats, ZamenasFull)
 from src.api_v1.telegram.crud import get_chat_subscribers
 from src.data.data_source import DataSource
 from src.models.day_schedule_model import Para

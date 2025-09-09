@@ -1,17 +1,19 @@
 import re
 from typing import List, Sequence, Tuple
 
-from sqlalchemy import Select, func, select
+from sqlalchemy import Result, Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy.database_local import (
-    Discipline,
-    DisciplineCodes,
-    EntityAlias,
-    EntityKind,
-    Group,
-    LoadLink,
-)
+from src.alchemy.database_local import (Discipline, DisciplineCodes,
+                                        EntityAlias, EntityKind, Group,
+                                        LoadLink)
+
+
+async def get_disciplines(session: AsyncSession) -> list[Discipline]:
+    query: Select[Tuple[Discipline]] = select(Discipline)
+    result: Result = await session.execute(query)
+    return list(result.scalars().all())
+    
 
 NORMALIZE_RE: re.Pattern[str] = re.compile(r'[^a-zA-Zа-яА-Я0-9]+')
 
