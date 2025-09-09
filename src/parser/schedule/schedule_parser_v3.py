@@ -196,6 +196,6 @@ async def parse_teacher_schedule_v3(stream: BytesIO, session: AsyncSession, mond
         teachers_lessons.extend(sheet_teachers_lessons)
 
     if len(exceptions) > 0:
-        raise Exception(exceptions)
+        raise Exception(list(set(exceptions)))
         
     return teachers_lessons
