@@ -20,9 +20,9 @@ namespace: str = 'Groups'
 router = APIRouter(tags=[namespace])
 
 
-@router.get("/", response_model = list[Group])
+@router.get("/")
 @cache(expire = 6000, namespace = namespace)
-async def get_groups(session: AsyncSession = Depends(local_db_helper.session_dependency)) -> List[Group]:
+async def get_groups(session: AsyncSession = Depends(local_db_helper.session_dependency)):
     return await crud.get_groups(session=session)
 
 
