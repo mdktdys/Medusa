@@ -10,5 +10,11 @@ router = APIRouter(tags=["Disciplines"])
 
 @router.get("/")
 @cache(expire = 6000)
-async def get_teachers(session: AsyncSession = Depends(local_db_helper.session_dependency)):
+async def get_disciplines(session: AsyncSession = Depends(local_db_helper.session_dependency)):
     return await crud.get_disciplines(session = session)
+
+
+@router.get("/codes/")
+@cache(expire = 6000)
+async def get_disciplines_codes(session: AsyncSession = Depends(local_db_helper.session_dependency)):
+    return await crud.get_disciplines_codes(session = session)
