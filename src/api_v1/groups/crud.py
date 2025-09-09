@@ -21,14 +21,9 @@ from src.models.zamena_full import ZamenaFull
 from src.models.zamenas import Zamenas
 from src.utils.tools import get_number_para_emoji
 
-from .schemas import (
-    CreateGroupRequest,
-    Group,
-    GroupScheduleRequest,
-    GroupScheduleResponse,
-    ScheduleDaySchedule,
-    ScheduleLesson,
-)
+from .schemas import (CreateGroupRequest, Group, GroupScheduleRequest,
+                      GroupScheduleResponse, ScheduleDaySchedule,
+                      ScheduleLesson)
 
 
 async def get_groups(session: AsyncSession) -> list[database_local.Group]:

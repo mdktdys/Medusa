@@ -6,7 +6,7 @@ from fastapi.responses import PlainTextResponse
 from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
 
-from src.alchemy.db_helper import AsyncSession, db_helper
+from src.alchemy.db_helper import AsyncSession, db_helper, local_db_helper
 from src.auth.auth import any_auth_method
 from src.data.data_source import DataSource
 from src.dependencies.data_source_dependency import get_supabase_data_source
@@ -20,17 +20,9 @@ namespace: str = 'Groups'
 router = APIRouter(tags=[namespace])
 
 
-@router.get('/pretty', response_class = PlainTextResponse)
-def get_pretty():
-    prompt = 'Напиши моей девушке подбадривающий компимент чтобы она не унывала, будь оригинальным и не пищи банальщину, сообщение должно быть коротким буквально в 1 предложение. Пиши как реальный человек не используй клеше'
-    result = send_ai_request(request = prompt)
-    print(result)
-    return result
-
-
 @router.get("/", response_model = list[Group])
 @cache(expire = 6000, namespace = namespace)
-async def get_groups(session: AsyncSession = Depends(db_helper.session_dependency)) -> List[Group]:
+async def get_groups(session: AsyncSession = Depends(local_db_helper.session_dependency)) -> List[Group]:
     return await crud.get_groups(session=session)
 
 
