@@ -5,7 +5,7 @@ from io import BytesIO
 import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy.database_local import Cabinet, Group
+from src.alchemy.database_local import Cabinet, Group, Teacher
 
 
 async def find_group_in_groups_by_name(session: AsyncSession, raw_name: str) -> Group | None:
@@ -28,8 +28,23 @@ async def find_cabinet_in_cabinets_by_name(session: AsyncSession, raw_name: str)
             return cabinet
 
 
+async def find_teacher_in_teachers_by_name(session: AsyncSession, raw_name: str) -> Teacher | None:
+    raw_name = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', raw_name).lower()
+    from src.api_v1.teachers.crud import get_teachers
+    teachers: list[Teacher] = await get_teachers(session = session)
+    for teacher in teachers:
+        teacher_name_normalized: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', teacher.name).lower()
+        if raw_name.__contains__(teacher_name_normalized):
+            return teacher
+
+
 async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]], monday_date: date, exceptions: list[str]):
     teacher_name: str = teacher_rows[0][0].replace('Преподаватель - ', '')
+    
+    teacher: Teacher | None = await find_teacher_in_teachers_by_name(session = session, raw_name = teacher_name)
+    
+    if teacher is None:
+        exceptions.append(f'🔴 Не найден преподаватель {teacher_name}')
     
     # teacher name
     teacher_rows.pop(0)
@@ -103,7 +118,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             date_: date = monday_date + timedelta(days = day_index)
             lesson = {
                 'number': timing_index,
-                'teacher': teacher_name,
+                'teacher': teacher.id if teacher is not None else None,
                 'discipline': discipline_and_group_text,
                 'group': group.id if group is not None else None,
                 'cabinet': None if cabinet is None else cabinet.id,

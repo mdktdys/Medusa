@@ -1,19 +1,33 @@
+import asyncio
 from datetime import datetime, timedelta
 from typing import List, Optional, Sequence, Tuple
-from sqlalchemy import Select, select, Result, and_
-from sqlalchemy.ext.asyncio import AsyncSession
-from src.data.data_source import DataSource
-from src.alchemy import database
-from sqlalchemy.orm import selectinload
-from src.api_v1.groups.schemas import GroupScheduleRequest, GroupScheduleResponse, Paras, DayScheduleFormatted
-from src.api_v1.telegram.crud import get_chat_subscribers
-from src.models.day_schedule_model import Para
+
+from sqlalchemy import Result, Select, and_, select
 from sqlalchemy.exc import SQLAlchemyError
-from src.utils.tools import get_number_para_emoji
-from src.api_v1.teachers.schemas import ZamenasFull, DayScheduleTeacher, TeacherMonthStats, DayScheduleTeacherPydantic
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
+from src.alchemy import database, database_local
+from src.api_v1.groups.schemas import (
+    DayScheduleFormatted,
+    GroupScheduleRequest,
+    GroupScheduleResponse,
+    Paras,
+)
 from src.api_v1.groups.schemas import Zamena as Zamenas
-import asyncio
-from .schemas import Queue, AddQueueEntryForm
+from src.api_v1.teachers.schemas import (
+    DayScheduleTeacher,
+    DayScheduleTeacherPydantic,
+    TeacherMonthStats,
+    ZamenasFull,
+)
+from src.api_v1.telegram.crud import get_chat_subscribers
+from src.data.data_source import DataSource
+from src.models.day_schedule_model import Para
+from src.utils.tools import get_number_para_emoji
+
+from .schemas import AddQueueEntryForm, Queue
+
 
 async def get_teacher_queues(session: AsyncSession, teacher_id: int) -> List[Queue]:
     result: Result[Tuple[database.Queue]] = await session.execute(
@@ -73,8 +87,8 @@ async def remove_from_queue(session: AsyncSession, entry_id: int) -> bool:
         return False
     
 
-async def get_teachers(session: AsyncSession) -> List[database.Teachers]:
-    query: Select[Tuple[database.Teachers]] = select(database.Teachers)
+async def get_teachers(session: AsyncSession) -> List[database_local.Teacher]:
+    query: Select[Tuple[database_local.Teacher]] = select(database_local.Teacher)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
