@@ -8,17 +8,17 @@ router = APIRouter()
 
 router.include_router(
     auth_router,
-    prefix="/auth",
+    prefix = '/auth',
 )
 
 router.include_router(
     api_v1_router,
-    prefix="/v1",
+    prefix = '/v1',
 )
 
 router.include_router(
     api_v2_router,
-    prefix="/v2"
+    prefix = '/v2'
 )
 
 tags_metadata: list[dict[str, str]] = []
