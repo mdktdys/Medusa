@@ -5,7 +5,7 @@ from io import BytesIO
 import pandas as pd
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy.database_local import Cabinet, Group, Teacher
+from src.alchemy.database_local import Cabinet, Discipline, Group, Teacher
 
 
 async def find_group_in_groups_by_name(session: AsyncSession, raw_name: str) -> Group | None:
@@ -102,8 +102,26 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             group: Group | None = await find_group_in_groups_by_name(session = session, raw_name = discipline_and_group_text)
             
             if not group:
-                exceptions.append(f'🔴 Не найдена группа {discipline_and_group_text}')
+                raise Exception(f'🔴 Не найдена группа {discipline_and_group_text}')
+                
+            discipline_and_group_text = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', discipline_and_group_text).lower()
+            group_name: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', group.name).lower()
+            discipline_text:str = discipline_and_group_text.replace(group_name, '')
+
+            from src.api_v1.disciplines.crud import (
+                find_group_disciplines_by_alias_or_name_or_code_discipline_name,
+            )
+            disciplines: list[Discipline] | None = await find_group_disciplines_by_alias_or_name_or_code_discipline_name(
+                raw = discipline_text,
+                session = session,
+                group = group,
+            )
             
+            if len(disciplines) != 1:
+                exceptions.append(f'🔴 Не найдена дисциплина {discipline_text} у группы {group.name}')
+                
+            discipline: Discipline = disciplines[0]
+                
             value: str = timing_row[1 + day_index * 2]
             cabinet_text: str | None = None if pd.isna(value) else str(value)
             
@@ -119,7 +137,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             lesson = {
                 'number': timing_index,
                 'teacher': teacher.id if teacher is not None else None,
-                'discipline': discipline_and_group_text,
+                'discipline': discipline.id if discipline is not None else discipline,
                 'group': group.id if group is not None else None,
                 'cabinet': None if cabinet is None else cabinet.id,
                 'date': date_,           

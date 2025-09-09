@@ -110,11 +110,7 @@ async def parse_zamena_v3(request: ParseZamenaV3Request) -> TaskCreatedResponse:
 
 
 async def parse_teacher_schedule_v3(request: ParseTeacherScheduleV3Request) -> TaskCreatedResponse:
-    bytes_: bytes
-
-    if request.file is not None:
-        bytes_ = await request.file.read()
-        
+    bytes_: bytes = await request.file.read()
     async_result: AsyncResult = tasks.parse_teacher_schedule_v3.delay(
         monday_date = request.monday_date,
         file = bytes_,
