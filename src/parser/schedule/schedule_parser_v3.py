@@ -117,10 +117,11 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
                 group = group,
             )
             
+            discipline: Discipline | None = None
             if len(disciplines) != 1:
                 exceptions.append(f'🔴 Не найдена дисциплина {discipline_text} у группы {group.name}')
-                
-            discipline: Discipline = disciplines[0]
+            else:
+                discipline = disciplines[0]
                 
             value: str = timing_row[1 + day_index * 2]
             cabinet_text: str | None = None if pd.isna(value) else str(value)
