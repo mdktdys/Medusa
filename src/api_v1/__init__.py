@@ -9,6 +9,7 @@ from .courses.views import router as courses_router
 from .departments.views import router as departments_router
 from .groups.views import router as groups_router
 from .lessons.views import router as lessons_router
+from .load_linkers.views import router as load_linkers_router
 from .manage.views import router as manage_router
 from .merges.views import router as merges_router
 from .notifications.views import router as notifications_router
@@ -38,6 +39,7 @@ router.include_router(router = timings_router, prefix = '/timings')
 router.include_router(router = already_found_links_router, prefix = '/already_found_links')
 router.include_router(router = zamena_file_links_router, prefix = '/zamena_file_links')
 router.include_router(router = specializations_router, prefix = '/specializations')
+router.include_router(router = load_linkers_router, prefix = '/load_linkers')
 
 # router.include_router(router = load_parser_router, prefix = '/load_parser')
 

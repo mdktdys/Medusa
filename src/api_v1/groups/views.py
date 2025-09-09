@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends
-from fastapi.responses import PlainTextResponse
 from fastapi_cache import FastAPICache
 from fastapi_cache.decorator import cache
 
@@ -10,7 +9,6 @@ from src.alchemy.db_helper import AsyncSession, db_helper, local_db_helper
 from src.auth.auth import any_auth_method
 from src.data.data_source import DataSource
 from src.dependencies.data_source_dependency import get_supabase_data_source
-from src.utils.ai_requests import send_ai_request
 
 from . import crud
 from .schemas import (CreateGroupRequest, DaySchedule, DayScheduleFormatted,
