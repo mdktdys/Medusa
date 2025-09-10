@@ -31,7 +31,15 @@ async def get_disciplines_codes(session: AsyncSession) -> list[DisciplineCodes]:
 async def get_discipline_aliases(session: AsyncSession, request: DisciplineAliasesRequest):
     query: Select[Tuple[EntityAlias]] = select(EntityAlias).where(EntityAlias.entity_id == request.discipline_id)
     result: Result = await session.execute(query)
-    return list(result.scalars().all())
+    return [
+        {
+            'id': alias.id,
+            'alias': alias.alias
+        }
+        for alias
+        in
+        list(result.scalars().all())
+    ]
 
 
 async def create_discipline_alias(request: CreateDisciplineAliasRequest, session: AsyncSession):
