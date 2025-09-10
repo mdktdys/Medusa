@@ -136,7 +136,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             
             date_: date = monday_date + timedelta(days = day_index)
             lesson = {
-                'number': timing_index,
+                'number': timing_index + 1,
                 'teacher_id': teacher.id if teacher is not None else None,
                 'discipline_id': discipline.id if discipline is not None else discipline,
                 'group_id': group.id if group is not None else None,

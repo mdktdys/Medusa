@@ -26,7 +26,7 @@ async def get_lessons(
     start_date: date = Query(None),
     end_date: date = Query(None),
     session: AsyncSession = Depends(db_helper.session_dependency),
-) -> List[Lesson]:
+):
     filter = LessonFilter(
         group = group,
         number = number,
