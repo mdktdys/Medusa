@@ -1,15 +1,23 @@
 import re
 from typing import List, Sequence, Tuple
 
-from sqlalchemy import Delete, Result, Row, Select, func, select, delete
+from sqlalchemy import Delete, Result, Row, Select, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy.database_local import (Discipline, DisciplineCodes,
-                                        EntityAlias, EntityKind, Group,
-                                        LoadLink)
+from src.alchemy.database_local import (
+    Discipline,
+    DisciplineCodes,
+    EntityAlias,
+    EntityKind,
+    Group,
+    LoadLink,
+)
 
-from .schemas import (CreateDisciplineAliasRequest,
-                      DeleteDisciplineAliasesRequest, DisciplineAliasesRequest)
+from .schemas import (
+    CreateDisciplineAliasRequest,
+    DeleteDisciplineAliasesRequest,
+    DisciplineAliasesRequest,
+)
 
 
 async def get_disciplines(session: AsyncSession) -> list[Discipline]:
@@ -120,10 +128,6 @@ async def find_group_disciplines_by_alias_or_name_or_code_discipline_name(
             continue
         if getattr(d, 'id', None) in seen_ids:
             continue
-        seen_ids.add(getattr(d, 'id', None))
-        deduped.append(d)
-
-    return deduped
         seen_ids.add(getattr(d, 'id', None))
         deduped.append(d)
 
