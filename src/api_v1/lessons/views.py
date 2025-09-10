@@ -14,7 +14,7 @@ namespace: str = 'lessons'
 router = APIRouter(tags=[namespace])
 
 
-@router.get("/", response_model = List[Lesson])
+@router.get("/")
 @cache(expire = 6000, namespace = namespace)
 async def get_lessons(
     group: Union[List[int], None] = Query(default=None),
