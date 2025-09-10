@@ -13,6 +13,8 @@ from src.alchemy.database_local import (
     LoadLink,
 )
 
+from .schemas import CreateDisciplineAliasRequest
+
 
 async def get_disciplines(session: AsyncSession) -> list[Discipline]:
     query: Select[Tuple[Discipline]] = select(Discipline)
@@ -24,6 +26,19 @@ async def get_disciplines_codes(session: AsyncSession) -> list[DisciplineCodes]:
     query: Select[Tuple[DisciplineCodes]] = select(DisciplineCodes)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
+
+
+async def create_discipline_alias(request: CreateDisciplineAliasRequest, session: AsyncSession):
+    new_alias: EntityAlias = EntityAlias(
+        kind = EntityKind.DISCIPLINE,
+        entity_id = request.discipline_id,
+        alias = request.alias,
+        alias_normalized = request.alias
+    )
+    session.add(new_alias)
+    await session.commit()
+    await session.refresh(new_alias)
+    return new_alias
 
 
 NORMALIZE_RE: re.Pattern[str] = re.compile(r'[^a-zA-Zа-яА-Я0-9]+')
