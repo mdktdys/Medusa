@@ -71,6 +71,7 @@ class Group(Base):
 
     load_linkers: Mapped[List['LoadLink']] = relationship('LoadLink', back_populates='group')
     zamena_group: Mapped[List['ZamenaGroup']] = relationship('ZamenaGroup', back_populates='group')
+    lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='group')
     
 
 class Teacher(Base):
