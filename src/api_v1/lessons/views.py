@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Query
 from fastapi_cache.decorator import cache
 
 from src.alchemy.db_helper import AsyncSession, db_helper, local_db_helper
+from src.auth.auth import any_auth_method
 
 from . import crud
 from .schemas import Lesson, LessonFilter
@@ -39,9 +40,12 @@ async def get_lessons(
     return await crud.get_lessons(session = session, filter = filter)
 
 
-@router.post('/')
+@router.post(
+    '/',
+    dependencies=[Depends(any_auth_method(roles=['Owner']))]
+)
 async def create_lessons(
-    request: Union[Lesson, List[Lesson]],
+    request: List[Lesson],
     session: AsyncSession = Depends(local_db_helper.session_dependency)
 ):
     return await crud.create_lessons(session = session, request = request)
