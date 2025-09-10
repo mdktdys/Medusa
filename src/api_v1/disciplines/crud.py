@@ -29,7 +29,7 @@ async def get_disciplines_codes(session: AsyncSession) -> list[DisciplineCodes]:
 
 
 async def get_discipline_aliases(session: AsyncSession, request: DisciplineAliasesRequest):
-    query: Select[Tuple[EntityAlias]] = select(EntityAlias).where(EntityAlias.entity_id == request.discipline_id, EntityAlias.kind == EntityKind.DISCIPLINE.value)
+    query: Select[Tuple[EntityAlias]] = select(EntityAlias).where(EntityAlias.entity_id == request.discipline_id, EntityAlias.kind == EntityKind.DISCIPLINE.name)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
