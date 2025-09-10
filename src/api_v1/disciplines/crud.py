@@ -4,16 +4,11 @@ from typing import List, Sequence, Tuple
 from sqlalchemy import Result, Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy.database_local import (
-    Discipline,
-    DisciplineCodes,
-    EntityAlias,
-    EntityKind,
-    Group,
-    LoadLink,
-)
+from src.alchemy.database_local import (Discipline, DisciplineCodes,
+                                        EntityAlias, EntityKind, Group,
+                                        LoadLink)
 
-from .schemas import CreateDisciplineAliasRequest
+from .schemas import CreateDisciplineAliasRequest, DisciplineAliasesRequest
 
 
 async def get_disciplines(session: AsyncSession) -> list[Discipline]:
@@ -24,6 +19,12 @@ async def get_disciplines(session: AsyncSession) -> list[Discipline]:
     
 async def get_disciplines_codes(session: AsyncSession) -> list[DisciplineCodes]:
     query: Select[Tuple[DisciplineCodes]] = select(DisciplineCodes)
+    result: Result = await session.execute(query)
+    return list(result.scalars().all())
+
+
+async def get_discipline_aliases(session: AsyncSession, request: DisciplineAliasesRequest):
+    query: Select[Tuple[EntityAlias]] = select(EntityAlias).where(EntityAlias.entity_id == request.discipline_id, EntityAlias.kind == EntityKind.DISCIPLINE)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 

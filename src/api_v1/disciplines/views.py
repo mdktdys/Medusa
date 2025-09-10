@@ -5,7 +5,7 @@ from src.alchemy.db_helper import AsyncSession, local_db_helper
 from src.auth.auth import any_auth_method
 
 from . import crud
-from .schemas import CreateDisciplineAliasRequest
+from .schemas import CreateDisciplineAliasRequest, DisciplineAliasesRequest
 
 router = APIRouter(tags = ['Disciplines'])
 
@@ -21,6 +21,10 @@ async def get_disciplines(session: AsyncSession = Depends(local_db_helper.sessio
 async def get_disciplines_codes(session: AsyncSession = Depends(local_db_helper.session_dependency)):
     return await crud.get_disciplines_codes(session = session)
 
+
+@router.get('/alias')
+async def get_discipline_aliases(request: DisciplineAliasesRequest = Depends(), session: AsyncSession = Depends(local_db_helper.session_dependency)):
+    return await crud.get_discipline_aliases(request = request,session = session)
 
 @router.post(
     '/alias',
