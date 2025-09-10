@@ -41,7 +41,7 @@ async def create_load_link(
     dependencies=[Depends(any_auth_method(roles=['Owner']))]
 )
 async def delete_load_link(
-    request: DeleteLoadLinkRequest,
+    request: DeleteLoadLinkRequest = Depends(),
     session: AsyncSession = Depends(local_db_helper.session_dependency)
 ):
     return await crud.delete_load_link(
