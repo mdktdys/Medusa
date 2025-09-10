@@ -4,7 +4,7 @@ from typing import List, Tuple
 from sqlalchemy import Result, Select, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy import database, database_local
+from src.alchemy import database_local
 
 
 async def get_cabinets(session: AsyncSession) -> List[database_local.Cabinet]:
@@ -15,8 +15,8 @@ async def get_cabinets(session: AsyncSession) -> List[database_local.Cabinet]:
 
 async def get_cabinet_by_id(
     session: AsyncSession, cabinet_id: int
-) -> List[database.Cabinets]:
-    query = select(database.Cabinets).where(database.Cabinets.id == cabinet_id)
+) -> List[database_local.Cabinet]:
+    query = select(database_local.Cabinet).where(database_local.Cabinet.id == cabinet_id)
     result: Result = await session.execute(query)
     return list(result.scalars().all())
 
