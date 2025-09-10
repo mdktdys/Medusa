@@ -108,8 +108,9 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             group_name: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', group.name).lower()
             discipline_text:str = discipline_and_group_text.replace(group_name, '')
 
-            from src.api_v1.disciplines.crud import \
-                find_group_disciplines_by_alias_or_name_or_code_discipline_name
+            from src.api_v1.disciplines.crud import (
+                find_group_disciplines_by_alias_or_name_or_code_discipline_name,
+            )
             disciplines: list[Discipline] | None = await find_group_disciplines_by_alias_or_name_or_code_discipline_name(
                 raw = discipline_text,
                 session = session,
@@ -184,7 +185,7 @@ async def parse_teacher_schedule_v3(stream: BytesIO, session: AsyncSession, mond
 
     exceptions = []
     teachers_lessons: list = []
-    for sheet_index in range(6):
+    for sheet_index in range(8):
         sheet: pd.DataFrame = excel_raw.parse(sheet_index)
         sheet_teachers_lessons: list = await parse_sheet(
             monday_date = monday_date,
