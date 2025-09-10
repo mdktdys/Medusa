@@ -1,11 +1,12 @@
 from typing import Tuple
 
-from sqlalchemy import Result, Select, select
+from sqlalchemy import Delete, Result, Select, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy import database_local
 
-from .schemas import CreateLoadLinkRequest, LoadLinkersRequest
+from .schemas import (CreateLoadLinkRequest, DeleteLoadLinkRequest,
+                      LoadLinkersRequest)
 
 
 async def get_load_linkers(session: AsyncSession, request: LoadLinkersRequest):
@@ -27,3 +28,10 @@ async def create_load_link(session: AsyncSession, request: CreateLoadLinkRequest
     await session.commit()
     await session.refresh(new_link)
     return new_link
+
+
+async def delete_load_link(session: AsyncSession, request: DeleteLoadLinkRequest):
+    query: Delete = delete(database_local.LoadLink).where(database_local.LoadLink.id == request.id)
+    await session.execute(query)
+    await session.commit()
+    return {"status": "ok"}

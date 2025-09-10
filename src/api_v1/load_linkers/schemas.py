@@ -5,7 +5,10 @@ from pydantic import BaseModel
 
 class LoadLinkersRequest(BaseModel):
     group_id: int
-    
+
+
+class DeleteLoadLinkRequest(BaseModel):
+    id: int
     
 class CreateLoadLinkRequest(BaseModel):
     first_year_hours: Optional[int]
