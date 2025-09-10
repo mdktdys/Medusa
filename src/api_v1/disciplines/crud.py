@@ -48,7 +48,7 @@ async def create_discipline_alias(request: CreateDisciplineAliasRequest, session
     )
     session.add(new_alias)
     await session.commit()
-    await session.refresh(new_alias, attribute_names = 'id')
+    await session.refresh(new_alias, attribute_names = ['id'])
     return new_alias
 
 
