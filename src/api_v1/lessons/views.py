@@ -4,7 +4,7 @@ from typing import List, Union
 from fastapi import APIRouter, Depends, Query
 from fastapi_cache.decorator import cache
 
-from src.alchemy.db_helper import AsyncSession, db_helper, local_db_helper
+from src.alchemy.db_helper import AsyncSession, local_db_helper
 from src.auth.auth import any_auth_method
 
 from . import crud
@@ -25,7 +25,7 @@ async def get_lessons(
     id: int = Query(None),
     start_date: date = Query(None),
     end_date: date = Query(None),
-    session: AsyncSession = Depends(db_helper.session_dependency),
+    session: AsyncSession = Depends(local_db_helper.session_dependency),
 ):
     filter = LessonFilter(
         group = group,
