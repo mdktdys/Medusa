@@ -6,7 +6,6 @@ from pydantic import BaseModel, ConfigDict, field_validator
 
 class Lesson(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: Optional[int]
     group_id: int
     number: int
     discipline_id: int
