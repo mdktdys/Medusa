@@ -48,7 +48,7 @@ async def create_lessons(session: AsyncSession, request: Union[Lesson, List[Less
     for item in lessons_data:
         lesson = database_local.Lesson(
             date_ = item.date,
-            timing_id = item.number,
+            timing_id = item.number + 1,
             teacher_id = item.teacher_id,
             discipline_id = item.discipline_id,
             cabinet_id = item.cabinet_id,
