@@ -41,7 +41,7 @@ async def get_discipline_aliases(session: AsyncSession, request: DisciplineAlias
 
 async def create_discipline_alias(request: CreateDisciplineAliasRequest, session: AsyncSession):
     new_alias: EntityAlias = EntityAlias(
-        kind = EntityKind.DISCIPLINE.value,
+        kind = EntityKind.DISCIPLINE.name,
         entity_id = request.discipline_id,
         alias = request.alias,
         alias_normalized = request.alias
