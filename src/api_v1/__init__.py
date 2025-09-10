@@ -5,6 +5,7 @@ from src.auth.auth import any_auth_method
 from .already_found_links.views import router as already_found_links_router
 from .bench.views import router as bench_router
 from .cabinets.views import router as cabinets_router
+from .celery_tasks.views import router as tasks_router
 from .courses.views import router as courses_router
 from .departments.views import router as departments_router
 from .disciplines.views import router as discipline_router
@@ -42,6 +43,7 @@ router.include_router(router = zamena_file_links_router, prefix = '/zamena_file_
 router.include_router(router = specializations_router, prefix = '/specializations')
 router.include_router(router = load_linkers_router, prefix = '/load_linkers')
 router.include_router(router = discipline_router, prefix = '/disciplines')
+router.include_router(router = tasks_router, prefix = '/tasks')
 
 # router.include_router(router = load_parser_router, prefix = '/load_parser')
 
