@@ -1,10 +1,12 @@
-from typing import List, Union
-from fastapi import APIRouter, Depends
-from fastapi_cache.decorator import cache
-from fastapi import Query
 from datetime import date
-from src.alchemy.db_helper import AsyncSession, db_helper
-from . import crud 
+from typing import List, Union
+
+from fastapi import APIRouter, Depends, Query
+from fastapi_cache.decorator import cache
+
+from src.alchemy.db_helper import AsyncSession, db_helper, local_db_helper
+
+from . import crud
 from .schemas import Lesson, LessonFilter
 
 namespace: str = 'lessons'
@@ -35,3 +37,11 @@ async def get_lessons(
         end_date = end_date,
     )
     return await crud.get_lessons(session = session, filter = filter)
+
+
+@router.post('/')
+async def create_lessons(
+    request: Union[Lesson, List[Lesson]],
+    session: AsyncSession = Depends(local_db_helper.session_dependency)
+):
+    return await crud.create_lessons(session = session, request = request)

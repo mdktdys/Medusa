@@ -1,16 +1,17 @@
 from datetime import date
+from typing import List, Optional, Union
+
 from pydantic import BaseModel, ConfigDict, field_validator
-from typing import Optional
-from typing import Union, List
+
 
 class Lesson(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id: int
-    group: int
+    id: Optional[int]
+    group_id: int
     number: int
-    course: int
-    teacher: int
-    cabinet: int
+    discipline_id: int
+    teacher_id: Optional[int]
+    cabinet_id: Optional[int]
     date: date
     
     

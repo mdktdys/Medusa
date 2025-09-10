@@ -1,8 +1,11 @@
-from typing import Tuple
+from typing import List, Tuple, Union
+
+from sqlalchemy import Result, Select, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.alchemy import database
+
+from src.alchemy import database, database_local
+
 from .schemas import Lesson, LessonFilter
-from sqlalchemy import Result, Select, select, and_
 
 
 async def get_lessons(session: AsyncSession, filter: LessonFilter) -> list[Lesson]:
@@ -36,3 +39,23 @@ async def get_lessons(session: AsyncSession, filter: LessonFilter) -> list[Lesso
 
     result: Result[Tuple[database.Paras]] = await session.execute(query)
     return list(result.scalars().all()) 
+
+
+async def create_lessons(session: AsyncSession, request: Union[Lesson, List[Lesson]]):
+    lessons_data: List[Lesson] = [request] if isinstance(request, Lesson) else request
+
+    lessons = []
+    for item in lessons_data:
+        lesson = database_local.Lesson(
+            date_ = item.date,
+            timing_id = item.number,
+            teacher_id = item.teacher_id,
+            discipline_id = item.discipline_id,
+            cabinet_id = item.cabinet_id,
+            group_id = item.group_id,
+        )
+        session.add(lesson)
+        lessons.append(lesson)
+
+    await session.commit()
+    return {"result": "ok", "count": len(lessons)}
