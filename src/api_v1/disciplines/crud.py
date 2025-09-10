@@ -1,19 +1,15 @@
 import re
 from typing import List, Sequence, Tuple
 
-from sqlalchemy import Result, Select, func, select
+from sqlalchemy import Delete, Result, Row, Select, func, select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy.database_local import (
-    Discipline,
-    DisciplineCodes,
-    EntityAlias,
-    EntityKind,
-    Group,
-    LoadLink,
-)
+from src.alchemy.database_local import (Discipline, DisciplineCodes,
+                                        EntityAlias, EntityKind, Group,
+                                        LoadLink)
 
-from .schemas import CreateDisciplineAliasRequest, DisciplineAliasesRequest
+from .schemas import (CreateDisciplineAliasRequest,
+                      DeleteDisciplineAliasesRequest, DisciplineAliasesRequest)
 
 
 async def get_disciplines(session: AsyncSession) -> list[Discipline]:
@@ -28,11 +24,18 @@ async def get_disciplines_codes(session: AsyncSession) -> list[DisciplineCodes]:
     return list(result.scalars().all())
 
 
+async def delete_discipline_alias(request: DeleteDisciplineAliasesRequest, session: AsyncSession):
+    query: Delete = delete(EntityAlias).where(EntityAlias.id == request.alias_id)
+    await session.execute(query)
+    await session.commit()
+    return {"status": "ok"}
+
+
 async def get_discipline_aliases(session: AsyncSession, request: DisciplineAliasesRequest):
     query: Select[Tuple[int,str]] = select(EntityAlias.id, EntityAlias.alias).where(EntityAlias.entity_id == request.discipline_id, EntityAlias.kind == EntityKind.DISCIPLINE.value)
     result: Result = await session.execute(query)
     result = await session.execute(query)
-    rows = result.all()
+    rows: Sequence[Row] = result.all()
     return [{"id": row.id, "alias": row.alias} for row in rows]
 
 
@@ -117,6 +120,10 @@ async def find_group_disciplines_by_alias_or_name_or_code_discipline_name(
             continue
         if getattr(d, 'id', None) in seen_ids:
             continue
+        seen_ids.add(getattr(d, 'id', None))
+        deduped.append(d)
+
+    return deduped
         seen_ids.add(getattr(d, 'id', None))
         deduped.append(d)
 

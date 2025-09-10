@@ -5,7 +5,8 @@ from src.alchemy.db_helper import AsyncSession, local_db_helper
 from src.auth.auth import any_auth_method
 
 from . import crud
-from .schemas import CreateDisciplineAliasRequest, DisciplineAliasesRequest
+from .schemas import (CreateDisciplineAliasRequest,
+                      DeleteDisciplineAliasesRequest, DisciplineAliasesRequest)
 
 router = APIRouter(tags = ['Disciplines'])
 
@@ -32,3 +33,11 @@ async def get_discipline_aliases(request: DisciplineAliasesRequest = Depends(), 
 )
 async def create_discipline_alias(request: CreateDisciplineAliasRequest, session: AsyncSession = Depends(local_db_helper.session_dependency)):
     return await crud.create_discipline_alias(request = request, session = session)
+
+
+@router.delete(
+    '/alias',
+    dependencies=[Depends(any_auth_method(roles=['Owner']))]
+)
+async def delete_discipline_alias(request: DeleteDisciplineAliasesRequest = Depends(), session: AsyncSession = Depends(local_db_helper.session_dependency)):
+    return await crud.delete_discipline_alias(request = request, session = session)

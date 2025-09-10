@@ -8,3 +8,7 @@ class CreateDisciplineAliasRequest(BaseModel):
     
 class DisciplineAliasesRequest(BaseModel):
     discipline_id: int
+    
+    
+class DeleteDisciplineAliasesRequest(BaseModel):
+    alias_id: int
