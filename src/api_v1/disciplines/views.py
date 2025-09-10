@@ -5,8 +5,11 @@ from src.alchemy.db_helper import AsyncSession, local_db_helper
 from src.auth.auth import any_auth_method
 
 from . import crud
-from .schemas import (CreateDisciplineAliasRequest,
-                      DeleteDisciplineAliasesRequest, DisciplineAliasesRequest)
+from .schemas import (
+    CreateDisciplineAliasRequest,
+    DeleteDisciplineAliasesRequest,
+    DisciplineAliasesRequest,
+)
 
 router = APIRouter(tags = ['Disciplines'])
 
@@ -24,14 +27,20 @@ async def get_disciplines_codes(session: AsyncSession = Depends(local_db_helper.
 
 
 @router.get('/alias')
-async def get_discipline_aliases(request: DisciplineAliasesRequest = Depends(), session: AsyncSession = Depends(local_db_helper.session_dependency)):
+async def get_discipline_aliases(
+    request: DisciplineAliasesRequest = Depends(),
+    session: AsyncSession = Depends(local_db_helper.session_dependency)
+):
     return await crud.get_discipline_aliases(request = request,session = session)
 
 @router.post(
     '/alias',
     dependencies=[Depends(any_auth_method(roles=['Owner']))]
 )
-async def create_discipline_alias(request: CreateDisciplineAliasRequest, session: AsyncSession = Depends(local_db_helper.session_dependency)):
+async def create_discipline_alias(
+    request: CreateDisciplineAliasRequest,
+    session: AsyncSession = Depends(local_db_helper.session_dependency)
+):
     return await crud.create_discipline_alias(request = request, session = session)
 
 
@@ -39,5 +48,8 @@ async def create_discipline_alias(request: CreateDisciplineAliasRequest, session
     '/alias',
     dependencies=[Depends(any_auth_method(roles=['Owner']))]
 )
-async def delete_discipline_alias(request: DeleteDisciplineAliasesRequest = Depends(), session: AsyncSession = Depends(local_db_helper.session_dependency)):
+async def delete_discipline_alias(
+    request: DeleteDisciplineAliasesRequest = Depends(),
+    session: AsyncSession = Depends(local_db_helper.session_dependency)
+):
     return await crud.delete_discipline_alias(request = request, session = session)

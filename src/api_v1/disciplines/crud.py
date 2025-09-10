@@ -4,20 +4,12 @@ from typing import List, Sequence, Tuple
 from sqlalchemy import Delete, Result, Row, Select, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.alchemy.database_local import (
-    Discipline,
-    DisciplineCodes,
-    EntityAlias,
-    EntityKind,
-    Group,
-    LoadLink,
-)
+from src.alchemy.database_local import (Discipline, DisciplineCodes,
+                                        EntityAlias, EntityKind, Group,
+                                        LoadLink)
 
-from .schemas import (
-    CreateDisciplineAliasRequest,
-    DeleteDisciplineAliasesRequest,
-    DisciplineAliasesRequest,
-)
+from .schemas import (CreateDisciplineAliasRequest,
+                      DeleteDisciplineAliasesRequest, DisciplineAliasesRequest)
 
 
 async def get_disciplines(session: AsyncSession) -> list[Discipline]:
@@ -49,7 +41,7 @@ async def get_discipline_aliases(session: AsyncSession, request: DisciplineAlias
 
 async def create_discipline_alias(request: CreateDisciplineAliasRequest, session: AsyncSession):
     new_alias: EntityAlias = EntityAlias(
-        kind = EntityKind.DISCIPLINE,
+        kind = EntityKind.DISCIPLINE.value,
         entity_id = request.discipline_id,
         alias = request.alias,
         alias_normalized = request.alias
