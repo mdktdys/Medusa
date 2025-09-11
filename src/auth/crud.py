@@ -31,7 +31,7 @@ async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRe
             
             
     if user is None:
-        pseudo_email: str = f"{telegram_id}@telegram.local"
+        pseudo_email: str = f"{telegram_id}@tg-login.uksivt.xyz"
         random_password = 'telegram_auth'
 
         user = await user_manager.create(
