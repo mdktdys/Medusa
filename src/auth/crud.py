@@ -11,7 +11,7 @@ from .user_manager import UserManager
 
 
 async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRequest, jwt_strategy: JWTStrategy, user_manager: UserManager):
-    telegram_id: int = request.user['id']
+    telegram_id: str = str(request.user['id'])
     telegram_username: str | None = request.user.get('username')
     telegram_first_name: str | None = request.user.get('first_name')
     telegram_last_name: str | None = request.user.get('last_name')
@@ -42,7 +42,7 @@ async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRe
                 is_verified=True,
             )
         )
-        user.telegram_id = str(telegram_id)
+        user.telegram_id = telegram_id
         user.username = telegram_username
         user.first_name = telegram_first_name
         user.last_name = telegram_last_name
