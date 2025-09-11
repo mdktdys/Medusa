@@ -46,6 +46,7 @@ async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRe
         user.username = telegram_username
         user.first_name = telegram_first_name
         user.last_name = telegram_last_name
+        user.photo_url = telegram_photo_url
         await session.commit()
         await session.refresh(user)
 

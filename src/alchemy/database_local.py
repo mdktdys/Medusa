@@ -165,7 +165,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
 
     telegram_id: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
     chat_id: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
-    photo_url: Mapped[Optional[bytes]] = mapped_column(BYTEA, default = None, nullable = True)
+    photo_url: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
     first_name: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
     last_name: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
 
