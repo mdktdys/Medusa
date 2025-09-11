@@ -1,3 +1,4 @@
+import crud
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,7 +36,4 @@ async def telegram_webapp_login(
     user_manager = Depends(get_user_manager),
     jwt_strategy = Depends(get_jwt_strategy),
 ):
-    return {
-        'result': request.user['username'],
-        'raw': request.model_dump()
-    }
+    return await crud.telegram_webapp_login(request = request, session = session, jwt_strategy = jwt_strategy, user_manager = user_manager)

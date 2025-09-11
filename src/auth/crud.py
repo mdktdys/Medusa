@@ -1,0 +1,57 @@
+from typing import Tuple
+
+from fastapi_users.authentication import JWTStrategy
+from sqlalchemy import Result, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.alchemy.database_local import User
+
+from .schemas import TelegramWebAppRequest, UserCreate
+from .user_manager import UserManager
+
+
+async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRequest, jwt_strategy: JWTStrategy, user_manager: UserManager):
+    telegram_id: int = request.user['id']
+    telegram_username: str | None = request.user['username']
+    telegram_first_name: str | None = request.user['first_name']
+    telegram_last_name: str | None = request.user['last_name']
+    telegram_photo_url: str | None = request.user['photo_url']
+    
+    result: Result[Tuple[User]] = await session.execute(select(User).where(User.telegram_id == telegram_id))
+    user: User | None = result.scalar_one_or_none()
+    
+    if user:
+        updated: bool = False
+        if telegram_username is not None and user.username != telegram_username:
+            user.username = telegram_username
+            updated = True
+            
+        if updated:
+            await session.commit()
+            
+            
+    if user is None:
+        pseudo_email = f"tg{telegram_id}@telegram.local"
+        random_password = 'telegram_auth'
+
+        user = await user_manager.create(
+            UserCreate(
+                email=pseudo_email,
+                password=random_password,
+                is_active=True,
+                is_verified=True,
+            )
+        )
+        user.telegram_id = str(telegram_id)
+        user.username = telegram_username
+        user.first_name = telegram_first_name
+        user.last_name = telegram_last_name
+        await session.commit()
+        await session.refresh(user)
+
+            
+    access_token: str = await jwt_strategy.write_token(user)
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
