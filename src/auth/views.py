@@ -1,10 +1,10 @@
-import crud
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy import local_db_helper
 from src.auth.schemas import UserCreate, UserRead
 
+from . import crud
 from .auth import (
     any_auth_method,
     auth_backend,
