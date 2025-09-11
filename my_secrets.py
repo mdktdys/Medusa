@@ -3,7 +3,7 @@ import os
 OPENROUTER_API_KEY: str = os.environ['OPENROUTER_API_KEY']
 PUBLIC_API_KEY: str | None = os.environ.get('PUBLIC_API_KEY')
 API_KEY: str | None = os.environ.get('API_KEY')
-SECRET: str | None = os.environ.get('SECRET')
+SECRET: str = os.environ['SECRET']
 REDIS_PASSWORD: str | None = os.environ.get('REDIS_PASSWORD')
 
 supabase_database_connection: str = os.environ['SUPABASE_DATABASE_CONNECTION']
