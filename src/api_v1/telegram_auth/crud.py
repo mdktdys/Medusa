@@ -60,7 +60,7 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> Auth
     if not user:
         new_user = database_local.User(
             chat_id = auth_request.chat_id,
-            photo_url = auth_request.photo_bytes,
+            photo_bytes = auth_request.photo_bytes,
             username = auth_request.username,
             first_name = auth_request.first_name,
             last_name = auth_request.last_name,
