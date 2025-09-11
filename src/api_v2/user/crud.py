@@ -1,4 +1,3 @@
-import base64
 from typing import Optional, Tuple
 
 from fastapi import HTTPException, status
@@ -11,17 +10,13 @@ from .schemas import UserResponse
 
 
 def me(user: User) -> UserResponse:
-    photo_base64: Optional[str] = None
-    if user.photo_url is not None:
-        photo_base64 = base64.b64encode(user.photo_url).decode("utf-8")
-
     return UserResponse(
-        email=user.email,
-        first_name=user.first_name,
-        last_name=user.last_name,
-        username=user.username,
-        role=user.role,
-        photo_base64 = photo_base64
+        email = user.email,
+        first_name = user.first_name,
+        last_name = user.last_name,
+        username = user.username,
+        role = user.role,
+        photo_url = user.photo_url
     )
 
 
