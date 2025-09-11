@@ -5,6 +5,7 @@ from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.alchemy.database_local import User
+from src.utils.get_remote_file_bytes import get_remote_file_bytes_async
 
 from .schemas import TelegramWebAppRequest, UserCreate
 from .user_manager import UserManager
@@ -20,10 +21,19 @@ async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRe
     result: Result[Tuple[User]] = await session.execute(select(User).where(User.telegram_id == telegram_id))
     user: User | None = result.scalar_one_or_none()
     
+    photo_bytes: bytes | None
+    if telegram_photo_url is not None:
+        photo_bytes = await get_remote_file_bytes_async(telegram_photo_url)
+    
     if user:
         updated: bool = False
+
         if telegram_username is not None and user.username != telegram_username:
             user.username = telegram_username
+            updated = True
+            
+        if photo_bytes and user.photo_bytes != photo_bytes:
+            user.photo_bytes = photo_bytes
             updated = True
             
         if updated:
@@ -46,7 +56,7 @@ async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRe
         user.username = telegram_username
         user.first_name = telegram_first_name
         user.last_name = telegram_last_name
-        user.photo_url = telegram_photo_url
+        user.photo_bytes = photo_bytes
         await session.commit()
         await session.refresh(user)
 

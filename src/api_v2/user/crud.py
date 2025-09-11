@@ -16,7 +16,7 @@ def me(user: User) -> UserResponse:
         last_name = user.last_name,
         username = user.username,
         role = user.role,
-        photo_url = user.photo_url
+        photo_bytes = user.photo_bytes
     )
 
 

@@ -4,24 +4,15 @@ from enum import Enum as PyEnum
 from typing import List, Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
-from sqlalchemy import (
-    Boolean,
-    Column,
-    Date,
-    DateTime,
-    Index,
-    Integer,
-    MetaData,
-    String,
-    Table,
-    Time,
-    UniqueConstraint,
-)
+from sqlalchemy import Boolean, Column, Date, DateTime
 from sqlalchemy import Enum as SAEnum
+from sqlalchemy import (Index, Integer, MetaData, String, Table, Time,
+                        UniqueConstraint)
 from sqlalchemy.dialects.postgresql import BYTEA, UUID
 from sqlalchemy.orm import DeclarativeBase
 
-from src.alchemy.database import ForeignKey, Mapped, func, mapped_column, relationship
+from src.alchemy.database import (ForeignKey, Mapped, func, mapped_column,
+                                  relationship)
 
 convention: dict[str, str] = {
     'ix': 'ix_%(table_name)s_%(column_0_name)s',
@@ -165,7 +156,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
 
     telegram_id: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
     chat_id: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
-    photo_url: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
+    photo_bytes: Mapped[Optional[bytes]] = mapped_column(BYTEA, default = None, nullable = True)
     first_name: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
     last_name: Mapped[Optional[str]] = mapped_column(String, default = None, nullable = True)
 

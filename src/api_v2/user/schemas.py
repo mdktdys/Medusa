@@ -9,4 +9,4 @@ class UserResponse(BaseModel):
     last_name: str | None = None
     username: str | None = None
     role: str | None = None
-    photo_url: str | None = None
+    photo_bytes: str | None = None
