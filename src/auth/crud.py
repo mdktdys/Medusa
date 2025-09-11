@@ -12,10 +12,10 @@ from .user_manager import UserManager
 
 async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRequest, jwt_strategy: JWTStrategy, user_manager: UserManager):
     telegram_id: int = request.user['id']
-    telegram_username: str | None = request.user['username']
-    telegram_first_name: str | None = request.user['first_name']
-    telegram_last_name: str | None = request.user['last_name']
-    telegram_photo_url: str | None = request.user['photo_url']
+    telegram_username: str | None = request.user.get('username')
+    telegram_first_name: str | None = request.user.get('first_name')
+    telegram_last_name: str | None = request.user.get('last_name')
+    telegram_photo_url: str | None = request.user.get('photo_url')
     
     result: Result[Tuple[User]] = await session.execute(select(User).where(User.telegram_id == telegram_id))
     user: User | None = result.scalar_one_or_none()
