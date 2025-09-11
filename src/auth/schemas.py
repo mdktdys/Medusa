@@ -16,4 +16,7 @@ class UserUpdate(schemas.BaseUserUpdate):
     pass
 
 class TelegramWebAppRequest(BaseModel):
-    init_data: dict
+    auth_date: int
+    hash: str
+    chat: dict
+    user: dict

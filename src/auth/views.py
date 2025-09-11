@@ -30,11 +30,12 @@ router.include_router(
 
 @router.post("/telegram/webapp")
 async def telegram_webapp_login(
-    request: TelegramWebAppRequest,
+    request: TelegramWebAppRequest = Depends(),
     session: AsyncSession = Depends(local_db_helper.session_dependency),
     user_manager = Depends(get_user_manager),
     jwt_strategy = Depends(get_jwt_strategy),
 ):
     return {
-        'result': request.init_data
+        'result': request.user['username'],
+        'raw': request.model_dump()
     }
