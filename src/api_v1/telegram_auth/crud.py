@@ -38,6 +38,7 @@ async def auth_status(request: AuthStatusRequest, session: AsyncSession) -> Auth
 
     await session.delete(state)
     await session.commit()
+
     return AuthStatusDto(
         access_token = state.access_token,
         refresh_token = state.refresh_token
@@ -54,7 +55,7 @@ async def verify_token(session: AsyncSession, auth_request: AuthRequest) -> Auth
             detail = 'Token not found'
         )
     
-    result: Result[Tuple[database_local.User]] = await session.execute(select(database_local.User).where(database_local.User.chat_id == auth_request.chat_id))
+    result: Result[Tuple[database_local.User]] = await session.execute(select(database_local.User).where(database_local.User.telegram_id == auth_request.user_id))
     user: database_local.User | None = result.scalars().first()
     
     if not user:

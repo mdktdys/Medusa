@@ -11,7 +11,7 @@ from .schemas import TelegramWebAppRequest, UserCreate
 from .user_manager import UserManager
 
 
-async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRequest, jwt_strategy: JWTStrategy, user_manager: UserManager):
+async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRequest, jwt_strategy: JWTStrategy, user_manager: UserManager, refresh_strategy: JWTStrategy):
     telegram_id: str = str(request.user['id'])
     telegram_username: str | None = request.user.get('username')
     telegram_first_name: str | None = request.user.get('first_name')
@@ -62,7 +62,9 @@ async def telegram_webapp_login(session: AsyncSession, request: TelegramWebAppRe
 
             
     access_token: str = await jwt_strategy.write_token(user)
+    refresh_token: str = await refresh_strategy.write_token(user)
+
     return {
-        "access_token": access_token,
-        "token_type": "bearer",
+        'refresh_token': refresh_token,
+        'access_token': access_token,
     }

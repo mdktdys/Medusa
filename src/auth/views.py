@@ -10,6 +10,7 @@ from .auth import (
     auth_backend,
     fastapi_users,
     get_jwt_strategy,
+    get_refresh_jwt_strategy,
     get_user_manager,
 )
 from .schemas import TelegramWebAppRequest
@@ -35,5 +36,12 @@ async def telegram_webapp_login(
     session: AsyncSession = Depends(local_db_helper.session_dependency),
     user_manager = Depends(get_user_manager),
     jwt_strategy = Depends(get_jwt_strategy),
+    refresh_strategy = Depends(get_refresh_jwt_strategy)
 ):
-    return await crud.telegram_webapp_login(request = request, session = session, jwt_strategy = jwt_strategy, user_manager = user_manager)
+    return await crud.telegram_webapp_login(
+        request = request,
+        session = session,
+        jwt_strategy = jwt_strategy,
+        user_manager = user_manager,
+        refresh_strategy = refresh_strategy
+    )
