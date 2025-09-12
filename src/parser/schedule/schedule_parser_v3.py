@@ -24,7 +24,7 @@ async def find_cabinet_in_cabinets_by_name(session: AsyncSession, raw_name: str)
     cabinets: list[Cabinet] = await get_cabinets(session = session)
     for cabinet in cabinets:
         cabinet_name_normalized: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', cabinet.name).lower()
-        if raw_name.__contains__(cabinet_name_normalized):
+        if raw_name == cabinet_name_normalized:
             return cabinet
 
 
@@ -92,7 +92,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
     for timing_index in range(len(merged_rows)):
         timing_row: list[str] = merged_rows[timing_index]
         
-        for day_index in range(5):
+        for day_index in range(6):
             value: str = timing_row[0 + day_index * 2]
             discipline_and_group_text: str | None = None if pd.isna(value) else str(value)
             
