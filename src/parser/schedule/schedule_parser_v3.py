@@ -43,8 +43,8 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
     
     teacher: Teacher | None = await find_teacher_in_teachers_by_name(session = session, raw_name = teacher_name)
     
-    if teacher is None:
-        exceptions.append(f'🔴 Не найден преподаватель {teacher_name}')
+    if teacher is None and teacher_name != '':
+        exceptions.append(f'⚠️ Не найден преподаватель {teacher_name}')
     
     # teacher name
     teacher_rows.pop(0)
