@@ -106,11 +106,10 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
                 
             discipline_and_group_text = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', discipline_and_group_text).lower()
             group_name: str = re.sub(r'[^a-zA-Zа-яА-Я0-9]', '', group.name).lower()
-            discipline_text:str = discipline_and_group_text.replace(group_name, '')
+            discipline_text:str = discipline_and_group_text.replace(group_name, '').replace('заменяет', '').replace('замененв', '')
 
-            from src.api_v1.disciplines.crud import (
-                find_group_disciplines_by_alias_or_name_or_code_discipline_name,
-            )
+            from src.api_v1.disciplines.crud import \
+                find_group_disciplines_by_alias_or_name_or_code_discipline_name
             disciplines: list[Discipline] | None = await find_group_disciplines_by_alias_or_name_or_code_discipline_name(
                 raw = discipline_text,
                 session = session,
