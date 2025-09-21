@@ -122,6 +122,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
                     exceptions.append(f'🔴 Не найдена дисциплина {discipline_text} у группы {group.name}')
                 else:
                     errors.append(f'⚠️ Не указана дисциплина у группы {group.name}')
+                    continue
             else:
                 discipline = disciplines[0]
                 
