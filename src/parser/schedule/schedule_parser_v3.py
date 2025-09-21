@@ -38,7 +38,7 @@ async def find_teacher_in_teachers_by_name(session: AsyncSession, raw_name: str)
             return teacher
 
 
-async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]], monday_date: date, exceptions: list[str]):
+async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]], monday_date: date, exceptions: list[str], errors: list[str]):
     teacher_name: str = teacher_rows[0][0].replace('Преподаватель - ', '')
     
     teacher: Teacher | None = await find_teacher_in_teachers_by_name(session = session, raw_name = teacher_name)
@@ -118,7 +118,10 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
             
             discipline: Discipline | None = None
             if len(disciplines) != 1:
-                exceptions.append(f'🔴 Не найдена дисциплина {discipline_text} у группы {group.name}')
+                if discipline_text != '':
+                    exceptions.append(f'🔴 Не найдена дисциплина {discipline_text} у группы {group.name}')
+                else:
+                    errors.append(f'⚠️ Не указана дисциплина у группы {group.name}')
             else:
                 discipline = disciplines[0]
                 
@@ -148,7 +151,7 @@ async def parse_teacher_rows(session: AsyncSession, teacher_rows: list[list[str]
     return lessons
         
 
-async def parse_sheet(session: AsyncSession, sheet: pd.DataFrame, monday_date: date, exceptions: list[str]) -> list:
+async def parse_sheet(session: AsyncSession, sheet: pd.DataFrame, monday_date: date, exceptions: list[str], errors: list[str]) -> list:
     rows: list[list[str]] = sheet.values.tolist() # type: ignore
     
     rows.pop(0)
@@ -172,6 +175,7 @@ async def parse_sheet(session: AsyncSession, sheet: pd.DataFrame, monday_date: d
             teacher_rows = teacher_rows,
             monday_date = monday_date,
             exceptions = exceptions,
+            errors = errors,
             session = session
         )
         teachers_lessons.extend(teacher_lessons)
@@ -183,12 +187,14 @@ async def parse_teacher_schedule_v3(stream: BytesIO, session: AsyncSession, mond
     excel_raw = pd.ExcelFile(stream)
 
     exceptions = []
+    errors = []
     teachers_lessons: list = []
     for sheet_index in range(8):
         sheet: pd.DataFrame = excel_raw.parse(sheet_index)
         sheet_teachers_lessons: list = await parse_sheet(
             monday_date = monday_date,
             exceptions = exceptions,
+            errors = errors,
             session = session,
             sheet = sheet,
         )
@@ -199,5 +205,9 @@ async def parse_teacher_schedule_v3(stream: BytesIO, session: AsyncSession, mond
             print(exception)
 
         raise Exception(list(set(exceptions)))
+    
+    if len(errors) > 0:
+        for error in errors:
+            print(error)
         
     return teachers_lessons
