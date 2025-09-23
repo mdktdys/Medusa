@@ -47,7 +47,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
         work_rows.pop(0)
         
     # Очистка пустых строк
-    # work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
+    work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
 
     from src.api_v1.groups.crud import get_groups_normalized_contains
 
