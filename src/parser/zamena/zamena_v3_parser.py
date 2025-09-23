@@ -47,36 +47,36 @@ async def parse_zamena_v3(stream: BytesIO, session):
         work_rows.pop(0)
         
     # Очистка пустых строк
-    work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
+    # work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
 
     from src.api_v1.groups.crud import get_groups_normalized_contains
 
     # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
-    for row in work_rows:
-        non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
-        if not non_empty_cells:
-            continue
-        if len(non_empty_cells) == 1:
-            non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
-            groups = await get_groups_normalized_contains(session=session, raw_name=non_empty_cell)
-            if groups:
-                group = groups[0]
-                row[:] = [group.name] * len(row)
-            else:
-                print(f'🔴 Не найдена группа -> {non_empty_cell}')
+    # for row in work_rows:
+    #     non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
+    #     if not non_empty_cells:
+    #         continue
+    #     if len(non_empty_cells) == 1:
+    #         non_empty_cell: str = clean_dirty_string(non_empty_cells[0])
+    #         groups = await get_groups_normalized_contains(session=session, raw_name=non_empty_cell)
+    #         if groups:
+    #             group = groups[0]
+    #             row[:] = [group.name] * len(row)
+    #         else:
+    #             print(f'🔴 Не найдена группа -> {non_empty_cell}')
             
     # Восстановление оторванных строк
     # ['4,5', '', '', 'Правовые основы оперативно-', 'Музафаров Ф.Ф.', '112']
     # ['', '', '', 'розыскной \nдеятельности', '', '']
     # -> ['4,5', '', '', 'Правовые основы оперативно-розыскной \nдеятельности', 'Музафаров Ф.Ф.', '112']
-    merged_rows: list[list[str]] = []
-    for row in work_rows:
-        if row[0] == '' and merged_rows:
-            prev_row: list[str] = merged_rows[-1]
-            prev_row[3] = (prev_row[3] + row[3]).strip()
-        else:
-            merged_rows.append(row)
-    work_rows = list(merged_rows)
+    # merged_rows: list[list[str]] = []
+    # for row in work_rows:
+    #     if row[0] == '' and merged_rows:
+    #         prev_row: list[str] = merged_rows[-1]
+    #         prev_row[3] = (prev_row[3] + row[3]).strip()
+    #     else:
+    #         merged_rows.append(row)
+    # work_rows = list(merged_rows)
         
     # перевод пар 3,4 на отдельные строки
     # extracted: list = []
