@@ -43,14 +43,27 @@ async def parse_zamena_v3(stream: BytesIO, session):
     #         row.pop(0)
             
     # Удаление строки хедеров
-    if first_row[0] == 'Пара':
+    if first_row[0] == 'Время':
         work_rows.pop(0)
         
     # Очистка пустых строк
     work_rows = [sublist for sublist in work_rows if any(item != "" for item in sublist)]
 
-    from src.api_v1.groups.crud import get_groups_normalized_contains
 
+    # Простановка группы в первую ячейку
+    # ['25ПД-2', '25ПД-2', '25ПД-2', '25ПД-2', '25ПД-2', '25ПД-2', '25ПД-2']
+    # ['', '3', '', '', 'Математика', 'Гайсин И.И.', '223']
+    # -> 
+    # ['25ПД-2', '3', '', '', 'Математика', 'Гайсин И.И.', '223']
+    group_name: str = work_rows[0][0]
+    for row in work_rows:
+        if row[0] == '':
+            row[0] = group_name
+        else:
+            group_name = row[0]
+
+
+    from src.api_v1.groups.crud import get_groups_normalized_contains
     # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
     # for row in work_rows:
     #     non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
