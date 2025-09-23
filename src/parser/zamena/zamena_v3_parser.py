@@ -120,71 +120,61 @@ async def parse_zamena_v3(stream: BytesIO, session):
 
     work_rows = list(extracted)
     
-    for row in work_rows:
-        print(row)
-
-    return {
-        'result': 'completed',
-        'work_rows': str(work_rows)
-    }
-
     # # Очистка от лишних символов
     # work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
     
     # # Перевод в айдишники
-    # from src.api_v1.disciplines.crud import (
-    #     find_group_disciplines_by_alias_or_name_or_code_discipline_name,
-    # )
+    from src.api_v1.disciplines.crud import (
+        find_group_disciplines_by_alias_or_name_or_code_discipline_name,
+    )
     
-    # current_group = None
-    # for row in work_rows:
-    #     if all_equal(row):
-    #         group_text: str = clean_trash(row[0])
-    #         groups = await get_groups_normalized_contains(
-    #             session=session,
-    #             raw_name=group_text
-    #         )
+    current_group = None
+    full_swap_groups_ids = []
+    for row in work_rows:
+        group_text: str = clean_trash(row[0])
+        groups = await get_groups_normalized_contains(
+            session=session,
+            raw_name=group_text
+        )
 
-    #         if not groups:
-    #             raise Exception(f'🔴 Не найдена группа {group_text}')
-    #         if len(groups) > 1:
-    #             raise Exception(f'🔴 Больше 1 совпадения группы {group_text}')
+        if not groups:
+            raise Exception(f'🔴 Не найдена группа {group_text}')
+        if len(groups) > 1:
+            raise Exception(f'🔴 Больше 1 совпадения группы {group_text}')
 
-    #         group = groups[0]
-    #         row[:] = [group] * len(row)
-    #         current_group = group
+        group = groups[0]
+        # row[:] = [group] * len(row)
+        current_group = group
 
-    #     else:
-    #         if current_group is None:
-    #             raise Exception(f'🔴 Нет align группы для {row}')
+        if all_equal(row):
+            full_swap_groups_ids.append(group.id)
+        
+        course_text: str = row[4]
+        founded_disciplines = await find_group_disciplines_by_alias_or_name_or_code_discipline_name(
+            session = session,
+            group = group,
+            raw = course_text
+        )
+        
+        if not founded_disciplines:
+            exceptions.append(f'🔴 Не найдена дисциплина {course_text} для группы {current_group.name}')
+            continue
+        if len(founded_disciplines) > 1:
+            raise Exception(f'🔴 Больше 1 совпадения дисциплин {course_text} для группы {current_group.name} -> {founded_disciplines}')
             
-    #         course_text: str = row[3]
-    #         founded_disciplines = await find_group_disciplines_by_alias_or_name_or_code_discipline_name(
-    #             session = session,
-    #             group = group,
-    #             raw = course_text
-    #         )
-            
-    #         if not founded_disciplines:
-    #             exceptions.append(f'🔴 Не найдена дисциплина {course_text} для группы {current_group.name}')
-    #             continue
-    #         if len(founded_disciplines) > 1:
-    #             raise Exception(f'🔴 Больше 1 совпадения дисциплин {course_text} для группы {current_group.name} -> {founded_disciplines}')
-            
-    # if len(exceptions) > 0:
-    #     for exception in exceptions:
-    #         logger.error(exception)
+    if len(exceptions) > 0:
+        for exception in exceptions:
+            logger.error(exception)
 
-    #     raise Exception(exceptions)
-            
+        raise Exception(exceptions)
     
-    # for row in work_rows:
-    #     print(row)
+    for row in work_rows:
+        print(row)
     
-    # return {
-    #     'result': 'completed',
-    #     'work_rows': str(work_rows)
-    # }
+    return {
+        'result': 'completed',
+        'work_rows': str(work_rows)
+    }
     
     
 def extract_all_tables_to_rows(tables: list[Table]) -> list[list[str]]:
