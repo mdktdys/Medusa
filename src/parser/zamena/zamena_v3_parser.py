@@ -79,33 +79,33 @@ async def parse_zamena_v3(stream: BytesIO, session):
     work_rows = list(merged_rows)
         
     # перевод пар 3,4 на отдельные строки
-    extracted: list = []
-    for row in work_rows:
-        timings_text = row[0]
+    # extracted: list = []
+    # for row in work_rows:
+    #     timings_text = row[0]
 
-        if not timings_text.replace(',','').isdigit():
-            extracted.append(row)
-            continue
+    #     if not timings_text.replace(',','').isdigit():
+    #         extracted.append(row)
+    #         continue
     
-        cell: str = timings_text.replace('.', ',')
+    #     cell: str = timings_text.replace('.', ',')
     
-        if cell[0] == ',':
-            cell = cell[1:]
+    #     if cell[0] == ',':
+    #         cell = cell[1:]
         
-        if cell[-1] == ',':
-            cell = cell[:-1]
+    #     if cell[-1] == ',':
+    #         cell = cell[:-1]
         
-        timings: list[str] = cell.split(',')
+    #     timings: list[str] = cell.split(',')
     
-        if len(timings) > 1:
-            for timing in timings:
-                copy_row = row.copy()
-                copy_row[0] = timing
-                extracted.append(copy_row)
-        else:
-            extracted.append(row)
+    #     if len(timings) > 1:
+    #         for timing in timings:
+    #             copy_row = row.copy()
+    #             copy_row[0] = timing
+    #             extracted.append(copy_row)
+    #     else:
+    #         extracted.append(row)
 
-    work_rows = list(extracted)
+    # work_rows = list(extracted)
     
     for row in work_rows:
         print(row)
