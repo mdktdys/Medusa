@@ -64,6 +64,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
 
 
     from src.api_v1.groups.crud import get_groups_normalized_contains
+
     # Восстановление строк с полной заменой ['','','21П-2','',''] -> ['21П-2','21П-2','21П-2','21П-2','21П-2']
     # for row in work_rows:
     #     non_empty_cells: list[str] = [cell for cell in row if isinstance(cell, str) and cell.strip()]
@@ -77,7 +78,6 @@ async def parse_zamena_v3(stream: BytesIO, session):
     #             row[:] = [group.name] * len(row)
     #         else:
     #             print(f'🔴 Не найдена группа -> {non_empty_cell}')
-            
     # Восстановление оторванных строк
     # ['4,5', '', '', 'Правовые основы оперативно-', 'Музафаров Ф.Ф.', '112']
     # ['', '', '', 'розыскной \nдеятельности', '', '']
@@ -90,7 +90,6 @@ async def parse_zamena_v3(stream: BytesIO, session):
     #     else:
     #         merged_rows.append(row)
     # work_rows = list(merged_rows)
-        
     # перевод пар 3,4 на отдельные строки
     extracted: list = []
     for row in work_rows:
@@ -150,17 +149,23 @@ async def parse_zamena_v3(stream: BytesIO, session):
             full_swap_groups_ids.append(group.id)
         
         course_text: str = row[4]
-        founded_disciplines = await find_group_disciplines_by_alias_or_name_or_code_discipline_name(
-            session = session,
-            group = group,
-            raw = course_text
-        )
+        course = None
+        if course_text != 'нет':
+            founded_disciplines = await find_group_disciplines_by_alias_or_name_or_code_discipline_name(
+                session = session,
+                group = group,
+                raw = course_text
+            )
         
-        if not founded_disciplines:
-            exceptions.append(f'🔴 Не найдена дисциплина {course_text} для группы {current_group.name}')
-            continue
-        if len(founded_disciplines) > 1:
-            raise Exception(f'🔴 Больше 1 совпадения дисциплин {course_text} для группы {current_group.name} -> {founded_disciplines}')
+            if not founded_disciplines:
+                exceptions.append(f'🔴 Не найдена дисциплина {course_text} для группы {current_group.name}')
+                continue
+            if len(founded_disciplines) > 1:
+                raise Exception(f'🔴 Больше 1 совпадения дисциплин {course_text} для группы {current_group.name} -> {founded_disciplines}')
+            
+            course = founded_disciplines[0]
+        
+        
             
     if len(exceptions) > 0:
         for exception in exceptions:
