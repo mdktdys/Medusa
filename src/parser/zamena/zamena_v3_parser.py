@@ -166,6 +166,8 @@ async def parse_zamena_v3(stream: BytesIO, session):
             course = founded_disciplines[0]
         
         
+    for row in work_rows:
+        print(row)
             
     if len(exceptions) > 0:
         for exception in exceptions:
@@ -173,8 +175,6 @@ async def parse_zamena_v3(stream: BytesIO, session):
 
         raise Exception(exceptions)
     
-    for row in work_rows:
-        print(row)
     
     return {
         'result': 'completed',
