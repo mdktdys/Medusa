@@ -120,12 +120,11 @@ async def parse_zamena_v3(stream: BytesIO, session):
     work_rows = list(extracted)
     
     # # Очистка от лишних символов
-    # work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
+    work_rows = [[clean_dirty_string(cell) for cell in row] for row in work_rows]
     
     # # Перевод в айдишники
-    from src.api_v1.disciplines.crud import (
-        find_group_disciplines_by_alias_or_name_or_code_discipline_name,
-    )
+    from src.api_v1.disciplines.crud import \
+        find_group_disciplines_by_alias_or_name_or_code_discipline_name
     
     current_group = None
     full_swap_groups_ids = []
