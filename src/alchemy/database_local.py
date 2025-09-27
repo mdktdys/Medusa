@@ -70,8 +70,9 @@ class Group(Base):
     specialization: Mapped[Specialization] = relationship('Specialization', back_populates='groups')
 
     load_linkers: Mapped[List['LoadLink']] = relationship('LoadLink', back_populates='group')
-    zamena_group: Mapped[List['ZamenaGroup']] = relationship('ZamenaGroup', back_populates='group')
     lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='group')
+    zamena_groups: Mapped[List['ZamenaGroup']] = relationship('ZamenaGroup', back_populates='group')
+    zamena_swaps: Mapped[List['ZamenaSwaps']] = relationship('ZamenaSwaps', back_populates='group')
     
 
 class Teacher(Base):
