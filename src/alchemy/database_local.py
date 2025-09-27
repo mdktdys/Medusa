@@ -265,8 +265,6 @@ class ZamenaGroup(Base):
     
     type: Mapped[ZamenaGroupType] = mapped_column(SAEnum(ZamenaGroupType, name="zamena_group_type", native_enum=False), nullable=False)
     
-    zamena_swaps: Mapped[List['ZamenaSwaps']] = relationship('ZamenaSwaps', back_populates='zamena_group')
-    
 
 class ZamenaSwaps(Base):
     __tablename__ = 'zamena_swaps'
