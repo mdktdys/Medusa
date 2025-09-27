@@ -1,8 +1,11 @@
-from pydantic import BaseModel, ConfigDict
 from datetime import date
-from src.api_v1.zamenas_full.schemas import ZamenasFull
+
+from pydantic import BaseModel, ConfigDict
+
 from src.api_v1.zamena_file_links.schemas import ZamenaFileLink
-from src.api_v1.zamenas.schemas import Zamena
+from src.api_v1.zamenas.schemas import ZamenaSwap
+from src.api_v1.zamenas_full.schemas import ZamenasFull
+
 
 class ZamenaRequest(BaseModel):
     model_config = ConfigDict(from_attributes = True)
@@ -18,5 +21,5 @@ class ZamenaResponse(BaseModel):
     cabinet_swaps: list
     zamenas_full: list[ZamenasFull]
     zamena_file_links: list[ZamenaFileLink]
-    zamenas: list[Zamena]
+    zamenas: list[ZamenaSwap]
     
