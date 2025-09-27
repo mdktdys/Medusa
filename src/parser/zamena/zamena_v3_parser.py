@@ -157,7 +157,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
                 raw = course_text
             )
         
-            if not founded_disciplines:
+            if len(founded_disciplines) == 0:
                 exceptions.append(f'🔴 Не найдена дисциплина {course_text} для группы {current_group.name}')
                 continue
             if len(founded_disciplines) > 1:
