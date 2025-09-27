@@ -147,6 +147,7 @@ async def parse_zamena_v3(stream: BytesIO, session):
 
         if all_equal(row):
             full_swap_groups_ids.append(group.id)
+            continue
         
         course_text: str = row[4]
         course = None
