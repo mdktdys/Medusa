@@ -75,7 +75,7 @@ class Teacher(Base):
 
     load_linkers: Mapped[List['LoadLink']] = relationship('LoadLink', back_populates='teacher')
     lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='teacher')
-    zamena_group_swap: Mapped[List['ZamenaGroupSwaps']] = relationship('ZamenaGroupSwaps', back_populates='teacher')
+    zamena_swaps: Mapped[List['ZamenaSwaps']] = relationship('ZamenaSwaps', back_populates='teacher')
 
 
 class Cabinet(Base):
@@ -84,7 +84,7 @@ class Cabinet(Base):
     name: Mapped[str] = mapped_column(String, nullable = False)
     ceil: Mapped[int] = mapped_column(Integer, nullable = True)
     lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='cabinet')
-    zamena_group_swap: Mapped[List['ZamenaGroupSwaps']] = relationship('ZamenaGroupSwaps', back_populates='cabinet')
+    zamena_swaps: Mapped[List['ZamenaSwaps']] = relationship('ZamenaSwaps', back_populates='cabinet')
     
 
 search_items_view = Table(
@@ -121,7 +121,7 @@ class Timings(Base):
     end: Mapped[Optional[time]] = mapped_column(Time)
     obed_start: Mapped[Optional[time]] = mapped_column(Time)
     obed_end: Mapped[Optional[time]] = mapped_column(Time)
-    zamena_group_swap: Mapped[List['ZamenaGroupSwaps']] = relationship('ZamenaGroupSwaps', back_populates='timing')
+    zamena_swaps: Mapped[List['ZamenaSwaps']] = relationship('ZamenaSwaps', back_populates='timing')
     lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='timing')
     
     
@@ -140,7 +140,7 @@ class Discipline(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
 
     load_linkers: Mapped[List['LoadLink']] = relationship('LoadLink', back_populates='discipline')
-    zamena_group_swap: Mapped[List['ZamenaGroupSwaps']] = relationship('ZamenaGroupSwaps', back_populates='discipline')
+    zamena_swaps: Mapped[List['ZamenaSwaps']] = relationship('ZamenaSwaps', back_populates='discipline')
     lessons: Mapped[List['Lesson']] = relationship('Lesson', back_populates='discipline')
 
 
@@ -226,8 +226,6 @@ class Zamena(Base):
     saturday_timings: Mapped[bool] = mapped_column(Boolean, default = False)
     file_url: Mapped[str] = mapped_column(String, nullable = True)
     file_hash: Mapped[str] = mapped_column(String, nullable = True)
-    zamena_group: Mapped[List['ZamenaGroup']] = relationship('ZamenaGroup', back_populates='zamena')
-    
     
 class ZamenaGroupType(PyEnum):
     FULL_SWAP = 'full_swap'
@@ -236,34 +234,42 @@ class ZamenaGroupType(PyEnum):
 
 
 class ZamenaGroup(Base):
-    __tablename__ = 'zamena_group'
-
+    __tablename__ = 'zamena_groups'
+    
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    type: Mapped[ZamenaGroupType] = mapped_column(SAEnum(ZamenaGroupType, name='zamena_group_type', native_enum = False), nullable=False)
-
-    zamena_id: Mapped[int] = mapped_column(Integer, ForeignKey('zamenas.id'), nullable=False)
-    zamena: Mapped[Zamena] = relationship('Zamena', back_populates='zamena_group')
-
-    group_id: Mapped[int] = mapped_column(Integer, ForeignKey('groups.id'), nullable=False)
-    group: Mapped[Group] = relationship('Group', back_populates='zamena_group')
+    zamena_id: Mapped[int] = mapped_column(Integer, ForeignKey('zamenas.id'), nullable = True)
+    zamena: Mapped[Zamena] = relationship('Zamena', back_populates='zamena_groups')
+    
+    group_id: Mapped[int] = mapped_column(Integer, ForeignKey('groups.id'), nullable = True)
+    group: Mapped[Group] = relationship('Group', back_populates='zamena_groups')
+    
+    type: Mapped[ZamenaGroupType] = mapped_column(SAEnum(ZamenaGroupType, name="zamena_group_type", native_enum=False), nullable=False)
+    
+    zamena_swaps: Mapped[List['ZamenaSwaps']] = relationship('ZamenaSwaps', back_populates='zamena_group')
     
 
-class ZamenaGroupSwaps(Base):
-    __tablename__ = 'zamena_group_swap'
+class ZamenaSwaps(Base):
+    __tablename__ = 'zamena_swaps'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+    zamena_id: Mapped[int] = mapped_column(Integer, ForeignKey('zamenas.id'), nullable = True)
+    zamena: Mapped[Zamena] = relationship('Zamena', back_populates='zamena_swaps')
+
+    group_id: Mapped[int] = mapped_column(Integer, ForeignKey('groups.id'), nullable = True)
+    group: Mapped[Group] = relationship('Group', back_populates='zamena_swaps')
     
     timing_id: Mapped[int] = mapped_column(Integer, ForeignKey('timings.number'), nullable = True)
-    timing: Mapped[Timings] = relationship('Timings', back_populates='zamena_group_swap')
+    timing: Mapped[Timings] = relationship('Timings', back_populates='zamena_swaps')
     
     teacher_id: Mapped[int] = mapped_column(Integer, ForeignKey('teachers.id'), nullable = True)
-    teacher: Mapped[Teacher] = relationship('Teacher', back_populates='zamena_group_swap')
+    teacher: Mapped[Teacher] = relationship('Teacher', back_populates='zamena_swaps')
     
     discipline_id: Mapped[int] = mapped_column(Integer, ForeignKey('disciplines.id'), nullable = True)
-    discipline: Mapped[Discipline] = relationship('Discipline', back_populates='zamena_group_swap')
+    discipline: Mapped[Discipline] = relationship('Discipline', back_populates='zamena_swaps')
     
     cabinet_id: Mapped[int] = mapped_column(Integer, ForeignKey('cabinets.id'), nullable = True)
-    cabinet: Mapped[Cabinet] = relationship('Cabinet', back_populates='zamena_group_swap')
+    cabinet: Mapped[Cabinet] = relationship('Cabinet', back_populates='zamena_swaps')
     
     
 class Lesson(Base):

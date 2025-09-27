@@ -1,37 +1,43 @@
-from typing import List, Union
+from typing import List
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
-from fastapi import Query
-from datetime import date
-from src.alchemy.db_helper import AsyncSession, db_helper
+from src.auth.auth import any_auth_method
+from src.alchemy.db_helper import AsyncSession, local_db_helper
 from . import crud 
-from .schemas import Zamena, ZamenaFilter
+from .schemas import ZamenaFilter, CreateZamenaRequest, ZamenaSwap, ZamenaGroup
 
 namespace: str = 'zamenas'
 router = APIRouter(tags=[namespace])
 
 
-@router.get("/", response_model = List[Zamena])
+@router.get('/')
 @cache(expire = 6000, namespace = namespace)
 async def get_zamenas(
-    group: Union[List[int], None] = Query(default=None),
-    number: int = Query(None),
-    course: int = Query(None),
-    teacher: int = Query(None),
-    cabinet: int = Query(None),
-    id: int = Query(None),
-    start_date: date = Query(None),
-    end_date: date = Query(None),
-    session: AsyncSession = Depends(db_helper.session_dependency),
-) -> List[Zamena]:
-    filter = ZamenaFilter(
-        group = group,
-        number = number,
-        course = course,
-        teacher = teacher,
-        cabinet = cabinet,
-        id = id,
-        start_date = start_date,
-        end_date = end_date,
-    )
-    return await crud.get_zamenas(session = session, filter = filter)
+    filter: ZamenaFilter = Depends(),
+    session: AsyncSession = Depends(local_db_helper.session_dependency),
+):
+    return await crud.get_amenas(session = session, filter = filter)
+
+
+@router.post('/', dependencies=[Depends(any_auth_method(roles=['Owner']))])
+async def create_zamena(
+    request: CreateZamenaRequest,
+    session: AsyncSession = Depends(local_db_helper.session_dependency),
+):
+    return await crud.create_zamena(session = session, request = request)
+
+
+@router.post('/swaps', dependencies=[Depends(any_auth_method(roles=['Owner']))])
+async def create_zamena_swaps(
+    request: List[ZamenaSwap],
+    session: AsyncSession = Depends(local_db_helper.session_dependency),
+):
+    return await crud.create_zamena_swaps(session = session, request = request)
+
+
+@router.post('/group', dependencies=[Depends(any_auth_method(roles=['Owner']))])
+async def create_zamena_group(
+    request: List[ZamenaGroup],
+    session: AsyncSession = Depends(local_db_helper.session_dependency),
+):
+    return await crud.create_zamena_group(session = session, request = request)
