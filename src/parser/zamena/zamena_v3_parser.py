@@ -193,25 +193,25 @@ async def parse_zamena_v3(stream: BytesIO, session):
         if len(exceptions) != 0:
             continue
         
-        swap = ZamenaSwaps(
-            group_id = group.id,
-            timing_id = timing,
-            teacher_id = teacher.id,
-            discipline_id = course.id,
-            cabinet_id = cabinet.id
-        )
-        zamena_swaps.append(swap)
+        # swap = ZamenaSwaps(
+        #     group_id = group.id,
+        #     timing_id = timing,
+        #     teacher_id = teacher.id,
+        #     discipline_id = course.id,
+        #     cabinet_id = cabinet.id
+        # )
+        # zamena_swaps.append(swap)
         
     
-    zamena = Zamena(
-        date_ = ,
-        saturday_timings = False,
-        file_url = '',
-        file_hash = '',   
-    )
+    # zamena = Zamena(
+    #     date_ = ,
+    #     saturday_timings = False,
+    #     file_url = '',
+    #     file_hash = '',   
+    # )
     
-    for zamena_swap in zamena_swaps:
-        zamena_swap.zamena_id = zamena.id
+    # for zamena_swap in zamena_swaps:
+    #     zamena_swap.zamena_id = zamena.id
         
     for row in work_rows:
         print(row)
