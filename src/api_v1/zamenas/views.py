@@ -1,10 +1,13 @@
 from typing import List
+
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
-from src.auth.auth import any_auth_method
+
 from src.alchemy.db_helper import AsyncSession, local_db_helper
-from . import crud 
-from .schemas import ZamenaFilter, CreateZamenaRequest, ZamenaSwap, ZamenaGroup
+from src.auth.auth import any_auth_method
+
+from . import crud
+from .schemas import CreateZamenaRequest, ZamenaFilter, ZamenaGroup, ZamenaSwap
 
 namespace: str = 'zamenas'
 router = APIRouter(tags=[namespace])
@@ -16,7 +19,7 @@ async def get_zamenas(
     filter: ZamenaFilter = Depends(),
     session: AsyncSession = Depends(local_db_helper.session_dependency),
 ):
-    return await crud.get_amenas(session = session, filter = filter)
+    return await crud.get_zamenas(session = session, filter = filter)
 
 
 @router.post('/', dependencies=[Depends(any_auth_method(roles=['Owner']))])

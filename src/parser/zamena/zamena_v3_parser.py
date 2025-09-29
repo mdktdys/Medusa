@@ -4,6 +4,8 @@ from docx import Document
 from docx.document import Document as DocumentObject
 from docx.table import Table
 
+from src.alchemy.database_local import (Zamena, ZamenaGroup, ZamenaGroupType,
+                                        ZamenaSwaps)
 from src.utils.logger import logger
 
 
@@ -30,6 +32,7 @@ def clean_dirty_string(string: str) -> str:
 
 async def parse_zamena_v3(stream: BytesIO, session):
     exceptions: list = []
+    zamena_swaps = []
     
     docx: DocumentObject = Document(stream)
     all_rows: list[list[str]] = extract_all_tables_to_rows(docx.tables)
@@ -162,9 +165,53 @@ async def parse_zamena_v3(stream: BytesIO, session):
                 continue
             if len(founded_disciplines) > 1:
                 raise Exception(f'🔴 Больше 1 совпадения дисциплин {course_text} для группы {current_group.name} -> {founded_disciplines}')
-            
             course = founded_disciplines[0]
+            
+            
+        cabinet_text: str = row[6]
+        cabinet = None
+        if cabinet_text != '':
+            from src.parser.schedule.schedule_parser_v3 import \
+                find_cabinet_in_cabinets_by_name
+            cabinet = await find_cabinet_in_cabinets_by_name(session = session, raw_name = cabinet_text)
+            
+            if cabinet is None:
+                exceptions.append(f'🔴 Не найден кабинет {cabinet_text}')
+                
+        teacher_text: str = row[5]
+        teacher = None
+        if teacher != '':
+            from src.parser.schedule.schedule_parser_v3 import \
+                find_teacher_in_teachers_by_name
+            teacher = await find_teacher_in_teachers_by_name(session = session, raw_name = teacher_text)
+            
+            if teacher is None:
+                exceptions.append(f'🔴 Не найден преподаватель {teacher_text}')
         
+        timing = int(row[1])
+        
+        if len(exceptions) != 0:
+            continue
+        
+        swap = ZamenaSwaps(
+            group_id = group.id,
+            timing_id = timing,
+            teacher_id = teacher.id,
+            discipline_id = course.id,
+            cabinet_id = cabinet.id
+        )
+        zamena_swaps.append(swap)
+        
+    
+    zamena = Zamena(
+        date_ = ,
+        saturday_timings = False,
+        file_url = '',
+        file_hash = '',   
+    )
+    
+    for zamena_swap in zamena_swaps:
+        zamena_swap.zamena_id = zamena.id
         
     for row in work_rows:
         print(row)

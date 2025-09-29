@@ -1,8 +1,11 @@
-from typing import Tuple, List, Union
+from typing import List, Tuple
+
+from sqlalchemy import Result, Select, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.alchemy import database_local
-from .schemas import ZamenaFilter, CreateZamenaRequest, ZamenaSwap, ZamenaGroup
-from sqlalchemy import Result, Select, select, and_
+
+from .schemas import CreateZamenaRequest, ZamenaFilter, ZamenaGroup, ZamenaSwap
 
 
 async def get_zamenas(session: AsyncSession, filter: ZamenaFilter):
@@ -68,5 +71,7 @@ async def create_zamena_group(session: AsyncSession, request: List[ZamenaGroup])
     await session.commit()
     return {'result': 'ok', 'count': len(zamena_groups)}
 
+
+    
 
     
